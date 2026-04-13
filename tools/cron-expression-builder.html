@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cron Expression Builder — Salesforce Decoded</title>
+  <meta name="description" content="Visual Salesforce cron expression builder with validation. Create scheduled job cron expressions with templates and real-time preview.">
+  <meta name="keywords" content="cron expression, salesforce scheduled jobs, cron builder, scheduled actions">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/cron-expression-builder.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+  <link rel="manifest" href="../site.webmanifest">
+  <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+  <!-- End Google Tag Manager -->
+  <style>
+    /* Material Design You 3 - Cron Builder Page */
+    
+    /* Improved heading spacing */
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+      line-height: 1.2;
+    }
+    
+    .display-medium {
+      margin-top: 0.75em !important;
+      margin-bottom: 0.75em !important;
+      letter-spacing: -0.5px;
+    }
+    
+    .display-small {
+      margin-top: 1em !important;
+      margin-bottom: 0.75em !important;
+    }
+    
+    p {
+      line-height: 1.6;
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+    
+    /* Breadcrumbs */
+    .breadcrumbs {
+      color: var(--md-on-surface-variant);
+      font-size: 0.875rem;
+      margin-bottom: 16px;
+    }
+    
+    .breadcrumbs a {
+      color: var(--md-primary);
+      text-decoration: none;
+    }
+    
+    .breadcrumbs a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Page header improvements */
+    .page-header {
+      padding: 120px 0 48px;
+      background: linear-gradient(135deg, var(--md-surface-container-lowest) 0%, var(--md-surface-container-low) 100%);
+    }
+    
+    .page-header p {
+      font-size: 1.0625rem;
+      color: var(--md-on-surface-variant);
+      max-width: 700px;
+    }
+    
+    /* Builder container */
+    .builder-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 32px 0;
+    }
+    
+    .builder-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .builder-label {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--md-on-surface);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    
+    .input-group label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--md-on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .input-group input,
+    .input-group select {
+      padding: 16px;
+      border: 2px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+      background: var(--md-surface-container);
+      color: var(--md-on-surface);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      appearance: none;
+    }
+    
+    .input-group input:hover,
+    .input-group select:hover {
+      border-color: var(--md-primary);
+      background: var(--md-surface-container-high);
+    }
+    
+    .input-group input:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: var(--md-primary);
+      background: var(--md-surface-container-highest);
+      box-shadow: inset 0 0 0 3px rgba(26, 86, 219, 0.08);
+    }
+    
+    .param-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .param-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .param-col label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--md-on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .param-col input {
+      padding: 16px;
+      border: 2px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+      background: var(--md-surface-container);
+      color: var(--md-on-surface);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .param-col input:hover {
+      border-color: var(--md-primary);
+      background: var(--md-surface-container-high);
+    }
+    
+    .param-col input:focus {
+      outline: none;
+      border-color: var(--md-primary);
+      background: var(--md-surface-container-highest);
+      box-shadow: inset 0 0 0 3px rgba(26, 86, 219, 0.08);
+    }
+    
+    .generate-btn,
+    .copy-btn {
+      padding: 12px 24px;
+      background: var(--md-primary);
+      color: var(--md-on-primary);
+      border: none;
+      border-radius: var(--md-shape-md);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .generate-btn:hover,
+    .copy-btn:hover {
+      background: #0a3fb8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(26, 86, 219, 0.2);
+    }
+    
+    .generate-btn:active,
+    .copy-btn:active {
+      transform: translateY(0);
+    }
+    
+    .copy-btn {
+      background: var(--md-surface-container-high);
+      color: var(--md-primary);
+      border: 1px solid var(--md-outline-variant);
+      margin-top: 8px;
+    }
+    
+    .copy-btn:hover {
+      background: var(--md-surface-container-highest);
+      border-color: var(--md-primary);
+    }
+    
+    /* Results panel */
+    .result-box {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    
+    .result-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--md-on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    
+    .cron-output {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--md-primary);
+      background: var(--md-surface-container);
+      padding: 16px;
+      border-radius: var(--md-shape-md);
+      border: 1px solid var(--md-outline-variant);
+      word-break: break-all;
+      margin-bottom: 12px;
+    }
+    
+    .cron-description {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--md-on-surface-variant);
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      padding: 16px;
+      border-radius: var(--md-shape-md);
+    }
+    
+    .validation-status {
+      padding: 12px;
+      border-radius: var(--md-shape-md);
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    
+    .validation-valid {
+      background: #f0fdf4;
+      border: 1px solid #16a34a;
+      color: #166534;
+    }
+    
+    .validation-invalid {
+      background: #fef2f2;
+      border: 1px solid #dc2626;
+      color: #991b1b;
+    }
+    
+    /* Chip styling */
+    .chip {
+      padding: 8px 16px;
+      background: var(--md-surface-container);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: 24px;
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--md-on-surface-variant);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .chip:hover {
+      background: var(--md-surface-container-high);
+      border-color: var(--md-primary);
+      color: var(--md-primary);
+    }
+    
+    .chip-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    
+    /* Template card styling */
+    .template-card {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .template-card:hover {
+      border-color: var(--md-primary);
+      box-shadow: 0 4px 16px rgba(26, 86, 219, 0.12);
+      transform: translateY(-2px);
+    }
+    
+    .template-card h4 {
+      margin: 0 0 8px 0;
+      font-size: 0.9rem;
+      color: var(--md-on-surface);
+    }
+    
+    .template-card p {
+      margin: 0;
+      font-size: 0.8125rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.5;
+    }
+    
+    .template-cron {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--md-primary);
+      margin-top: 8px;
+      word-break: break-all;
+    }
+    
+    /* Card styling */
+    .card {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-lg);
+      transition: all 0.2s ease;
+    }
+    
+    .card:hover {
+      border-color: var(--md-primary);
+      box-shadow: 0 4px 16px rgba(26, 86, 219, 0.12);
+      transform: translateY(-2px);
+    }
+    
+    .card h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--md-on-surface);
+    }
+    
+    .card p {
+      margin: 0;
+      color: var(--md-on-surface-variant);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    /* Section spacing */
+    .section {
+      padding: 80px 0;
+    }
+    
+    .mt-48 {
+      margin-top: 48px;
+    }
+    
+    .pt-48 {
+      padding-top: 48px;
+    }
+    
+    .mb-24 {
+      margin-bottom: 24px;
+    }
+    
+    .mt-16 {
+      margin-top: 16px;
+    }
+    
+    .gap-24 {
+      gap: 24px;
+    }
+    
+    .gap-12 {
+      gap: 12px;
+    }
+    
+    .mb-12 {
+      margin-bottom: 12px;
+    }
+    
+    /* Grid system */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    
+    @media (min-width: 768px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    /* Flex utilities */
+    .flex {
+      display: flex;
+    }
+    
+    .items-center {
+      align-items: center;
+    }
+    
+    /* Callout styling */
+    .callout {
+      padding: 24px;
+      border-radius: var(--md-shape-lg);
+      border: 1px solid var(--md-outline-variant);
+    }
+    
+    .callout-info {
+      background: #eff6ff;
+      border-color: #0284c7;
+    }
+    
+    .callout span.material-symbols-rounded {
+      color: #0284c7;
+      font-size: 24px;
+      margin-right: 16px;
+      display: inline-flex;
+      vertical-align: middle;
+    }
+    
+    .callout p {
+      margin: 12px 0;
+      line-height: 1.6;
+      color: var(--md-on-surface-variant);
+    }
+    
+    .callout p:first-child {
+      margin-top: 0;
+    }
+    
+    .callout strong {
+      color: var(--md-on-surface);
+      font-weight: 600;
+    }
+    
+    .callout code {
+      background: var(--md-surface-container);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 1024px) {
+      .builder-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .param-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Reveal animation support */
+    .reveal {
+      opacity: 1;
+      animation: fadeIn 0.6s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html" class="active">Tools</a></li>
+        <li><a href="../errors.html">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../prompts.html">Prompts</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search tools..."></div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../tools.html">Tools</a><span class="separator">/</span>
+        <span class="current">Cron Expression Builder</span>
+      </div>
+      <h1 class="display-medium reveal stagger-2">Cron Expression Builder</h1>
+      <p class="reveal stagger-3">Visually create and validate Salesforce scheduled job cron expressions. No more guessing — see exactly when your jobs will run.</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <div class="builder-container reveal">
+        <!-- Builder Panel -->
+        <div class="builder-panel">
+          <label class="builder-label">Build Your Cron Expression</label>
+          
+          <div class="input-group">
+            <label>Seconds</label>
+            <input type="text" id="seconds" value="0" placeholder="0-59 or *">
+          </div>
+          
+          <div class="input-group">
+            <label>Minutes</label>
+            <input type="text" id="minutes" value="0" placeholder="0-59 or *">
+          </div>
+          
+          <div class="param-row">
+            <div class="param-col">
+              <label>Hours</label>
+              <input type="text" id="hours" value="8" placeholder="0-23 or *">
+            </div>
+            <div class="param-col">
+              <label>Day of Month</label>
+              <input type="text" id="day" value="*" placeholder="1-31 or *">
+            </div>
+          </div>
+          
+          <div class="param-row">
+            <div class="param-col">
+              <label>Month</label>
+              <input type="text" id="month" value="*" placeholder="1-12 or *">
+            </div>
+            <div class="param-col">
+              <label>Day of Week</label>
+              <input type="text" id="dayOfWeek" value="?" placeholder="0-6 or ?">
+            </div>
+          </div>
+          
+          <div class="input-group">
+            <label>Year</label>
+            <input type="text" id="year" value="*" placeholder="* or specific year">
+          </div>
+          
+          <button class="generate-btn" onclick="generateCron()">Generate Cron</button>
+          
+          <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--md-outline-variant);">
+            <label class="builder-label">Quick Templates</label>
+            <div class="chip-group">
+              <button class="chip" onclick="loadTemplate('0 0 8 * * ? *')">Daily at 8 AM</button>
+              <button class="chip" onclick="loadTemplate('0 0 * * * ? *')">Every Hour</button>
+              <button class="chip" onclick="loadTemplate('0 */15 * * * ? *')">Every 15 Min</button>
+              <button class="chip" onclick="loadTemplate('0 0 0 * * ? *')">Midnight Daily</button>
+              <button class="chip" onclick="loadTemplate('0 0 8 ? * MON-FRI *')">Weekdays at 8 AM</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="builder-panel">
+          <label class="builder-label">Cron Expression</label>
+          
+          <div id="validation-status"></div>
+          
+          <div class="result-box">
+            <div class="result-title">Your Expression</div>
+            <div class="cron-output" id="cron-output">0 0 8 * * ? *</div>
+            <button class="copy-btn" onclick="copyCron()">
+              <span class="material-symbols-rounded" style="display:inline; margin-right:8px; font-size:18px;">content_copy</span>
+              Copy to Clipboard
+            </button>
+          </div>
+          
+          <div class="cron-description" id="cron-description">
+            <strong>Runs:</strong> Every day at 8:00 AM UTC
+          </div>
+          
+          <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--md-outline-variant);">
+            <div class="result-title">Cron Reference</div>
+            <div style="font-size: 0.875rem; color: var(--md-on-surface-variant); line-height: 1.7;">
+              <p><strong>Field Order:</strong> Seconds Minutes Hours Day Month DayOfWeek Year</p>
+              <p><strong>Special Values:</strong></p>
+              <ul style="margin: 8px 0; padding-left: 20px;">
+                <li><code>*</code> = any value</li>
+                <li><code>?</code> = no specific value (Day/DayOfWeek only)</li>
+                <li><code>-</code> = range (e.g., 1-5)</li>
+                <li><code>,</code> = list (e.g., 1,3,5)</li>
+                <li><code>/</code> = step (e.g., */15)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Section -->
+      <div class="mt-48 pt-48" style="border-top: 1px solid var(--md-outline-variant);">
+        <h2 class="display-small reveal mb-24">Common Scheduled Job Patterns</h2>
+        <div class="grid-2">
+          <div class="template-card reveal stagger-1" onclick="loadTemplate('0 0 8 * * ? *')">
+            <h4>Daily at 8 AM</h4>
+            <p>Perfect for daily batch jobs, data synchronization, and morning reports.</p>
+            <div class="template-cron">0 0 8 * * ? *</div>
+          </div>
+
+          <div class="template-card reveal stagger-2" onclick="loadTemplate('0 0 0 * * ? *')">
+            <h4>Midnight Every Night</h4>
+            <p>Common for nightly cleanup jobs and end-of-day processing.</p>
+            <div class="template-cron">0 0 0 * * ? *</div>
+          </div>
+
+          <div class="template-card reveal stagger-3" onclick="loadTemplate('0 */30 * * * ? *')">
+            <h4>Every 30 Minutes</h4>
+            <p>Real-time processes like transaction sync and status updates.</p>
+            <div class="template-cron">0 */30 * * * ? *</div>
+          </div>
+
+          <div class="template-card reveal stagger-4" onclick="loadTemplate('0 0 8 ? * MON-FRI *')">
+            <h4>Weekdays at 8 AM</h4>
+            <p>Business hours jobs that skip weekends and holidays.</p>
+            <div class="template-cron">0 0 8 ? * MON-FRI *</div>
+          </div>
+
+          <div class="template-card reveal stagger-5" onclick="loadTemplate('0 0 9 1 * ? *')">
+            <h4>First Day of Month</h4>
+            <p>Monthly invoicing, reconciliation, and billing cycles.</p>
+            <div class="template-cron">0 0 9 1 * ? *</div>
+          </div>
+
+          <div class="template-card reveal stagger-6" onclick="loadTemplate('0 15 14 * * ? *')">
+            <h4>2:15 PM Daily</h4>
+            <p>Scheduled at specific time for report generation or exports.</p>
+            <div class="template-cron">0 15 14 * * ? *</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips Section -->
+      <div class="mt-48">
+        <h2 class="display-small reveal mb-24">Cron Expression Tips</h2>
+        <div class="callout callout-info reveal">
+          <span class="material-symbols-rounded">lightbulb</span>
+          <div>
+            <p><strong>Avoid Peak Hours:</strong> Schedule batch jobs during off-peak hours (nights/weekends) to avoid impacting user performance.</p>
+            <p><strong>Use Day of Week Carefully:</strong> When both day-of-month and day-of-week are specified (not ?), the job runs if EITHER matches.</p>
+            <p><strong>Time Zone:</strong> Salesforce uses UTC. Account for time zones when scheduling — 8 AM PT = 15:00 UTC.</p>
+            <p><strong>Testing:</strong> Always test your scheduled action with a future execution date before deploying to production.</p>
+            <p><strong>Governor Limits:</strong> Monitor execution time; scheduled jobs share the same governor limits as normal transactions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+          <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+        <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="https://sfdecoded.netlify.app/"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+
+  <script src="../js/main.js"></script>
+  <script>
+    const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+    function generateCron() {
+      const seconds = document.getElementById('seconds').value.trim();
+      const minutes = document.getElementById('minutes').value.trim();
+      const hours = document.getElementById('hours').value.trim();
+      const day = document.getElementById('day').value.trim();
+      const month = document.getElementById('month').value.trim();
+      const dayOfWeek = document.getElementById('dayOfWeek').value.trim();
+      const year = document.getElementById('year').value.trim();
+
+      const cron = `${seconds} ${minutes} ${hours} ${day} ${month} ${dayOfWeek} ${year}`;
+      const validation = validateCron(cron);
+
+      document.getElementById('cron-output').textContent = cron;
+      updateValidationStatus(validation);
+      updateDescription(cron, validation);
+    }
+
+    function validateCron(cron) {
+      const parts = cron.split(' ');
+      if (parts.length !== 7) return { valid: false, errors: ['Cron expression must have exactly 7 fields'] };
+
+      const ranges = [
+        { min: 0, max: 59, name: 'Seconds' },
+        { min: 0, max: 59, name: 'Minutes' },
+        { min: 0, max: 23, name: 'Hours' },
+        { min: 1, max: 31, name: 'Day of Month' },
+        { min: 1, max: 12, name: 'Month' },
+        { min: 0, max: 6, name: 'Day of Week' },
+        { min: 1970, max: 2099, name: 'Year' }
+      ];
+
+      const errors = [];
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        const range = ranges[i];
+
+        if (!/^[\d\-,*/?]+(\/\d+)?$/.test(part)) {
+          errors.push(`${range.name} contains invalid characters`);
+          continue;
+        }
+
+        if (part === '*' || part === '?') continue;
+
+        if (part.includes('-')) {
+          const [start, end] = part.split('-').map(x => parseInt(x));
+          if (start < range.min || start > range.max || end < range.min || end > range.max) {
+            errors.push(`${range.name} range out of bounds (${range.min}-${range.max})`);
+          }
+        }
+
+        if (part.includes(',')) {
+          const values = part.split(',').map(x => parseInt(x.trim()));
+          for (const val of values) {
+            if (isNaN(val) || val < range.min || val > range.max) {
+              errors.push(`${range.name} value out of bounds (${range.min}-${range.max})`);
+            }
+          }
+        }
+      }
+
+      return { valid: errors.length === 0, errors };
+    }
+
+    function updateValidationStatus(validation) {
+      const statusDiv = document.getElementById('validation-status');
+      if (validation.valid) {
+        statusDiv.className = 'validation-status validation-valid';
+        statusDiv.innerHTML = '<span class="material-symbols-rounded" style="display:inline; margin-right:8px; font-size:18px;">check_circle</span> Valid cron expression';
+      } else {
+        statusDiv.className = 'validation-status validation-invalid';
+        statusDiv.innerHTML = '<span class="material-symbols-rounded" style="display:inline; margin-right:8px; font-size:18px;">error</span> ' + validation.errors[0];
+      }
+    }
+
+    function updateDescription(cron, validation) {
+      const parts = cron.split(' ');
+      const desc = document.getElementById('cron-description');
+      
+      if (!validation.valid) {
+        desc.innerHTML = '<strong>Invalid expression</strong> — Please correct the errors above';
+        return;
+      }
+
+      let description = 'Runs: ';
+
+      // Parse the cron
+      const sec = parts[0];
+      const min = parts[1];
+      const hour = parts[2];
+      const dayOfMonth = parts[3];
+      const month = parts[4];
+      const dayOfWeek = parts[5];
+
+      if (hour !== '*' && min !== '*' && sec === '0') {
+        description += `at ${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')} `;
+      } else if (min !== '*' && sec === '0') {
+        description += `at ${String(min).padStart(2, '0')} minutes past the hour `;
+      }
+
+      if (dayOfWeek !== '?') {
+        description += `on ${dayOfWeek} `;
+      }
+
+      if (dayOfMonth !== '*') {
+        description += `on day ${dayOfMonth} `;
+      }
+
+      if (month !== '*') {
+        description += `in month ${month} `;
+      }
+
+      desc.innerHTML = `<strong>Runs:</strong> ${description || 'Complex schedule (see cron fields above)'}`;
+    }
+
+    function loadTemplate(cronTemplate) {
+      const parts = cronTemplate.split(' ');
+      document.getElementById('seconds').value = parts[0];
+      document.getElementById('minutes').value = parts[1];
+      document.getElementById('hours').value = parts[2];
+      document.getElementById('day').value = parts[3];
+      document.getElementById('month').value = parts[4];
+      document.getElementById('dayOfWeek').value = parts[5];
+      document.getElementById('year').value = parts[6] || '*';
+      generateCron();
+    }
+
+    function copyCron() {
+      const cronText = document.getElementById('cron-output').textContent;
+      navigator.clipboard.writeText(cronText).then(() => {
+        const btn = event.target.closest('.copy-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-rounded" style="display:inline; margin-right:8px; font-size:18px;">check</span> Copied!';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+        }, 2000);
+      });
+    }
+
+    // Initialize
+    generateCron();
+  </script>
+</body>
+</html>

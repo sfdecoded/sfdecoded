@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Prompts — Salesforce Decoded</title>
+  <meta name="description" content="Curated Claude prompts for Salesforce developers. Generate code, debug errors, optimize queries, and more with Anthropic's advanced AI model.">
+  <meta name="keywords" content="claude prompts, salesforce prompts, apex code generation, soql optimization, debugging prompts">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/prompts/claude.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html">Tools</a></li>
+        <li><a href="../errors.html">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../prompts.html" class="active">Prompts</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html" class="active"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search prompts..."></div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="breadcrumbs" style="padding: 0 0 16px; border-bottom: 1px solid var(--md-outline-variant);">
+    <div class="container">
+      <a href="../index.html">Home</a>
+      <span class="separator">/</span>
+      <a href="../prompts.html">Prompts</a>
+      <span class="separator">/</span>
+      <span class="current">Claude</span>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="overline reveal">
+        <span>AI Prompts</span>
+      </div>
+      <h1 class="display-medium reveal stagger-2">Claude Prompts</h1>
+      <p class="reveal stagger-3">Curated prompts for Anthropic's Claude AI model. Generate optimized code, debug issues, and accelerate your Salesforce development workflow.</p>
+    </div>
+  </header>
+
+  <!-- Prompts Grid -->
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-2" style="gap:32px">
+
+        <!-- Apex Code Generation -->
+        <div class="card card-elevated" style="padding:32px">
+          <div class="flex items-center gap-16 mb-16">
+            <div class="card-icon" style="margin:0;width:56px;height:56px;background:#f3e8ff;color:#6d28d9"><span class="material-symbols-rounded" style="font-size:28px">code</span></div>
+            <div>
+              <span class="label-medium text-primary">Prompt</span>
+              <h3 style="margin:0;font-size:1.25rem">Apex Code Generation</h3>
+            </div>
+          </div>
+          <p>Generate optimized Apex classes, triggers, and test classes from your requirements. Claude excels at producing clean, well-documented code.</p>
+          <div class="mt-24 flex items-center justify-between">
+            <div class="chip-group"><span class="chip">Apex</span><span class="chip">Code Gen</span></div>
+            <button class="btn btn-outlined copy-btn" onclick="copyPrompt('Generate an optimized Apex class/trigger based on my requirements. Include proper error handling, governor limit considerations, and comprehensive inline comments. Ensure the code follows Salesforce best practices.')">Copy</button>
+          </div>
+        </div>
+
+        <!-- Debug Salesforce Errors -->
+        <div class="card card-elevated" style="padding:32px">
+          <div class="flex items-center gap-16 mb-16">
+            <div class="card-icon" style="margin:0;width:56px;height:56px;background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded" style="font-size:28px">bug_report</span></div>
+            <div>
+              <span class="label-medium text-primary">Prompt</span>
+              <h3 style="margin:0;font-size:1.25rem">Debug Salesforce Errors</h3>
+            </div>
+          </div>
+          <p>Paste your error stack trace and describe the context. Claude analyzes and suggests solutions with debugging strategies.</p>
+          <div class="mt-24 flex items-center justify-between">
+            <div class="chip-group"><span class="chip">Debugging</span><span class="chip">Apex</span></div>
+            <button class="btn btn-outlined copy-btn" onclick="copyPrompt('I encountered this error in my Salesforce code: [paste error stack trace]. The context is [describe what you were trying to do]. Please analyze the root cause and suggest solutions with debugging strategies.')">Copy</button>
+          </div>
+        </div>
+
+        <!-- SOQL Query Optimization -->
+        <div class="card card-elevated" style="padding:32px">
+          <div class="flex items-center gap-16 mb-16">
+            <div class="card-icon" style="margin:0;width:56px;height:56px;background:#fef3c7;color:#92400e"><span class="material-symbols-rounded" style="font-size:28px">database</span></div>
+            <div>
+              <span class="label-medium text-primary">Prompt</span>
+              <h3 style="margin:0;font-size:1.25rem">SOQL Query Optimization</h3>
+            </div>
+          </div>
+          <p>Share your SOQL queries and get optimization suggestions. Claude identifies performance issues and proposes better approaches.</p>
+          <div class="mt-24 flex items-center justify-between">
+            <div class="chip-group"><span class="chip">SOQL</span><span class="chip">Performance</span></div>
+            <button class="btn btn-outlined copy-btn" onclick="copyPrompt('Please optimize this SOQL query: [paste your query]. Identify potential governor limit violations, missing filters, and suggest more efficient alternatives with explanations.')">Copy</button>
+          </div>
+        </div>
+
+        <!-- General Code Review -->
+        <div class="card card-elevated" style="padding:32px">
+          <div class="flex items-center gap-16 mb-16">
+            <div class="card-icon" style="margin:0;width:56px;height:56px;background:#d1fae5;color:#065f46"><span class="material-symbols-rounded" style="font-size:28px">terminal</span></div>
+            <div>
+              <span class="label-medium text-primary">Prompt</span>
+              <h3 style="margin:0;font-size:1.25rem">General Code Review</h3>
+            </div>
+          </div>
+          <p>Ask Claude to review your code for best practices, security issues, and performance improvements. Great for detailed feedback.</p>
+          <div class="mt-24 flex items-center justify-between">
+            <div class="chip-group"><span class="chip">Code Review</span><span class="chip">Best Practices</span></div>
+            <button class="btn btn-outlined copy-btn" onclick="copyPrompt('Please review this code: [paste your code]. Provide feedback on: security concerns, performance optimizations, code style compliance, best practices, and overall quality. Suggest specific improvements.')">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Claude Shortcut Hacks -->
+  <section class="section" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(99, 102, 241, 0.04) 100%);">
+    <div class="container">
+      <div style="max-width: 900px; margin: 0 auto;">
+        <div class="overline reveal" style="text-align: center;">
+          <span>Pro Tips</span>
+        </div>
+        <h2 class="headline-medium reveal stagger-2" style="text-align: center; margin-bottom: 16px;">32 Claude Shortcut Hacks</h2>
+        <p class="reveal stagger-3" style="text-align: center; margin-bottom: 32px;">Add one of these at the very start of your prompt for faster, more precise results.<br><span class="label-medium" style="color: var(--md-outline);">Example: <code style="background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px;">/ELI5: [your topic]</code> → get a simple, kid-friendly explanation.</span></p>
+
+        <div class="grid" style="gap: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">child_care</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/ELI5</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Explain as if to a 5-year-old</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">summarize</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/TLDR</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Summarize a very long text in a few lines</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">list_alt</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/STEP-BY-STEP</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Lay out reasoning step by step</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">done_all</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/CHECKLIST</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Turn response into a checklist</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">summarize</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/EXEC SUMMARY</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Quick executive-style summary</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">person</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/ACT AS</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Speak in a specific role</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">edit</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/BRIEFLY</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Force a very short answer</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">description</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/JARGON</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Use technical vocabulary</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">groups</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/AUDIENCE</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Adapt response to an audience</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">tune</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/TONE</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Change the tone (formal, funny, etc.)</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">code</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/DEV MODE</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Raw, technical developer style</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">account_tree</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/PM MODE</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Project-management perspective</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">analytics</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/SWOT</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Strengths/Weaknesses/Opportunities/Threats</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">table_chart</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/FORMAT AS</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Enforce specific format (table, JSON)</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">compare</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/COMPARE</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Put two or more things side by side</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">splitscreen</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/MULTI-PERSPECTIVE</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Show several points of view</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">memory</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/CONTEXT STACK</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Keep multiple layers of context</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">bookmarks</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/BEGIN WITH / END WITH</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Force start or end with something</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">checklist</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/ROLE: TASK: FORMAT:</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Define role, task, and format</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">schema</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/SCHEMA</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Generate structured outline or data model</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">edit</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/REWRITE AS</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Rephrase in a requested style</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">lightbulb</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/REFLECTIVE MODE</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Reflect on its own answer</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">error</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/SYSTEMATIC BIAS CHECK</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Identify potential biases</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">schedule</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/DELIBERATE THINKING</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Slower, more thoughtful reasoning</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">visibility_off</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/NO AUTOPILOT</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Forbid superficial responses</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">assessment</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/EVAL-SELF</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Critical self-evaluation of response</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">panorama_photosphere</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/PARALLEL LENSES</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Examine from several angles</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">science</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/FIRST PRINCIPLES</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Rebuild from fundamental basics</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">link</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/CHAIN OF THOUGHT</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Show intermediate reasoning</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">warning</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/PITFALLS</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Identify possible traps and errors</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">trending_up</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/METRICS MODE</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Express answers with measures</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 20px; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-symbols-rounded" style="color: var(--md-primary); flex-shrink: 0;">shield</span>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 600;">/GUARDRAIL</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--md-on-surface-variant);">Set strict boundaries not to cross</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+                <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+           <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4>
+          <ul>
+            <li><a href="../tools.html">Tools</a></li>
+            <li><a href="../errors.html">Errors</a></li>
+            <li><a href="../guides.html">Guides</a></li>
+            <li><a href="../prompts.html">Prompts</a></li>
+            <li><a href="../extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Resources</h4>
+          <ul>
+            <li><a href="../tips.html">Tips</a></li>
+            <li><a href="../resources.html">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="https://sfdecoded.netlify.app/"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  
+  <script>
+    function copyPrompt(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        // Visual feedback
+        event.target.textContent = 'Copied!';
+        setTimeout(() => {
+          event.target.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+  </script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

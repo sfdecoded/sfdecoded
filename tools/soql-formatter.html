@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOQL Formatter — Format & Beautify SOQL Queries | Salesforce Decoded</title>
+  <meta name="description" content="Free online SOQL formatter. Paste your messy Salesforce SOQL query and get clean, indented, readable output instantly. No signup required.">
+  <meta name="keywords" content="soql formatter, soql beautifier, format soql query, salesforce soql formatter online">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/soql-formatter.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+         <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+    <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html" class="active">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <!-- Breadcrumbs + Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a>
+        <span class="separator">/</span>
+        <a href="../tools.html">Tools</a>
+        <span class="separator">/</span>
+        <span class="current">SOQL Formatter</span>
+      </div>
+      <h1 class="display-medium reveal stagger-2">SOQL Formatter</h1>
+      <p class="reveal stagger-3">Paste your SOQL query and get clean, properly indented output instantly.</p>
+    </div>
+  </header>
+
+  <!-- Tool Section -->
+  <section class="section">
+    <div class="container">
+      <div class="tool-area reveal-scale">
+        <div class="tool-area-header">
+          <div class="flex items-center gap-12">
+            <span class="material-symbols-rounded" style="color:var(--md-primary)">code</span>
+            <span class="title-medium">SOQL Query Formatter</span>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-tonal" onclick="formatSOQL()" style="padding:8px 20px">
+              <span class="material-symbols-rounded" style="font-size:18px">auto_fix_high</span>
+              Format
+            </button>
+            <button class="btn btn-text" onclick="clearAll()" style="padding:8px 16px">Clear</button>
+          </div>
+        </div>
+        <div class="tool-area-body">
+          <div>
+            <label class="label-medium text-outline" style="display:block;margin-bottom:8px">Input</label>
+            <textarea id="soql-input" placeholder="Paste your SOQL query here...
+
+Example: SELECT Id, Name, Email, Phone, Account.Name FROM Contact WHERE Account.Industry = 'Technology' AND CreatedDate = THIS_YEAR ORDER BY Name ASC LIMIT 100"></textarea>
+          </div>
+     <div style="background:var(--md-surface-container-low)">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <label class="label-medium text-outline">Formatted Output</label>
+    <button class="btn btn-tonal" id="copy-btn" onclick="copyOutput()" 
+      style="padding:6px 14px;font-size:0.8125rem;display:none">
+      <span class="material-symbols-rounded" style="font-size:16px">content_copy</span>
+      Copy
+    </button>
+  </div>
+  <div id="error-banner" style="display:none;padding:12px 16px;border-radius:var(--md-shape-md);
+    background:var(--md-error-container);color:var(--md-on-error-container);
+    font-size:0.875rem;margin-bottom:12px;display:none;align-items:center;gap:8px">
+    <span class="material-symbols-rounded" style="font-size:18px;flex-shrink:0">error</span>
+    <span id="error-text"></span>
+  </div>
+  <pre id="soql-output" style="font-family:var(--font-mono);font-size:0.875rem;
+    line-height:1.7;min-height:240px;white-space:pre-wrap;color:var(--md-on-surface)"></pre>
+</div>
+        </div>
+      </div>
+
+      <!-- How it Works -->
+      <div class="mt-48">
+        <h2 class="headline-large reveal">How it works</h2>
+        <div class="grid grid-3 mt-24">
+          <div class="feature-item reveal stagger-1">
+            <div class="feature-item-icon"><span class="material-symbols-rounded">content_paste</span></div>
+            <div><h3>1. Paste your query</h3><p>Paste any SOQL query into the input area, no matter how messy.</p></div>
+          </div>
+          <div class="feature-item reveal stagger-2">
+            <div class="feature-item-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">auto_fix_high</span></div>
+            <div><h3>2. Click Format</h3><p>Our formatter parses and restructures your query with proper indentation.</p></div>
+          </div>
+          <div class="feature-item reveal stagger-3">
+            <div class="feature-item-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">content_copy</span></div>
+            <div><h3>3. Copy and use</h3><p>Copy the clean output to your clipboard and paste into your code.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+          <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+     <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p></div>
+    <div class="footer-col"><h4>Product</h4>
+      <ul><li><a href="../tools.html">Tools</a></li>
+        <li><a href="../errors.html">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../extensions.html">Extensions</a></li></ul>
+    </div>
+    <div class="footer-col"><h4>Resources</h4><ul>
+      <li><a href="../tips.html">Tips</a></li>
+      <li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+  </div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+
+<script src="../js/main.js"></script>
+<script>
+  function showError(msg) {
+    const banner = document.getElementById('error-banner');
+    document.getElementById('error-text').textContent = msg;
+    banner.style.display = 'flex';
+    document.getElementById('soql-output').textContent = '';
+    document.getElementById('copy-btn').style.display = 'none';
+  }
+
+  function hideError() {
+    document.getElementById('error-banner').style.display = 'none';
+  }
+
+  function formatSOQL() {
+    const input = document.getElementById('soql-input').value.trim();
+
+    if (!input) {
+      showError('Please paste a SOQL query before formatting.');
+      return;
+    }
+
+    if (!/^SELECT\s/i.test(input)) {
+      showError('Invalid SOQL — queries must start with SELECT.');
+      return;
+    }
+
+    // Check for FROM clause
+    if (!/\bFROM\b/i.test(input)) {
+      showError('Invalid SOQL — missing FROM clause.');
+      return;
+    }
+
+    hideError();
+
+    const KEYWORDS = [
+      'SELECT','FROM','WHERE','AND','OR',
+      'GROUP BY','ORDER BY','HAVING',
+      'LIMIT','OFFSET','TYPEOF','END',
+      'WITH','USING SCOPE'
+    ];
+
+    let query = input.replace(/\s+/g,' ').trim();
+
+    KEYWORDS.forEach(k => {
+      const r = new RegExp('\\b' + k.replace(' ', '\\s+') + '\\b', 'gi');
+      query = query.replace(r, k);
+    });
+
+    query = query
+      .replace(/\bFROM\b/g,    "\nFROM")
+      .replace(/\bWHERE\b/g,   "\nWHERE")
+      .replace(/\bGROUP BY\b/g,"\nGROUP BY")
+      .replace(/\bORDER BY\b/g,"\nORDER BY")
+      .replace(/\bHAVING\b/g,  "\nHAVING")
+      .replace(/\bLIMIT\b/g,   "\nLIMIT")
+      .replace(/\bOFFSET\b/g,  "\nOFFSET")
+      .replace(/\bAND\b/g,     "\n    AND")
+      .replace(/\bOR\b/g,      "\n    OR");
+
+    function splitFields(str) {
+      let fields = [], depth = 0, current = '';
+      for (let c of str) {
+        if (c === '(') depth++;
+        if (c === ')') depth--;
+        if (c === ',' && depth === 0) { fields.push(current.trim()); current = ''; }
+        else current += c;
+      }
+      if (current.trim()) fields.push(current.trim());
+      return fields;
+    }
+
+    function findMainFrom(q) {
+      let depth = 0;
+      for (let i = 0; i < q.length; i++) {
+        if (q[i] === '(') depth++;
+        if (q[i] === ')') depth--;
+        if (depth === 0 && q.substring(i, i + 5) === "\nFROM") return i;
+      }
+      return -1;
+    }
+
+    if (query.startsWith("SELECT ")) {
+      const fromIndex = findMainFrom(query);
+      const selectPart = query.substring(7, fromIndex);
+      const fields = splitFields(selectPart);
+      query = "SELECT\n    " + fields.join(",\n    ") + query.substring(fromIndex);
+    }
+
+    query = query.replace(/\(\s*SELECT/g, "\n    (\n        SELECT");
+    query = query.replace(/\)\s*,/g, "\n    ),");
+    query = query.replace(/\(\n\s+SELECT([\s\S]*?)FROM/gi, function(match, fields) {
+      const list = splitFields(fields);
+      return "(\n        SELECT\n            " + list.join(",\n            ") + "\n        FROM";
+    });
+
+    const result = query.trim();
+    document.getElementById('soql-output').textContent = result;
+    document.getElementById('copy-btn').style.display = 'flex';
+  }
+
+  function copyOutput() {
+    const output = document.getElementById('soql-output').textContent;
+    if (!output) return;
+    navigator.clipboard.writeText(output).then(() => {
+      const btn = document.getElementById('copy-btn');
+      const icon = btn.querySelector('.material-symbols-rounded');
+      const originalHTML = btn.innerHTML;
+      icon.textContent = 'check';
+      btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:16px">check</span> Copied!';
+      setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+      showToast('Formatted SOQL copied!');
+    });
+  }
+
+  function clearAll() {
+    document.getElementById('soql-input').value = '';
+    document.getElementById('soql-output').textContent = '';
+    document.getElementById('copy-btn').style.display = 'none';
+    hideError();
+  }
+</script>
+</body>
+</html>

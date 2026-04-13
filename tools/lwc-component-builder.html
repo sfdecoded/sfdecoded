@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LWC Component Builder — Salesforce Decoded</title>
+  <meta name="description" content="Generate complete LWC components with visual template builder. Create HTML, JS, CSS with drag-drop interface and copy production-ready code.">
+  <meta name="keywords" content="lwc component generator, lightning web components, lwc template builder, salesforce lwc">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/lwc-component-builder.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+  <link rel="manifest" href="../site.webmanifest">
+  <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+  <style>
+    /* ── Step indicator ─────────────────────────────────────────── */
+    .steps-bar {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 40px;
+      background: var(--md-surface-container-low);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-full);
+      padding: 6px;
+    }
+    .step {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: var(--md-shape-full);
+      cursor: pointer;
+      transition: all 0.25s var(--md-motion-standard);
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--md-on-surface-variant);
+      user-select: none;
+    }
+    .step.active {
+      background: var(--md-primary);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(26,86,219,0.3);
+    }
+    .step.done {
+      background: var(--md-primary-container);
+      color: var(--md-on-primary-container);
+    }
+    .step-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step:not(.active) .step-num {
+      background: var(--md-outline-variant);
+      color: var(--md-on-surface-variant);
+    }
+    .step.done .step-num {
+      background: var(--md-primary);
+      color: #fff;
+    }
+    .step-label { display: none; }
+    @media(min-width: 640px) { .step-label { display: inline; } }
+
+    /* ── Step panels ────────────────────────────────────────────── */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: stepIn 0.3s var(--md-motion-emphasized); }
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Template grid ──────────────────────────────────────────── */
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .tpl-card {
+      border: 2px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-lg);
+      padding: 20px 16px 16px;
+      background: var(--md-surface-container-lowest);
+      cursor: pointer;
+      transition: all 0.2s var(--md-motion-standard);
+      text-align: center;
+      position: relative;
+    }
+    .tpl-card:hover {
+      border-color: var(--md-primary);
+      transform: translateY(-3px);
+      box-shadow: var(--md-elevation-2);
+    }
+    .tpl-card.selected {
+      border-color: var(--md-primary);
+      background: var(--md-primary-container);
+    }
+    .tpl-card.selected .tpl-check {
+      opacity: 1;
+    }
+    .tpl-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--md-shape-md);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 10px;
+      font-size: 20px;
+    }
+    .tpl-name {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--md-on-surface);
+      margin-bottom: 4px;
+    }
+    .tpl-desc {
+      font-size: 0.75rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.4;
+    }
+    .tpl-check {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--md-primary);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .tpl-card.selected .tpl-name { color: var(--md-on-primary-container); }
+    .tpl-card.selected .tpl-desc { color: var(--md-on-primary-container); opacity: 0.8; }
+
+    /* ── Form inputs ─────────────────────────────────────────────── */
+    .field-group {
+      margin-bottom: 20px;
+    }
+    .field-group label {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--md-on-surface-variant);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    .field-group input,
+    .field-group select {
+      width: 100%;
+      padding: 11px 16px;
+      border: 1.5px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+      background: var(--md-surface-container-lowest);
+      color: var(--md-on-surface);
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field-group input:focus,
+    .field-group select:focus {
+      border-color: var(--md-primary);
+      box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
+    }
+    .field-hint {
+      font-size: 0.75rem;
+      color: var(--md-outline);
+      margin-top: 5px;
+    }
+    .name-preview {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--md-primary);
+      margin-top: 6px;
+    }
+
+    /* ── Elements panel ─────────────────────────────────────────── */
+    .elements-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .el-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+      background: var(--md-surface-container-lowest);
+      cursor: grab;
+      font-size: 0.8125rem;
+      font-family: var(--font-mono);
+      color: var(--md-on-surface);
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .el-chip:hover {
+      border-color: var(--md-primary);
+      background: var(--md-primary-container);
+      color: var(--md-on-primary-container);
+      transform: translateY(-1px);
+    }
+    .el-chip:active { cursor: grabbing; transform: scale(0.97); }
+    .el-chip .el-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--md-primary); flex-shrink: 0;
+    }
+
+    /* ── Canvas ──────────────────────────────────────────────────── */
+    .canvas-wrap {
+      border: 2px dashed var(--md-outline-variant);
+      border-radius: var(--md-shape-lg);
+      min-height: 200px;
+      padding: 16px;
+      background: var(--md-surface-container-lowest);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .canvas-wrap.drag-over {
+      border-color: var(--md-primary);
+      background: var(--md-primary-container);
+    }
+    .canvas-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      color: var(--md-on-surface-variant);
+      gap: 8px;
+    }
+    .canvas-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--md-surface-container);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+      margin-bottom: 8px;
+      animation: chipIn 0.2s var(--md-motion-emphasized);
+      gap: 8px;
+    }
+    @keyframes chipIn {
+      from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .canvas-row-name {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--md-primary);
+      flex: 1;
+    }
+    .canvas-row-remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--md-on-surface-variant);
+      border-radius: var(--md-shape-full);
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+      font-size: 16px;
+    }
+    .canvas-row-remove:hover { background: var(--md-error-container); color: var(--md-on-error-container); }
+
+    /* ── Properties builder ──────────────────────────────────────── */
+    .props-add-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    .prop-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--md-surface-container);
+      border-radius: var(--md-shape-md);
+      border: 1px solid var(--md-outline-variant);
+      margin-bottom: 8px;
+      animation: chipIn 0.2s var(--md-motion-emphasized);
+    }
+    .prop-pill-info {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .prop-name { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--md-primary); }
+    .prop-type-badge {
+      font-size: 0.7rem; font-weight: 600;
+      padding: 2px 8px; border-radius: var(--md-shape-full);
+      background: var(--md-secondary-container); color: var(--md-on-secondary-container);
+      font-family: var(--font-display);
+    }
+    .prop-decorator-badge {
+      font-size: 0.7rem; font-weight: 600;
+      padding: 2px 8px; border-radius: var(--md-shape-full);
+      background: var(--md-primary-container); color: var(--md-on-primary-container);
+      font-family: var(--font-mono);
+    }
+
+    /* ── Builder 2-col layout ────────────────────────────────────── */
+    .build-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .build-layout { grid-template-columns: 1fr; }
+    }
+    .panel-card {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-xl);
+      overflow: hidden;
+    }
+    .panel-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--md-outline-variant);
+      background: var(--md-surface-container-low);
+    }
+    .panel-card-title {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--md-on-surface);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .panel-card-body { padding: 20px; }
+
+    /* ── Code tabs ───────────────────────────────────────────────── */
+    .code-tab-bar {
+      display: flex;
+      gap: 0;
+      background: var(--md-surface-container);
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .code-tab {
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--md-on-surface-variant);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .code-tab:hover { color: var(--md-on-surface); background: var(--md-surface-container-high); }
+    .code-tab.active { color: var(--md-primary); border-bottom-color: var(--md-primary); background: var(--md-surface-container-lowest); }
+    .code-tab-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-html { background: #f97316; }
+    .dot-js   { background: #eab308; }
+    .dot-css  { background: #3b82f6; }
+    .dot-meta { background: #8b5cf6; }
+
+    .code-panel { display: none; }
+    .code-panel.active { display: block; }
+    .code-output {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.7;
+      padding: 20px;
+      background: var(--md-inverse-surface);
+      color: var(--md-inverse-on-surface);
+      min-height: 280px;
+      overflow-x: auto;
+      white-space: pre;
+      margin: 0;
+    }
+    .code-footer {
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      background: var(--md-inverse-surface);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .copy-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: var(--md-shape-full);
+      color: var(--md-inverse-on-surface);
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.2); }
+    .copy-btn.copied { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.4); color: #86efac; }
+
+    /* ── Summary card ─────────────────────────────────────────────── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .summary-chip {
+      padding: 14px 16px;
+      background: var(--md-surface-container);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-lg);
+    }
+    .summary-chip-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--md-outline);
+      margin-bottom: 4px;
+      font-family: var(--font-display);
+    }
+    .summary-chip-value {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--md-primary);
+    }
+
+    /* ── Nav buttons ──────────────────────────────────────────────── */
+    .step-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--md-outline-variant);
+    }
+
+    /* ── Feature pills ────────────────────────────────────────────── */
+    .feature-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .feature-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      background: var(--md-surface-container);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-full);
+      font-size: 0.8125rem;
+      color: var(--md-on-surface-variant);
+    }
+    .feature-pill .material-symbols-rounded { font-size: 15px; color: var(--md-primary); }
+
+    /* ── Syntax highlight ─────────────────────────────────────────── */
+    .tk-kw  { color: #c792ea; }
+    .tk-str { color: #c3e88d; }
+    .tk-cmt { color: #676e95; }
+    .tk-fn  { color: #82aaff; }
+    .tk-num { color: #f78c6c; }
+    .tk-ty  { color: #ffcb6b; }
+    .tk-tag { color: #f07178; }
+    .tk-at  { color: #89ddff; }
+    .tk-prop { color: #c792ea; }
+  </style>
+</head>
+<body>
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html" class="active">Tools</a></li>
+        <li><a href="../errors.html">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search tools..."></div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../tools.html">Tools</a><span class="separator">/</span>
+        <span class="current">LWC Component Builder</span>
+      </div>
+      <h1 class="display-medium reveal stagger-2">LWC Component Builder</h1>
+      <p class="reveal stagger-3">Configure, build, and generate production-ready Lightning Web Components in three steps.</p>
+      <div class="feature-pills reveal stagger-4">
+        <span class="feature-pill"><span class="material-symbols-rounded">html</span> HTML template</span>
+        <span class="feature-pill"><span class="material-symbols-rounded">javascript</span> JavaScript class</span>
+        <span class="feature-pill"><span class="material-symbols-rounded">css</span> Stylesheet</span>
+        <span class="feature-pill"><span class="material-symbols-rounded">settings</span> JS-meta.xml</span>
+        <span class="feature-pill"><span class="material-symbols-rounded">bolt</span> 6 templates</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- Step indicator -->
+      <div class="steps-bar reveal">
+        <div class="step active" id="step-btn-1" onclick="goToStep(1)">
+          <div class="step-num">1</div>
+          <span class="step-label">Configure</span>
+        </div>
+        <div class="step" id="step-btn-2" onclick="goToStep(2)">
+          <div class="step-num">2</div>
+          <span class="step-label">Build</span>
+        </div>
+        <div class="step" id="step-btn-3" onclick="goToStep(3)">
+          <div class="step-num">3</div>
+          <span class="step-label">Generate</span>
+        </div>
+      </div>
+
+      <!-- ── STEP 1: Configure ─────────────────────────────────── -->
+      <div class="step-panel active" id="panel-1">
+        <div style="max-width:720px">
+          <h2 class="display-small" style="margin-bottom:8px">Configure your component</h2>
+          <p class="body-large text-muted" style="margin-bottom:32px">Name your component and choose a starting template. You can customise everything in the next step.</p>
+
+          <!-- Component name -->
+          <div class="field-group">
+            <label>Component Name</label>
+            <input type="text" id="compName" value="myComponent" placeholder="e.g. accountViewer" oninput="updateNamePreview()">
+            <div class="field-hint">Use camelCase — no spaces or special characters.</div>
+            <div class="name-preview" id="namePreview">myComponent.html &nbsp;·&nbsp; myComponent.js &nbsp;·&nbsp; myComponent.css</div>
+          </div>
+
+          <!-- Target -->
+          <div class="field-group">
+            <label>Target / Deployment Location</label>
+            <select id="compTarget">
+              <option value="lightning__AppPage">App Page</option>
+              <option value="lightning__RecordPage">Record Page</option>
+              <option value="lightning__HomePage">Home Page</option>
+              <option value="lightning__FlowScreen">Flow Screen</option>
+              <option value="lightning__UtilityBar">Utility Bar</option>
+            </select>
+          </div>
+
+          <!-- Wire adapter -->
+          <div class="field-group">
+            <label>Wire Adapter (optional)</label>
+            <select id="compWire">
+              <option value="none">None</option>
+              <option value="getRecord">getRecord — fetch a single record</option>
+              <option value="getRelatedListRecords">getRelatedListRecords — related list</option>
+              <option value="getListUi">getListUi — list view</option>
+              <option value="getPicklistValues">getPicklistValues — picklist options</option>
+              <option value="custom">Custom Apex method (@AuraEnabled)</option>
+            </select>
+          </div>
+
+          <!-- Template picker -->
+          <label style="display:block;font-family:var(--font-display);font-size:0.8125rem;font-weight:600;color:var(--md-on-surface-variant);margin-bottom:12px;letter-spacing:0.02em">Starting Template</label>
+          <div class="template-grid" id="tplGrid">
+            <div class="tpl-card selected" data-tpl="button" onclick="selectTpl(this,'button')">
+              <div class="tpl-check">✓</div>
+              <div class="tpl-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">smart_button</span></div>
+              <div class="tpl-name">Button</div>
+              <div class="tpl-desc">Simple action button with handler</div>
+            </div>
+            <div class="tpl-card" data-tpl="card" onclick="selectTpl(this,'card')">
+              <div class="tpl-check">✓</div>
+              <div class="tpl-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">credit_card</span></div>
+              <div class="tpl-name">Card</div>
+              <div class="tpl-desc">Data display card with icon</div>
+            </div>
+            <div class="tpl-card" data-tpl="form" onclick="selectTpl(this,'form')">
+              <div class="tpl-check">✓</div>
+              <div class="tpl-icon" style="background:#fef3c7;color:#92400e"><span class="material-symbols-rounded">edit_note</span></div>
+              <div class="tpl-name">Form</div>
+              <div class="tpl-desc">Input form with submit handler</div>
+            </div>
+            <div class="tpl-card" data-tpl="table" onclick="selectTpl(this,'table')">
+              <div class="tpl-check">✓</div>
+              <div class="tpl-icon" style="background:#ede9fe;color:#5b21b6"><span class="material-symbols-rounded">table_chart</span></div>
+              <div class="tpl-name">Data Table</div>
+              <div class="tpl-desc">lightning-datatable with columns</div>
+            </div>
+            <div class="tpl-card" data-tpl="modal" onclick="selectTpl(this,'modal')">
+              <div class="tpl-check">✓</div>
+              <div class="tpl-icon" style="background:#fce7f3;color:#9d174d"><span class="material-symbols-rounded">open_in_new</span></div>
+              <div class="tpl-name">Modal</div>
+              <div class="tpl-desc">Dialog with header/body/footer</div>
+            </div>
+            <div class="tpl-card" data-tpl="list" onclick="selectTpl(this,'list')">
+              <div class="tpl-check">✓</div>
+              <div class="tpl-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">format_list_bulleted</span></div>
+              <div class="tpl-name">List</div>
+              <div class="tpl-desc">Iterated list with for:each</div>
+            </div>
+          </div>
+
+          <div class="step-nav">
+            <span></span>
+            <button class="btn btn-filled" onclick="goToStep(2)">
+              Next: Build <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: Build ─────────────────────────────────────── -->
+      <div class="step-panel" id="panel-2">
+        <h2 class="display-small" style="margin-bottom:8px">Build your component</h2>
+        <p class="body-large text-muted" style="margin-bottom:28px">Drag Lightning components onto the canvas and define the properties your component will expose.</p>
+
+        <div class="build-layout">
+
+          <!-- Left: Elements palette -->
+          <div>
+            <div class="panel-card" style="margin-bottom:20px">
+              <div class="panel-card-header">
+                <div class="panel-card-title">
+                  <span class="material-symbols-rounded" style="font-size:18px;color:var(--md-primary)">widgets</span>
+                  Lightning Components
+                </div>
+                <span class="body-small text-outline">Drag onto canvas →</span>
+              </div>
+              <div class="panel-card-body">
+                <div class="elements-grid" id="elementsGrid">
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-button')"><div class="el-dot"></div>lightning-button</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-input')"><div class="el-dot"></div>lightning-input</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-card')"><div class="el-dot"></div>lightning-card</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-datatable')"><div class="el-dot"></div>lightning-datatable</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-modal')"><div class="el-dot"></div>lightning-modal</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-badge')"><div class="el-dot"></div>lightning-badge</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-spinner')"><div class="el-dot"></div>lightning-spinner</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-accordion')"><div class="el-dot"></div>lightning-accordion</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-combobox')"><div class="el-dot"></div>lightning-combobox</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-icon')"><div class="el-dot"></div>lightning-icon</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-tab')"><div class="el-dot"></div>lightning-tab</div>
+                  <div class="el-chip" draggable="true" ondragstart="onDragStart(event,'lightning-textarea')"><div class="el-dot"></div>lightning-textarea</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Properties -->
+            <div class="panel-card">
+              <div class="panel-card-header">
+                <div class="panel-card-title">
+                  <span class="material-symbols-rounded" style="font-size:18px;color:var(--md-primary)">tune</span>
+                  Component Properties
+                </div>
+              </div>
+              <div class="panel-card-body">
+                <div class="props-add-row">
+                  <div class="field-group" style="margin:0">
+                    <label>Name</label>
+                    <input type="text" id="propName" placeholder="e.g. recordId">
+                  </div>
+                  <div class="field-group" style="margin:0">
+                    <label>Type</label>
+                    <select id="propType" style="padding:11px 10px">
+                      <option>String</option>
+                      <option>Boolean</option>
+                      <option>Number</option>
+                      <option>Object</option>
+                      <option>Array</option>
+                    </select>
+                  </div>
+                  <div class="field-group" style="margin:0">
+                    <label>Decorator</label>
+                    <select id="propDecorator" style="padding:11px 10px">
+                      <option value="@api">@api</option>
+                      <option value="@track">@track</option>
+                      <option value="">none</option>
+                    </select>
+                  </div>
+                </div>
+                <button class="btn btn-tonal" onclick="addProp()" style="width:100%;margin-bottom:16px">
+                  <span class="material-symbols-rounded" style="font-size:16px">add</span> Add Property
+                </button>
+                <div id="propsList"></div>
+                <div id="propsEmpty" style="text-align:center;padding:16px;color:var(--md-outline);font-size:0.8125rem">No properties yet — add one above.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Canvas -->
+          <div>
+            <div class="panel-card" style="position:sticky;top:100px">
+              <div class="panel-card-header">
+                <div class="panel-card-title">
+                  <span class="material-symbols-rounded" style="font-size:18px;color:var(--md-primary)">layers</span>
+                  Component Canvas
+                </div>
+                <button class="btn btn-text" onclick="clearCanvas()" style="padding:6px 12px;font-size:0.8125rem">
+                  <span class="material-symbols-rounded" style="font-size:15px">clear_all</span> Clear
+                </button>
+              </div>
+              <div class="panel-card-body">
+                <p style="font-size:0.8125rem;color:var(--md-outline);margin-bottom:12px">
+                  Components here will be added to the HTML template in addition to the base template.
+                </p>
+                <div class="canvas-wrap" id="canvas" ondrop="onDrop(event)" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)">
+                  <div class="canvas-empty" id="canvasEmpty">
+                    <span class="material-symbols-rounded" style="font-size:36px;color:var(--md-outline-variant)">drag_indicator</span>
+                    <span style="font-size:0.875rem;color:var(--md-on-surface-variant)">Drop components here</span>
+                    <span style="font-size:0.75rem;color:var(--md-outline)">or use the base template as-is</span>
+                  </div>
+                  <div id="canvasItems"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn btn-outlined" onclick="goToStep(1)">
+            <span class="material-symbols-rounded" style="font-size:18px">arrow_back</span> Back
+          </button>
+          <button class="btn btn-filled" onclick="generateAndGoStep3()">
+            <span class="material-symbols-rounded" style="font-size:18px">auto_fix_high</span> Generate Code
+          </button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: Generate ──────────────────────────────────── -->
+      <div class="step-panel" id="panel-3">
+        <h2 class="display-small" style="margin-bottom:8px">Your component is ready</h2>
+        <p class="body-large text-muted" style="margin-bottom:28px">Copy each file into a folder named <code id="folderName" style="font-size:0.9rem">myComponent</code> inside <code style="font-size:0.9rem">force-app/main/default/lwc/</code></p>
+
+        <!-- Summary chips -->
+        <div class="summary-grid" id="summaryGrid"></div>
+
+        <!-- File structure hint -->
+        <div class="callout callout-info" style="margin-bottom:28px">
+          <span class="material-symbols-rounded">folder</span>
+          <p id="folderHint" style="margin:0;font-family:var(--font-mono);font-size:0.8125rem;line-height:1.8"></p>
+        </div>
+
+        <!-- Code tabs -->
+        <div class="panel-card">
+          <div class="code-tab-bar">
+            <button class="code-tab active" onclick="switchCodeTab(this,'ct-html')"><div class="code-tab-dot dot-html"></div>.html</button>
+            <button class="code-tab" onclick="switchCodeTab(this,'ct-js')"><div class="code-tab-dot dot-js"></div>.js</button>
+            <button class="code-tab" onclick="switchCodeTab(this,'ct-css')"><div class="code-tab-dot dot-css"></div>.css</button>
+            <button class="code-tab" onclick="switchCodeTab(this,'ct-meta')"><div class="code-tab-dot dot-meta"></div>js-meta.xml</button>
+          </div>
+
+          <div class="code-panel active" id="ct-html">
+            <pre class="code-output" id="out-html"></pre>
+            <div class="code-footer"><button class="copy-btn" onclick="copyTab('out-html',this)"><span class="material-symbols-rounded" style="font-size:15px">content_copy</span> Copy HTML</button></div>
+          </div>
+          <div class="code-panel" id="ct-js">
+            <pre class="code-output" id="out-js"></pre>
+            <div class="code-footer"><button class="copy-btn" onclick="copyTab('out-js',this)"><span class="material-symbols-rounded" style="font-size:15px">content_copy</span> Copy JS</button></div>
+          </div>
+          <div class="code-panel" id="ct-css">
+            <pre class="code-output" id="out-css"></pre>
+            <div class="code-footer"><button class="copy-btn" onclick="copyTab('out-css',this)"><span class="material-symbols-rounded" style="font-size:15px">content_copy</span> Copy CSS</button></div>
+          </div>
+          <div class="code-panel" id="ct-meta">
+            <pre class="code-output" id="out-meta"></pre>
+            <div class="code-footer"><button class="copy-btn" onclick="copyTab('out-meta',this)"><span class="material-symbols-rounded" style="font-size:15px">content_copy</span> Copy XML</button></div>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn btn-outlined" onclick="goToStep(2)">
+            <span class="material-symbols-rounded" style="font-size:18px">arrow_back</span> Back
+          </button>
+          <button class="btn btn-tonal" onclick="startOver()">
+            <span class="material-symbols-rounded" style="font-size:18px">restart_alt</span> Start Over
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+          <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+        <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="https://sfdecoded.netlify.app/"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+  <script>
+    // ── State ────────────────────────────────────────────────────────────────
+    let currentStep = 1;
+    let selectedTemplate = 'button';
+    let canvasItems = [];
+    let properties = [];
+
+    // ── Step navigation ──────────────────────────────────────────────────────
+    function goToStep(n) {
+      currentStep = n;
+      document.querySelectorAll('.step-panel').forEach((p,i) => p.classList.toggle('active', i+1 === n));
+      document.querySelectorAll('.step').forEach((s,i) => {
+        s.classList.toggle('active', i+1 === n);
+        s.classList.toggle('done', i+1 < n);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function generateAndGoStep3() {
+      generate();
+      goToStep(3);
+    }
+
+    function startOver() {
+      canvasItems = []; properties = [];
+      renderCanvas(); renderProps();
+      document.getElementById('compName').value = 'myComponent';
+      updateNamePreview();
+      goToStep(1);
+    }
+
+    // ── Step 1 ───────────────────────────────────────────────────────────────
+    function updateNamePreview() {
+      const n = document.getElementById('compName').value.trim() || 'myComponent';
+      document.getElementById('namePreview').textContent =
+        `${n}.html  ·  ${n}.js  ·  ${n}.css  ·  ${n}.js-meta.xml`;
+    }
+    updateNamePreview();
+
+    function selectTpl(el, tpl) {
+      document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedTemplate = tpl;
+    }
+
+    // ── Step 2 — drag & drop ─────────────────────────────────────────────────
+    function onDragStart(e, name) { e.dataTransfer.setData('el', name); }
+    function onDragOver(e) { e.preventDefault(); document.getElementById('canvas').classList.add('drag-over'); }
+    function onDragLeave() { document.getElementById('canvas').classList.remove('drag-over'); }
+    function onDrop(e) {
+      e.preventDefault();
+      document.getElementById('canvas').classList.remove('drag-over');
+      const name = e.dataTransfer.getData('el');
+      if (name) { canvasItems.push(name); renderCanvas(); }
+    }
+
+    function renderCanvas() {
+      const empty = document.getElementById('canvasEmpty');
+      const items = document.getElementById('canvasItems');
+      empty.style.display = canvasItems.length ? 'none' : 'flex';
+      items.innerHTML = canvasItems.map((el, i) => `
+        <div class="canvas-row">
+          <span style="font-size:18px">⚡</span>
+          <span class="canvas-row-name">&lt;${el}&gt;</span>
+          <button class="canvas-row-remove" onclick="removeCanvas(${i})" title="Remove">
+            <span class="material-symbols-rounded" style="font-size:16px">close</span>
+          </button>
+        </div>
+      `).join('');
+    }
+    function removeCanvas(i) { canvasItems.splice(i,1); renderCanvas(); }
+    function clearCanvas() { canvasItems = []; renderCanvas(); }
+
+    // ── Step 2 — properties ───────────────────────────────────────────────────
+    function addProp() {
+      const name = document.getElementById('propName').value.trim();
+      if (!name) { document.getElementById('propName').focus(); return; }
+      const type = document.getElementById('propType').value;
+      const dec  = document.getElementById('propDecorator').value;
+      properties.push({ name, type, dec });
+      document.getElementById('propName').value = '';
+      renderProps();
+    }
+    function removeProp(i) { properties.splice(i,1); renderProps(); }
+    function renderProps() {
+      const list  = document.getElementById('propsList');
+      const empty = document.getElementById('propsEmpty');
+      empty.style.display = properties.length ? 'none' : 'block';
+      list.innerHTML = properties.map((p,i) => `
+        <div class="prop-pill">
+          <div class="prop-pill-info">
+            ${p.dec ? `<span class="prop-decorator-badge">${p.dec}</span>` : ''}
+            <span class="prop-name">${p.name}</span>
+            <span class="prop-type-badge">${p.type}</span>
+          </div>
+          <button class="canvas-row-remove" onclick="removeProp(${i})" title="Remove">
+            <span class="material-symbols-rounded" style="font-size:16px">close</span>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // ── Code generation ───────────────────────────────────────────────────────
+    const TEMPLATES = {
+      button: {
+        html: (n) =>
+`<template>
+  <div class="container">
+    <lightning-button
+      label="Click Me"
+      variant="brand"
+      onclick={handleClick}>
+    </lightning-button>
+  </div>
+</template>`,
+        baseJs: (cls) =>
+`  handleClick() {
+    // TODO: add your click handler logic
+    console.log('Button clicked');
+  }`
+      },
+      card: {
+        html: (n) =>
+`<template>
+  <lightning-card
+    title="Card Title"
+    icon-name="standard:account">
+    <div class="slds-p-around_medium">
+      <p>Card content goes here.</p>
+    </div>
+  </lightning-card>
+</template>`,
+        baseJs: () => ''
+      },
+      form: {
+        html: () =>
+`<template>
+  <lightning-card title="Form" icon-name="standard:contact">
+    <div class="slds-p-around_medium">
+      <lightning-input
+        label="Name"
+        value={name}
+        onchange={handleNameChange}>
+      </lightning-input>
+      <lightning-input
+        label="Email"
+        type="email"
+        value={email}
+        onchange={handleEmailChange}>
+      </lightning-input>
+      <div class="slds-m-top_medium">
+        <lightning-button
+          label="Submit"
+          variant="brand"
+          onclick={handleSubmit}>
+        </lightning-button>
+      </div>
+    </div>
+  </lightning-card>
+</template>`,
+        baseJs: () =>
+`  name = '';
+  email = '';
+
+  handleNameChange(event) {
+    this.name = event.detail.value;
+  }
+
+  handleEmailChange(event) {
+    this.email = event.detail.value;
+  }
+
+  handleSubmit() {
+    console.log('Submitted:', this.name, this.email);
+  }`
+      },
+      table: {
+        html: () =>
+`<template>
+  <lightning-card title="Data Table" icon-name="standard:list">
+    <lightning-datatable
+      key-field="id"
+      data={tableData}
+      columns={columns}
+      hide-checkbox-column>
+    </lightning-datatable>
+  </lightning-card>
+</template>`,
+        baseJs: () =>
+`  columns = [
+    { label: 'Name',  fieldName: 'name',  type: 'text'  },
+    { label: 'Email', fieldName: 'email', type: 'email' },
+    { label: 'Phone', fieldName: 'phone', type: 'phone' }
+  ];
+
+  tableData = [];`
+      },
+      modal: {
+        html: () =>
+`<template>
+  <lightning-button
+    label="Open Modal"
+    variant="brand"
+    onclick={openModal}>
+  </lightning-button>
+
+  <template if:true={isOpen}>
+    <section role="dialog" class="slds-modal slds-fade-in-open">
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 class="slds-modal__title">Modal Title</h2>
+        </header>
+        <div class="slds-modal__content slds-p-around_medium">
+          <p>Modal body content goes here.</p>
+        </div>
+        <footer class="slds-modal__footer">
+          <lightning-button label="Cancel" onclick={closeModal}></lightning-button>
+          <lightning-button label="Save" variant="brand" onclick={handleSave}></lightning-button>
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+</template>`,
+        baseJs: () =>
+`  isOpen = false;
+
+  openModal()  { this.isOpen = true;  }
+  closeModal() { this.isOpen = false; }
+
+  handleSave() {
+    // TODO: save logic
+    this.closeModal();
+  }`
+      },
+      list: {
+        html: () =>
+`<template>
+  <lightning-card title="List" icon-name="standard:record">
+    <template if:true={isLoading}>
+      <lightning-spinner alternative-text="Loading"></lightning-spinner>
+    </template>
+    <template if:false={isLoading}>
+      <ul class="slds-has-dividers_top-space">
+        <template for:each={items} for:item="item">
+          <li key={item.id} class="slds-item slds-p-around_small">
+            {item.name}
+          </li>
+        </template>
+      </ul>
+    </template>
+  </lightning-card>
+</template>`,
+        baseJs: () =>
+`  isLoading = false;
+  items = [];`
+      }
+    };
+
+    function buildClassName(name) {
+      return name.replace(/[-_](.)/g, (_,c) => c.toUpperCase())
+                 .replace(/^./, c => c.toUpperCase());
+    }
+
+    function generate() {
+      const rawName = document.getElementById('compName').value.trim() || 'myComponent';
+      const cls     = buildClassName(rawName);
+      const target  = document.getElementById('compTarget').value;
+      const wire    = document.getElementById('compWire').value;
+      const tpl     = TEMPLATES[selectedTemplate];
+
+      // ── HTML ────────────────────────────────────────────────────
+      let htmlBody = tpl.html(rawName);
+      if (canvasItems.length) {
+        const extra = canvasItems.map(el => `  <${el}></${el}>`).join('\n');
+        htmlBody = htmlBody.replace('</template>', `\n  <!-- Additional elements -->\n${extra}\n</template>`);
+      }
+
+      // ── JS imports ──────────────────────────────────────────────
+      const hasApi   = properties.some(p => p.dec === '@api');
+      const hasTrack = properties.some(p => p.dec === '@track');
+      const hasWire  = wire !== 'none';
+
+      let imports = `import { LightningElement`;
+      if (hasApi)   imports += `, api`;
+      if (hasTrack) imports += `, track`;
+      if (hasWire)  imports += `, wire`;
+      imports += ` } from 'lwc';`;
+
+      if (wire === 'getRecord') {
+        imports += `\nimport { getRecord } from 'lightning/uiRecordApi';`;
+      } else if (wire === 'getRelatedListRecords') {
+        imports += `\nimport { getRelatedListRecords } from 'lightning/uiRelatedListApi';`;
+      } else if (wire === 'getListUi') {
+        imports += `\nimport { getListUi } from 'lightning/uiListApi';`;
+      } else if (wire === 'getPicklistValues') {
+        imports += `\nimport { getPicklistValues } from 'lightning/uiObjectInfoApi';`;
+      } else if (wire === 'custom') {
+        imports += `\nimport myApexMethod from '@salesforce/apex/MyController.myApexMethod';`;
+      }
+
+      // ── JS body ──────────────────────────────────────────────────
+      const propLines = properties.map(p => {
+        const dec = p.dec ? `  ${p.dec}\n` : '';
+        const def = p.type === 'Boolean' ? 'false'
+                  : p.type === 'Number'  ? '0'
+                  : p.type === 'Array'   ? '[]'
+                  : p.type === 'Object'  ? '{}'
+                  : "''";
+        return `${dec}  ${p.name} = ${def};`;
+      }).join('\n\n');
+
+      let wireBlock = '';
+      if (wire === 'getRecord') {
+        wireBlock = `\n  @wire(getRecord, { recordId: '$recordId', fields: [] })\n  wiredRecord({ error, data }) {\n    if (data) { /* handle data */ }\n    if (error) { console.error(error); }\n  }`;
+      } else if (wire === 'custom') {
+        wireBlock = `\n  @wire(myApexMethod)\n  wiredData({ error, data }) {\n    if (data) { /* handle data */ }\n    if (error) { console.error(error); }\n  }`;
+      }
+
+      const baseJs = tpl.baseJs(cls);
+
+      const jsCode =
+`${imports}
+
+export default class ${cls} extends LightningElement {
+
+${propLines ? propLines + '\n' : ''}${wireBlock}
+${baseJs ? '\n' + baseJs.split('\n').map(l => '  ' + l).join('\n') : ''}
+}`;
+
+      // ── CSS ──────────────────────────────────────────────────────
+      const cssCode =
+`:host {
+  display: block;
+}
+
+.container {
+  padding: 1rem;
+}
+
+/* Add component-specific styles here.
+   Note: LWC uses Shadow DOM — styles
+   are automatically scoped to this
+   component and won't leak out. */`;
+
+      // ── meta.xml ─────────────────────────────────────────────────
+      const metaCode =
+`<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>60.0</apiVersion>
+  <isExposed>true</isExposed>
+  <targets>
+    <target>${target}</target>
+  </targets>
+</LightningComponentBundle>`;
+
+      // ── Output ───────────────────────────────────────────────────
+      document.getElementById('out-html').textContent = htmlBody;
+      document.getElementById('out-js').textContent   = jsCode.trim();
+      document.getElementById('out-css').textContent  = cssCode;
+      document.getElementById('out-meta').textContent = metaCode;
+
+      // ── Summary ───────────────────────────────────────────────────
+      document.getElementById('folderName').textContent = rawName;
+      document.getElementById('folderHint').innerHTML =
+        `lwc/${rawName}/<br>` +
+        `&nbsp;&nbsp;├── ${rawName}.html<br>` +
+        `&nbsp;&nbsp;├── ${rawName}.js<br>` +
+        `&nbsp;&nbsp;├── ${rawName}.css<br>` +
+        `&nbsp;&nbsp;└── ${rawName}.js-meta.xml`;
+
+      document.getElementById('summaryGrid').innerHTML = [
+        { label: 'Component',  value: rawName },
+        { label: 'Class',      value: cls },
+        { label: 'Template',   value: selectedTemplate },
+        { label: 'Target',     value: target.replace('lightning__','') },
+        { label: 'Properties', value: properties.length + ' defined' },
+        { label: 'Elements',   value: canvasItems.length + ' added' },
+      ].map(s => `
+        <div class="summary-chip">
+          <div class="summary-chip-label">${s.label}</div>
+          <div class="summary-chip-value">${s.value}</div>
+        </div>
+      `).join('');
+    }
+
+    // ── Code tab switching ────────────────────────────────────────────────────
+    function switchCodeTab(btn, panelId) {
+      document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(panelId).classList.add('active');
+    }
+
+    // ── Copy ─────────────────────────────────────────────────────────────────
+    function copyTab(elId, btn) {
+      const text = document.getElementById(elId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:15px">check</span> Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+        showToast('Code copied to clipboard!');
+      });
+    }
+  </script>
+</body>
+</html>

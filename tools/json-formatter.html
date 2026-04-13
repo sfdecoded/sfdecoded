@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Formatter — Salesforce Decoded</title>
+  <meta name="description" content="Pretty-print, minify, and validate JSON responses from Salesforce REST API calls. Free browser-based JSON formatter for Salesforce developers.">
+  <meta name="keywords" content="json formatter, salesforce json, json validator, json minifier, salesforce rest api">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/json-formatter.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <style>
+    .tool-area-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 420px;
+    }
+    .tool-panel {
+      display: flex;
+      flex-direction: column;
+    }
+    .tool-panel-label {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--md-outline);
+      padding: 12px 20px 8px;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .tool-panel textarea {
+      flex: 1;
+      width: 100%;
+      min-height: 360px;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.75;
+      background: transparent;
+      color: var(--md-on-surface);
+      padding: 16px 20px;
+    }
+    .tool-panel textarea::placeholder {
+      color: var(--md-outline);
+    }
+    .tool-panel .output-area {
+      flex: 1;
+      min-height: 360px;
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.75;
+      color: var(--md-on-surface);
+      overflow: auto;
+      white-space: pre;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+    .output-area.error-state {
+      color: var(--md-error);
+    }
+    .output-area.success-state {
+      color: var(--md-on-surface);
+    }
+    .tool-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--md-shape-full);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .status-valid {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .status-invalid {
+      background: var(--md-error-container);
+      color: var(--md-on-error-container);
+    }
+    .status-idle {
+      background: var(--md-surface-container-high);
+      color: var(--md-outline);
+    }
+    @media (max-width: 768px) {
+      .tool-area-body {
+        grid-template-columns: 1fr;
+      }
+      .tool-panel:first-child {
+        border-right: none !important;
+        border-bottom: 1px solid var(--md-outline-variant);
+      }
+    }
+    .json-key    { color: #82aaff; }
+    .json-string { color: #c3e88d; }
+    .json-number { color: #f78c6c; }
+    .json-bool   { color: #c792ea; }
+    .json-null   { color: #676e95; }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
+    @media (max-width: 640px) { .info-grid { grid-template-columns: 1fr; } }
+    .info-card {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-lg);
+      padding: 20px;
+    }
+    .info-card h4 {
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--md-on-surface);
+    }
+    .info-card p {
+      font-size: 0.875rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.55;
+    }
+  </style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html" class="active">Tools</a></li>
+        <li><a href="../errors.html">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../prompts.html">Prompts</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search tools, errors, guides..."></div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <nav class="breadcrumbs reveal">
+        <a href="../index.html">Home</a>
+        <span class="separator">/</span>
+        <a href="../tools.html">Tools</a>
+        <span class="separator">/</span>
+        <span class="current">JSON Formatter</span>
+      </nav>
+      <div class="overline reveal stagger-2">
+        <span>Formatter</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">JSON Formatter</h1>
+      <p class="reveal stagger-4">Pretty-print, minify, and validate JSON responses from Salesforce REST API calls. Works entirely in your browser — nothing is sent to a server.</p>
+    </div>
+  </header>
+
+  <!-- Tool Section -->
+  <section class="section">
+    <div class="container">
+
+      <!-- Tool Area -->
+      <div class="tool-area reveal">
+        <div class="tool-area-header">
+          <div class="tool-actions">
+            <button class="btn btn-filled" id="btn-format" onclick="formatJSON()">
+              <span class="material-symbols-rounded">auto_fix_high</span> Format
+            </button>
+            <button class="btn btn-tonal" onclick="minifyJSON()">
+              <span class="material-symbols-rounded">compress</span> Minify
+            </button>
+            <button class="btn btn-outlined" onclick="validateJSON()">
+              <span class="material-symbols-rounded">check_circle</span> Validate
+            </button>
+            <button class="btn btn-text" onclick="clearAll()">
+              <span class="material-symbols-rounded">delete_sweep</span> Clear
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="status-chip status-idle" id="status-chip">
+              <span class="material-symbols-rounded" style="font-size:14px">radio_button_unchecked</span>
+              Ready
+            </span>
+            <button class="btn btn-text" onclick="copyOutput()" title="Copy output">
+              <span class="material-symbols-rounded">content_copy</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tool-area-body">
+          <div class="tool-panel" style="border-right:1px solid var(--md-outline-variant)">
+            <div class="tool-panel-label">Input JSON</div>
+            <textarea id="json-input" placeholder='Paste your JSON here...&#10;&#10;{"name":"Account","type":"sObject","fields":[{"name":"Id","type":"id"}]}'
+              oninput="liveValidate(this.value)" spellcheck="false"></textarea>
+          </div>
+          <div class="tool-panel">
+            <div class="tool-panel-label">Output</div>
+            <div class="output-area" id="json-output">Formatted JSON will appear here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="info-grid">
+        <div class="info-card reveal stagger-1">
+          <div class="card-icon" style="background:#fff7ed;color:#c2410c;width:40px;height:40px;border-radius:var(--md-shape-sm);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <span class="material-symbols-rounded" style="font-size:20px">auto_fix_high</span>
+          </div>
+          <h4>Pretty Print</h4>
+          <p>Instantly beautify any valid JSON with proper indentation, line breaks, and syntax highlighting.</p>
+        </div>
+        <div class="info-card reveal stagger-2">
+          <div class="card-icon" style="background:#dbeafe;color:#1e40af;width:40px;height:40px;border-radius:var(--md-shape-sm);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <span class="material-symbols-rounded" style="font-size:20px">compress</span>
+          </div>
+          <h4>Minify</h4>
+          <p>Collapse JSON into a single line to reduce payload size before sending it to a Salesforce API endpoint.</p>
+        </div>
+        <div class="info-card reveal stagger-3">
+          <div class="card-icon" style="background:#d1fae5;color:#065f46;width:40px;height:40px;border-radius:var(--md-shape-sm);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <span class="material-symbols-rounded" style="font-size:20px">check_circle</span>
+          </div>
+          <h4>Validate</h4>
+          <p>Instantly detect syntax errors with a clear message pointing to the exact location of the problem.</p>
+        </div>
+      </div>
+
+      <!-- Usage tips -->
+      <div class="section-header mt-48 reveal">
+        <div class="overline"><span>Usage Tips</span></div>
+        <h2 class="display-small">How to use this tool</h2>
+      </div>
+
+      <div class="grid grid-2 reveal">
+        <div class="callout callout-info">
+          <span class="material-symbols-rounded">info</span>
+          <div>
+            <p><strong>Tip:</strong> Paste the raw response from Salesforce's REST API Explorer or Workbench directly into the input panel, then click <strong>Format</strong> to make it readable in seconds.</p>
+          </div>
+        </div>
+        <div class="callout callout-warning">
+          <span class="material-symbols-rounded">warning</span>
+          <div>
+            <p><strong>Security:</strong> All processing happens entirely in your browser. Your JSON data never leaves your machine — safe for org data and API responses.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+           <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+        <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+      </div>
+        <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+
+  <script src="../js/main.js"></script>
+  <script>
+    // ── Live validate on input ──────────────────────────────────────────────
+    function liveValidate(value) {
+      const chip = document.getElementById('status-chip');
+      if (!value.trim()) {
+        chip.className = 'status-chip status-idle';
+        chip.innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">radio_button_unchecked</span> Ready';
+        return;
+      }
+      try {
+        JSON.parse(value);
+        chip.className = 'status-chip status-valid';
+        chip.innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">check_circle</span> Valid JSON';
+      } catch {
+        chip.className = 'status-chip status-invalid';
+        chip.innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">error</span> Invalid JSON';
+      }
+    }
+
+    // ── Syntax highlight helper ─────────────────────────────────────────────
+    function syntaxHighlight(json) {
+      return json
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+          let cls = 'json-number';
+          if (/^"/.test(match)) cls = /:$/.test(match) ? 'json-key' : 'json-string';
+          else if (/true|false/.test(match)) cls = 'json-bool';
+          else if (/null/.test(match)) cls = 'json-null';
+          return `<span class="${cls}">${match}</span>`;
+        });
+    }
+
+    // ── Format ──────────────────────────────────────────────────────────────
+    function formatJSON() {
+      const input = document.getElementById('json-input').value.trim();
+      const output = document.getElementById('json-output');
+      if (!input) { output.textContent = 'Please paste some JSON first.'; return; }
+      try {
+        const parsed = JSON.parse(input);
+        const formatted = JSON.stringify(parsed, null, 2);
+        output.classList.remove('error-state');
+        output.classList.add('success-state');
+        output.innerHTML = syntaxHighlight(formatted);
+        setStatus('valid');
+      } catch (e) {
+        output.classList.add('error-state');
+        output.classList.remove('success-state');
+        output.textContent = '✕ ' + e.message;
+        setStatus('invalid');
+      }
+    }
+
+    // ── Minify ──────────────────────────────────────────────────────────────
+    function minifyJSON() {
+      const input = document.getElementById('json-input').value.trim();
+      const output = document.getElementById('json-output');
+      if (!input) { output.textContent = 'Please paste some JSON first.'; return; }
+      try {
+        const parsed = JSON.parse(input);
+        output.classList.remove('error-state');
+        output.classList.add('success-state');
+        output.textContent = JSON.stringify(parsed);
+        setStatus('valid');
+      } catch (e) {
+        output.classList.add('error-state');
+        output.textContent = '✕ ' + e.message;
+        setStatus('invalid');
+      }
+    }
+
+    // ── Validate ────────────────────────────────────────────────────────────
+    function validateJSON() {
+      const input = document.getElementById('json-input').value.trim();
+      const output = document.getElementById('json-output');
+      if (!input) { output.textContent = 'Please paste some JSON first.'; return; }
+      try {
+        const parsed = JSON.parse(input);
+        const keys = countKeys(parsed);
+        output.classList.remove('error-state');
+        output.classList.add('success-state');
+        output.textContent = `✓ Valid JSON\n\nSummary:\n  Type    : ${Array.isArray(parsed) ? 'Array' : typeof parsed}\n  Keys    : ${keys}\n  Size    : ${new Blob([input]).size} bytes (raw)`;
+        setStatus('valid');
+      } catch (e) {
+        output.classList.add('error-state');
+        output.classList.remove('success-state');
+        output.textContent = `✕ Invalid JSON\n\n${e.message}`;
+        setStatus('invalid');
+      }
+    }
+
+    function countKeys(obj, count = 0) {
+      if (typeof obj === 'object' && obj !== null) {
+        const keys = Object.keys(obj);
+        count += keys.length;
+        keys.forEach(k => { count = countKeys(obj[k], count); });
+      }
+      return count;
+    }
+
+    function setStatus(state) {
+      const chip = document.getElementById('status-chip');
+      if (state === 'valid') {
+        chip.className = 'status-chip status-valid';
+        chip.innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">check_circle</span> Valid JSON';
+      } else {
+        chip.className = 'status-chip status-invalid';
+        chip.innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">error</span> Invalid JSON';
+      }
+    }
+
+    // ── Clear ───────────────────────────────────────────────────────────────
+    function clearAll() {
+      document.getElementById('json-input').value = '';
+      const output = document.getElementById('json-output');
+      output.textContent = 'Formatted JSON will appear here.';
+      output.classList.remove('error-state', 'success-state');
+      const chip = document.getElementById('status-chip');
+      chip.className = 'status-chip status-idle';
+      chip.innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">radio_button_unchecked</span> Ready';
+    }
+
+    // ── Copy output ─────────────────────────────────────────────────────────
+    function copyOutput() {
+      const text = document.getElementById('json-output').textContent;
+      if (!text || text === 'Formatted JSON will appear here.') return;
+      navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+    }
+  </script>
+</body>
+</html>

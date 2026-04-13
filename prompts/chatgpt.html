@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatGPT Prompts — Salesforce Decoded</title>
+  <meta name="description" content="Curated ChatGPT prompts for Salesforce developers. Quick code snippets, explanations, troubleshooting, and documentation with OpenAI's ChatGPT.">
+  <meta name="keywords" content="chatgpt prompts, salesforce prompts, code snippets, troubleshooting, documentation">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/prompts/chatgpt.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html">Tools</a></li>
+        <li><a href="../errors.html">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../prompts.html" class="active">Prompts</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html" class="active"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search prompts..."></div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="breadcrumbs" style="padding: 0 0 16px; border-bottom: 1px solid var(--md-outline-variant);">
+    <div class="container">
+      <a href="../index.html">Home</a>
+      <span class="separator">/</span>
+      <a href="../prompts.html">Prompts</a>
+      <span class="separator">/</span>
+      <span class="current">ChatGPT</span>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="overline reveal">
+        <span>AI Prompts</span>
+      </div>
+      <h1 class="display-medium reveal stagger-2">ChatGPT Prompts</h1>
+      <p class="reveal stagger-3">Curated prompts for OpenAI's ChatGPT. Quick code snippets, clear explanations, and practical solutions for Salesforce development.</p>
+    </div>
+  </header>
+
+  <!-- Prompts Grid -->
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-2" style="gap:32px">
+
+        <!-- Salesforce Concept Explanation -->
+        <div class="card card-elevated" style="padding:32px">
+          <div class="flex items-center gap-16 mb-16">
+            <div class="card-icon" style="margin:0;width:56px;height:56px;background:#fecaca;color:#991b1b"><span class="material-symbols-rounded" style="font-size:28px">school</span></div>
+            <div>
+              <span class="label-medium text-primary">Prompt</span>
+              <h3 style="margin:0;font-size:1.25rem">Salesforce Concept Explanation</h3>
+            </div>
+          </div>
+          <p>Ask ChatGPT to explain Salesforce concepts, best practices, and governance structures in a clear, beginner-friendly way.</p>
+          <div class="mt-24 flex items-center justify-between">
+            <div class="chip-group"><span class="chip">Learning</span><span class="chip">Salesforce</span></div>
+            <button class="btn btn-outlined copy-btn" onclick="copyPrompt('Explain [Salesforce concept] in simple terms. Include: what it is, why it matters, when to use it, and a practical example.')">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+                <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+           <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4>
+          <ul>
+            <li><a href="../tools.html">Tools</a></li>
+            <li><a href="../errors.html">Errors</a></li>
+            <li><a href="../guides.html">Guides</a></li>
+            <li><a href="../prompts.html">Prompts</a></li>
+            <li><a href="../extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Resources</h4>
+          <ul>
+            <li><a href="../tips.html">Tips</a></li>
+            <li><a href="../resources.html">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="https://sfdecoded.netlify.app/"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  
+  <script>
+    function copyPrompt(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        // Visual feedback
+        event.target.textContent = 'Copied!';
+        setTimeout(() => {
+          event.target.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+  </script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Code Generator — Generate Salesforce Apex Boilerplate | Salesforce Decoded</title>
+  <meta name="description" content="Generate Salesforce Apex boilerplate code instantly. Create classes, triggers, test classes, batch jobs, and schedulable classes with proper structure.">
+  <meta name="keywords" content="apex code generator, salesforce apex template, apex trigger template, apex test class generator, apex batch class">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/apex-code-generator.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+        <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+    <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html" class="active">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal"><a href="../index.html">Home</a><span class="separator">/</span><a href="../tools.html">Tools</a><span class="separator">/</span><span class="current">Apex Code Generator</span></div>
+      <h1 class="display-medium reveal stagger-2">Apex Code Generator</h1>
+      <p class="reveal stagger-3">Generate production-ready Apex boilerplate code. Pick a template, customize your inputs, and get clean code instantly.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- Generator Form -->
+      <div class="card card-elevated reveal-scale" style="padding:32px;max-width:680px;margin-bottom:32px">
+        <h3 class="headline-small mb-24">Configure Your Code</h3>
+
+        <div style="display:grid;gap:20px">
+          <!-- Template Type -->
+          <div>
+            <label class="label-large" style="display:block;margin-bottom:8px">Template Type</label>
+            <div class="chip-group" id="template-chips">
+              <button class="chip active" data-type="trigger-handler" onclick="selectTemplate(this)">Trigger + Handler</button>
+              <button class="chip" data-type="service-class" onclick="selectTemplate(this)">Service Class</button>
+              <button class="chip" data-type="batch-class" onclick="selectTemplate(this)">Batch Class</button>
+              <button class="chip" data-type="test-class" onclick="selectTemplate(this)">Test Class</button>
+              <button class="chip" data-type="schedulable" onclick="selectTemplate(this)">Schedulable</button>
+              <button class="chip" data-type="queueable" onclick="selectTemplate(this)">Queueable</button>
+            </div>
+          </div>
+
+          <!-- Object Name -->
+<div>
+  <label class="label-large" for="obj-name" style="display:block;margin-bottom:8px">Object API Name</label>
+  <input type="text" id="obj-name" value="Account" placeholder="e.g. Account, Contact, Custom_Object__c"
+    style="width:100%;padding:12px 16px;border:1px solid var(--md-outline-variant);border-radius:var(--md-shape-md);font-family:var(--font-body);font-size:0.9375rem;background:var(--md-surface-container-lowest);color:var(--md-on-surface);outline:none;transition:border-color 0.2s"
+    oninput="validateObjName()">
+  <div id="obj-name-error" style="display:none;margin-top:6px;font-size:0.8125rem;color:var(--md-error);display:none;align-items:center;gap:4px">
+    <span class="material-symbols-rounded" style="font-size:15px">error</span>
+    <span id="obj-name-error-text">Invalid object API name</span>
+  </div>
+  <p style="margin-top:6px;font-size:0.8125rem;color:var(--md-on-surface-variant)">
+    Use only letters, numbers, and underscores. Custom objects end in <code>__c</code>.
+  </p>
+</div>
+
+          <!-- Class Name -->
+          <div>
+            <label class="label-large" for="class-name" style="display:block;margin-bottom:8px">Class Name (auto-generated)</label>
+            <input type="text" id="class-name" placeholder="Auto-generated based on object" style="width:100%;padding:12px 16px;border:1px solid var(--md-outline-variant);border-radius:var(--md-shape-md);font-family:var(--font-mono);font-size:0.9375rem;background:var(--md-surface-container);color:var(--md-on-surface-variant);outline:none" readonly>
+          </div>
+
+          <button class="btn btn-filled" onclick="generateCode()" style="align-self:flex-start">
+            <span class="material-symbols-rounded" style="font-size:18px">auto_fix_high</span>
+            Generate Code
+          </button>
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div id="output-container" style="display:none">
+        <div class="code-block reveal-scale" style="margin-bottom:16px">
+          <div class="code-block-header">
+            <span class="code-block-lang" id="output-filename">Apex</span>
+            <button class="code-copy-btn" onclick="copyCode()"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+          </div>
+          <pre id="code-output" style="margin:0;white-space:pre;overflow-x:auto"></pre>
+        </div>
+
+        <!-- Second file for trigger+handler -->
+        <div id="output-container-2" style="display:none">
+          <div class="code-block" style="margin-bottom:16px">
+            <div class="code-block-header">
+              <span class="code-block-lang" id="output-filename-2">Apex</span>
+              <button class="code-copy-btn" onclick="copyCode2()"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+            <pre id="code-output-2" style="margin:0;white-space:pre;overflow-x:auto"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template Descriptions -->
+      <div class="mt-48">
+        <h2 class="headline-large reveal">Available Templates</h2>
+        <div class="grid grid-3 mt-24">
+          <div class="card reveal stagger-1">
+            <div class="card-icon"><span class="material-symbols-rounded">bolt</span></div>
+            <h3>Trigger + Handler</h3>
+            <p>Clean trigger with a dedicated handler class. Follows one-trigger-per-object best practice with context routing.</p>
+          </div>
+          <div class="card reveal stagger-2">
+            <div class="card-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">account_tree</span></div>
+            <h3>Service Class</h3>
+            <p>Business logic service class with static methods, error handling, and Database.SaveResult patterns.</p>
+          </div>
+          <div class="card reveal stagger-3">
+            <div class="card-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">all_inclusive</span></div>
+            <h3>Batch Class</h3>
+            <p>Complete Database.Batchable implementation with start, execute, finish methods and error logging.</p>
+          </div>
+          <div class="card reveal stagger-4">
+            <div class="card-icon" style="background:#fef3c7;color:#92400e"><span class="material-symbols-rounded">science</span></div>
+            <h3>Test Class</h3>
+            <p>Test class with @TestSetup, positive/negative cases, bulk testing, and proper assertions.</p>
+          </div>
+          <div class="card reveal stagger-5">
+            <div class="card-icon" style="background:#ede9fe;color:#5b21b6"><span class="material-symbols-rounded">schedule</span></div>
+            <h3>Schedulable</h3>
+            <p>Schedulable Apex class with execute method and a helper to schedule via Execute Anonymous.</p>
+          </div>
+          <div class="card reveal stagger-6">
+            <div class="card-icon" style="background:#fce7f3;color:#9d174d"><span class="material-symbols-rounded">queue</span></div>
+            <h3>Queueable</h3>
+            <p>Queueable Apex with chaining support, finalizer pattern, and async execution context.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+         <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+     <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+
+  <script src="../js/main.js"></script>
+<script>
+  let selectedTemplate = 'trigger-handler';
+
+  // Valid Salesforce API name: letters/numbers/underscores, no leading digit,
+  // no consecutive underscores, no leading/trailing underscore, optional __c/__mdt/__e suffix
+  const API_NAME_REGEX = /^[A-Za-z][A-Za-z0-9]*(_[A-Za-z0-9]+)*(__c|__mdt|__e|__b|__x)?$/;
+
+  function validateObjName() {
+    const input = document.getElementById('obj-name');
+    const errorEl = document.getElementById('obj-name-error');
+    const errorText = document.getElementById('obj-name-error-text');
+    const val = input.value.trim();
+
+    let errorMsg = null;
+
+    if (!val) {
+      errorMsg = 'Object API name is required.';
+    } else if (/\s/.test(val)) {
+      errorMsg = 'Spaces are not allowed in API names.';
+    } else if (/[^A-Za-z0-9_]/.test(val)) {
+      errorMsg = 'Special characters are not allowed. Use only letters, numbers, and underscores.';
+    } else if (/^[0-9]/.test(val)) {
+      errorMsg = 'API names cannot start with a number.';
+    } else if (/^_/.test(val) || /_$/.test(val.replace(/__(c|mdt|e|b|x)$/i, ''))) {
+      errorMsg = 'API names cannot start or end with an underscore.';
+    } else if (/__.*__/.test(val.replace(/__(c|mdt|e|b|x)$/i, ''))) {
+      errorMsg = 'API names cannot contain consecutive underscores.';
+    } else if (!API_NAME_REGEX.test(val)) {
+      errorMsg = 'Invalid Salesforce API name format.';
+    }
+
+    if (errorMsg) {
+      input.style.borderColor = 'var(--md-error)';
+      errorText.textContent = errorMsg;
+      errorEl.style.display = 'flex';
+      return false;
+    } else {
+      input.style.borderColor = 'var(--md-outline-variant)';
+      errorEl.style.display = 'none';
+      updateClassName();
+      return true;
+    }
+  }
+
+  function selectTemplate(chip) {
+    document.querySelectorAll('#template-chips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    selectedTemplate = chip.dataset.type;
+    updateClassName();
+  }
+
+  document.getElementById('obj-name').addEventListener('input', validateObjName);
+
+  function updateClassName() {
+    const obj = document.getElementById('obj-name').value.trim().replace(/__c$/i, '');
+    const name = obj || 'MyObject';
+    const map = {
+      'trigger-handler':  name + 'TriggerHandler',
+      'service-class':    name + 'Service',
+      'batch-class':      name + 'BatchProcessor',
+      'test-class':       name + 'TriggerHandlerTest',
+      'schedulable':      name + 'ScheduledJob',
+      'queueable':        name + 'QueueableJob'
+    };
+    document.getElementById('class-name').value = map[selectedTemplate] || name;
+  }
+  updateClassName();
+
+  function generateCode() {
+    if (!validateObjName()) {
+      document.getElementById('obj-name').focus();
+      return;
+    }
+
+    const obj  = document.getElementById('obj-name').value.trim();
+    const name = obj.replace(/__(c|mdt|e|b|x)$/i, '');
+    const container  = document.getElementById('output-container');
+    const container2 = document.getElementById('output-container-2');
+    const output  = document.getElementById('code-output');
+    const output2 = document.getElementById('code-output-2');
+    const fname   = document.getElementById('output-filename');
+    const fname2  = document.getElementById('output-filename-2');
+
+    container.style.display  = 'block';
+    container2.style.display = 'none';
+
+    const templates = {
+      'trigger-handler': () => {
+        container2.style.display = 'block';
+        fname.textContent  = `${name}Trigger.trigger`;
+        fname2.textContent = `${name}TriggerHandler.cls`;
+        output.textContent =
+`trigger ${name}Trigger on ${obj} (
+    before insert, before update, before delete,
+    after insert, after update, after delete, after undelete
+) {
+    ${name}TriggerHandler handler = new ${name}TriggerHandler();
+
+    if (Trigger.isBefore) {
+        if (Trigger.isInsert)      handler.beforeInsert(Trigger.new);
+        else if (Trigger.isUpdate) handler.beforeUpdate(Trigger.new, Trigger.oldMap);
+        else if (Trigger.isDelete) handler.beforeDelete(Trigger.old, Trigger.oldMap);
+    } else {
+        if (Trigger.isInsert)        handler.afterInsert(Trigger.new, Trigger.newMap);
+        else if (Trigger.isUpdate)   handler.afterUpdate(Trigger.new, Trigger.oldMap);
+        else if (Trigger.isDelete)   handler.afterDelete(Trigger.old, Trigger.oldMap);
+        else if (Trigger.isUndelete) handler.afterUndelete(Trigger.new);
+    }
+}`;
+        output2.textContent =
+`public class ${name}TriggerHandler {
+
+    public void beforeInsert(List<${obj}> newRecords) {
+        // Set default field values
+    }
+
+    public void beforeUpdate(List<${obj}> newRecords, Map<Id, ${obj}> oldMap) {
+        for (${obj} record : newRecords) {
+            ${obj} oldRecord = oldMap.get(record.Id);
+            // Compare old vs new values
+        }
+    }
+
+    public void beforeDelete(List<${obj}> oldRecords, Map<Id, ${obj}> oldMap) {
+        // Prevent deletion logic
+    }
+
+    public void afterInsert(List<${obj}> newRecords, Map<Id, ${obj}> newMap) {
+        // Related record creation, async calls
+    }
+
+    public void afterUpdate(List<${obj}> newRecords, Map<Id, ${obj}> oldMap) {
+        // Cascading updates
+    }
+
+    public void afterDelete(List<${obj}> oldRecords, Map<Id, ${obj}> oldMap) {
+        // Cleanup related data
+    }
+
+    public void afterUndelete(List<${obj}> newRecords) {
+        // Restore related data
+    }
+}`;
+      },
+
+      'service-class': () => {
+        fname.textContent = `${name}Service.cls`;
+        output.textContent =
+`public with sharing class ${name}Service {
+
+    public static List<${obj}> getByIds(Set<Id> recordIds) {
+        return [
+            SELECT Id, Name
+            FROM ${obj}
+            WHERE Id IN :recordIds
+        ];
+    }
+
+    public static List<Database.SaveResult> safeUpdate(List<${obj}> records) {
+        List<Database.SaveResult> results = Database.update(records, false);
+        logErrors(results);
+        return results;
+    }
+
+    public static List<Database.SaveResult> safeInsert(List<${obj}> records) {
+        List<Database.SaveResult> results = Database.insert(records, false);
+        logErrors(results);
+        return results;
+    }
+
+    private static void logErrors(List<Database.SaveResult> results) {
+        for (Database.SaveResult sr : results) {
+            if (!sr.isSuccess()) {
+                for (Database.Error err : sr.getErrors()) {
+                    System.debug(LoggingLevel.ERROR,
+                        '${name}Service Error: ' + err.getStatusCode() +
+                        ' - ' + err.getMessage());
+                }
+            }
+        }
+    }
+}`;
+      },
+
+      'batch-class': () => {
+        fname.textContent = `${name}BatchProcessor.cls`;
+        output.textContent =
+`public class ${name}BatchProcessor implements Database.Batchable<SObject>, Database.Stateful {
+
+    private Integer successCount = 0;
+    private Integer failureCount = 0;
+    private List<String> errors  = new List<String>();
+
+    public Database.QueryLocator start(Database.BatchableContext bc) {
+        return Database.getQueryLocator([
+            SELECT Id, Name
+            FROM ${obj}
+            ORDER BY CreatedDate ASC
+        ]);
+    }
+
+    public void execute(Database.BatchableContext bc, List<${obj}> scope) {
+        List<${obj}> toUpdate = new List<${obj}>();
+
+        for (${obj} record : scope) {
+            try {
+                // Your processing logic here
+                toUpdate.add(record);
+            } catch (Exception e) {
+                failureCount++;
+                errors.add(record.Id + ': ' + e.getMessage());
+            }
+        }
+
+        if (!toUpdate.isEmpty()) {
+            List<Database.SaveResult> results = Database.update(toUpdate, false);
+            for (Database.SaveResult sr : results) {
+                if (sr.isSuccess()) { successCount++; }
+                else {
+                    failureCount++;
+                    for (Database.Error err : sr.getErrors()) {
+                        errors.add(sr.getId() + ': ' + err.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    public void finish(Database.BatchableContext bc) {
+        System.debug('Success: ' + successCount + ' | Failures: ' + failureCount);
+        if (!errors.isEmpty()) System.debug('Errors: ' + String.join(errors, '\\n'));
+    }
+}
+
+// Database.executeBatch(new ${name}BatchProcessor(), 200);`;
+      },
+
+      'test-class': () => {
+        fname.textContent = `${name}TriggerHandlerTest.cls`;
+        output.textContent =
+`@isTest
+private class ${name}TriggerHandlerTest {
+
+    @TestSetup
+    static void makeData() {
+        List<${obj}> records = new List<${obj}>();
+        for (Integer i = 0; i < 200; i++) {
+            records.add(new ${obj}(Name = 'Test ${name} ' + i));
+        }
+        insert records;
+    }
+
+    @isTest
+    static void testInsert_setsDefaults() {
+        List<${obj}> records = [SELECT Id, Name FROM ${obj}];
+        System.assertEquals(200, records.size(), 'Should create 200 test records');
+    }
+
+    @isTest
+    static void testUpdate_positive() {
+        List<${obj}> records = [SELECT Id, Name FROM ${obj} LIMIT 50];
+        for (${obj} rec : records) { rec.Name = rec.Name + ' Updated'; }
+
+        Test.startTest();
+        update records;
+        Test.stopTest();
+
+        for (${obj} rec : [SELECT Id, Name FROM ${obj} WHERE Id IN :records]) {
+            System.assert(rec.Name.contains('Updated'), 'Name should be updated');
+        }
+    }
+
+    @isTest
+    static void testBulkInsert_200Records() {
+        delete [SELECT Id FROM ${obj}];
+        List<${obj}> records = new List<${obj}>();
+        for (Integer i = 0; i < 200; i++) {
+            records.add(new ${obj}(Name = 'Bulk ' + i));
+        }
+
+        Test.startTest();
+        insert records;
+        Test.stopTest();
+
+        System.assertEquals(200, [SELECT COUNT() FROM ${obj}],
+            'Should handle 200 records without hitting limits');
+    }
+}`;
+      },
+
+      'schedulable': () => {
+        fname.textContent = `${name}ScheduledJob.cls`;
+        output.textContent =
+`public class ${name}ScheduledJob implements Schedulable {
+
+    public void execute(SchedulableContext sc) {
+        List<${obj}> records = [
+            SELECT Id, Name
+            FROM ${obj}
+            LIMIT 10000
+        ];
+
+        if (!records.isEmpty()) {
+            for (${obj} record : records) {
+                // Your logic here
+            }
+            Database.update(records, false);
+        }
+
+        System.debug('${name}ScheduledJob completed. Processed: ' + records.size());
+    }
+}
+
+// Run daily at 2:00 AM:
+// System.schedule('${name} Daily Job', '0 0 2 * * ?', new ${name}ScheduledJob());`;
+      },
+
+      'queueable': () => {
+        fname.textContent = `${name}QueueableJob.cls`;
+        output.textContent =
+`public class ${name}QueueableJob implements Queueable, Database.AllowsCallouts {
+
+    private List<Id> recordIds;
+
+    public ${name}QueueableJob(List<Id> recordIds) {
+        this.recordIds = recordIds;
+    }
+
+    public void execute(QueueableContext context) {
+        if (recordIds == null || recordIds.isEmpty()) return;
+
+        List<${obj}> records = [
+            SELECT Id, Name
+            FROM ${obj}
+            WHERE Id IN :recordIds
+        ];
+
+        List<${obj}> toUpdate = new List<${obj}>();
+        for (${obj} record : records) {
+            // Your async processing logic
+            toUpdate.add(record);
+        }
+
+        if (!toUpdate.isEmpty()) Database.update(toUpdate, false);
+
+        System.debug('${name}QueueableJob processed ' + toUpdate.size() + ' records');
+    }
+}
+
+// System.enqueueJob(new ${name}QueueableJob(new List<Id>{ '001xx...' }));`;
+      }
+    };
+
+    if (templates[selectedTemplate]) {
+      templates[selectedTemplate]();
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function copyCode() {
+    const t = document.getElementById('code-output').textContent;
+    if (t) { navigator.clipboard.writeText(t); showToast('Code copied!'); }
+  }
+  function copyCode2() {
+    const t = document.getElementById('code-output-2').textContent;
+    if (t) { navigator.clipboard.writeText(t); showToast('Code copied!'); }
+  }
+</script>
+</body>
+</html>

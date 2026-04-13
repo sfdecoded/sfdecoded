@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Icon Explorer — Browse All SLDS Icons | Salesforce Decoded</title>
+  <meta name="description" content="Browse, search, and preview all Salesforce Lightning Design System (SLDS) icons. Copy icon names and usage code instantly.">
+  <meta name="keywords" content="salesforce icon explorer, slds icons, salesforce lightning icons, salesforce icon list, slds icon reference">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/salesforce-icon-explorer.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+ <style>
+  .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+  .icon-card {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    padding: 20px 12px; border-radius: var(--md-shape-lg);
+    border: 1px solid var(--md-outline-variant); background: var(--md-surface-container-lowest);
+    cursor: pointer; transition: all 0.2s cubic-bezier(0.2,0,0,1); text-align: center;
+  }
+  .icon-card:hover { border-color: var(--md-primary); box-shadow: var(--md-elevation-2); transform: translateY(-2px); }
+  .icon-card.selected { border-color: var(--md-primary); background: var(--md-primary-container); }
+  .icon-card-svg { width: 32px; height: 32px; }
+  .icon-card-name { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--md-outline); word-break: break-all; line-height: 1.3; }
+  .icon-card:hover .icon-card-name { color: var(--md-on-surface); }
+
+  .icon-detail-panel {
+    position: sticky; top: 100px; padding: 1.5rem; background: var(--md-surface-container-low);
+    border-radius: var(--md-shape-xl); border: 1px solid var(--md-outline-variant);
+  }
+  .icon-preview {
+    width: 72px; height: 72px; display: flex; align-items: center; justify-content: center;
+    background: var(--md-primary-container); border-radius: var(--md-shape-lg);
+    margin: 0 auto 16px;
+  }
+  .icon-preview svg { width: 40px; height: 40px; }
+
+  .icon-category-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+    border-radius: var(--md-shape-full); font-size: 0.6875rem; font-weight: 600; }
+  .cat-standard { background: #dbeafe; color: #1e40af; }
+  .cat-custom   { background: #d1fae5; color: #065f46; }
+  .cat-utility  { background: #fef3c7; color: #92400e; }
+  .cat-action   { background: #ede9fe; color: #5b21b6; }
+  .cat-doctype  { background: #fce7f3; color: #9d174d; }
+
+  .copy-tab-group { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+  .copy-tab {
+    padding: 5px 12px; border-radius: var(--md-shape-full); font-family: var(--font-display);
+    font-size: 0.75rem; font-weight: 600; border: 1px solid var(--md-outline-variant);
+    background: transparent; color: var(--md-on-surface-variant); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-tab:hover { background: var(--md-surface-container); }
+  .copy-tab.active { background: var(--md-primary-container); color: var(--md-on-primary-container); border-color: var(--md-primary); }
+
+  .color-swatch-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .color-swatch {
+    width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+    border: 2px solid transparent; transition: all 0.15s; flex-shrink: 0;
+  }
+  .color-swatch:hover { transform: scale(1.15); }
+  .color-swatch.active { border-color: var(--md-on-surface); box-shadow: 0 0 0 2px var(--md-surface-container-lowest); }
+
+  .copy-code-block {
+    background: var(--md-inverse-surface); border-radius: var(--md-shape-md);
+    padding: 12px 14px; cursor: pointer; position: relative; margin-bottom: 8px;
+    transition: opacity 0.15s;
+  }
+  .copy-code-block:hover { opacity: 0.9; }
+  .copy-code-block code { font-family: var(--font-mono); font-size: 0.7rem; color: var(--md-inverse-on-surface); line-height: 1.6; display: block; white-space: pre-wrap; word-break: break-all; background: none; padding: 0; }
+  .copy-code-block .copy-hint { position: absolute; top: 8px; right: 10px; font-size: 0.65rem; color: var(--md-outline); font-family: var(--font-display); }
+
+  .icon-error { color: var(--md-on-surface-variant); font-size: 0.75rem; text-align: center; padding: 8px; }
+
+  @media (max-width: 768px) { .icon-layout { grid-template-columns: 1fr !important; } }
+</style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+          <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+    <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html" class="active">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal"><a href="../index.html">Home</a><span class="separator">/</span><a href="../tools.html">Tools</a><span class="separator">/</span><span class="current">Salesforce Icon Explorer</span></div>
+      <h1 class="display-medium reveal stagger-2">Salesforce Icon Explorer</h1>
+      <p class="reveal stagger-3">Browse, search, and copy all Salesforce Lightning Design System (SLDS) icon names across every category.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- Search & Filter -->
+      <div class="flex gap-16 mb-32 reveal" style="flex-wrap:wrap;align-items:flex-end">
+        <div style="flex:1;min-width:260px">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);border-radius:var(--md-shape-full)">
+            <span class="material-symbols-rounded" style="color:var(--md-on-surface-variant);font-size:20px">search</span>
+            <input type="text" id="icon-search" placeholder="Search icons (e.g. account, email, chart...)" style="flex:1;border:none;outline:none;font-family:var(--font-body);font-size:0.9375rem;background:transparent;color:var(--md-on-surface)">
+          </div>
+        </div>
+        <div class="chip-group" id="cat-filter">
+          <button class="chip active" data-cat="all" onclick="filterCat(this)">All</button>
+          <button class="chip" data-cat="standard" onclick="filterCat(this)"><span class="icon-category-badge cat-standard" style="padding:0;background:none;color:inherit">Standard</span></button>
+          <button class="chip" data-cat="custom" onclick="filterCat(this)">Custom</button>
+          <button class="chip" data-cat="utility" onclick="filterCat(this)">Utility</button>
+          <button class="chip" data-cat="action" onclick="filterCat(this)">Action</button>
+          <button class="chip" data-cat="doctype" onclick="filterCat(this)">Doctype</button>
+        </div>
+      </div>
+
+      <div class="icon-layout" style="display:grid;grid-template-columns:1fr 280px;gap:32px;align-items:start">
+        <!-- Icon Grid -->
+        <div>
+          <div class="flex items-center justify-between mb-16">
+            <span class="body-small text-outline" id="icon-count">Loading icons...</span>
+          </div>
+          <div class="icon-grid" id="icon-grid"></div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="icon-detail-panel" id="detail-panel">
+  <div class="text-center text-muted body-small" id="detail-placeholder" style="padding:40px 0">
+    <span class="material-symbols-rounded" style="font-size:48px;color:var(--md-outline-variant);display:block;margin-bottom:12px">touch_app</span>
+    Click any icon to see details and copy usage code
+  </div>
+
+  <div id="detail-content" style="display:none">
+    <div class="icon-preview" id="detail-preview"></div>
+    <h3 class="headline-small text-center" id="detail-name" style="margin-bottom:4px"></h3>
+    <div class="text-center mb-16" id="detail-category"></div>
+
+    <!-- Copy format tabs -->
+    <div class="label-medium text-outline mb-8">Copy as</div>
+    <div class="copy-tab-group">
+      <button class="copy-tab active" data-tab="lwc"  onclick="setCopyTab('lwc')">LWC</button>
+      <button class="copy-tab"        data-tab="aura" onclick="setCopyTab('aura')">Aura</button>
+      <button class="copy-tab"        data-tab="slds" onclick="setCopyTab('slds')">SLDS</button>
+      <button class="copy-tab"        data-tab="svg"  onclick="setCopyTab('svg')">SVG</button>
+    </div>
+    <div class="copy-code-block" onclick="copyCurrentUsage()" title="Click to copy">
+      <span class="copy-hint">click to copy</span>
+      <code id="detail-code"></code>
+    </div>
+
+    <!-- Full icon name -->
+    <div class="label-medium text-outline mb-8" style="margin-top:12px">Icon name</div>
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--md-surface-container);border-radius:var(--md-shape-sm);cursor:pointer;margin-bottom:16px" onclick="copyIconName()" title="Click to copy">
+      <code id="detail-fullname" style="font-size:0.8125rem;flex:1;background:none;padding:0"></code>
+      <span class="material-symbols-rounded" style="font-size:16px;color:var(--md-outline)">content_copy</span>
+    </div>
+
+    <!-- Color picker in panel -->
+    <div class="label-medium text-outline mb-8">Icon color</div>
+    <div class="color-swatch-group" id="color-swatches"></div>
+    </div>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+          <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+     <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4>
+      <ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li>
+        <li><a href="../extensions.html">Extensions</a></li></ul></div><div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li>
+          <li><a href="../resources.html">Resources</a></li></ul></div><div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li>
+            </ul></div></div>  <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+
+  <script src="../js/main.js"></script>
+<script>
+  const SPRITE_PATHS = {
+    utility:  '../icons/utility-sprite/svg/symbols.svg',
+    standard: '../icons/standard-sprite/svg/symbols.svg',
+    action:   '../icons/action-sprite/svg/symbols.svg',
+    custom:   '../icons/custom-sprite/svg/symbols.svg',
+    doctype:  '../icons/doctype-sprite/svg/symbols.svg',
+  };
+
+  const spriteCache = {};   // cat → parsed SVGDocument
+  const spriteFailed = {};
+  let icons = [];           // { name, cat } — built dynamically from sprites
+
+  // ── Load + parse every sprite, extract symbol IDs ─────────────────────────
+  async function loadSprite(cat) {
+    try {
+      const res = await fetch(SPRITE_PATHS[cat]);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, 'image/svg+xml');
+      spriteCache[cat] = doc;
+
+      // Extract all <symbol> IDs — these are the icon names
+      doc.querySelectorAll('symbol[id]').forEach(sym => {
+        icons.push({ name: sym.id, cat });
+      });
+    } catch (e) {
+      spriteFailed[cat] = true;
+      console.warn(`[IconExplorer] Could not load "${cat}" sprite:`, e.message);
+    }
+  }
+
+  // ── Render an icon SVG from the cached sprite ──────────────────────────────
+  function makeIconSVG(name, cat, colorHex, size = 32) {
+    const sprite = spriteCache[cat];
+    if (sprite) {
+      const sym = sprite.getElementById(name);
+      if (sym) {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', sym.getAttribute('viewBox') || '0 0 100 100');
+        svg.setAttribute('width', size);
+        svg.setAttribute('height', size);
+        svg.style.fill = colorHex;
+        svg.style.flexShrink = '0';
+        sym.childNodes.forEach(n => svg.appendChild(n.cloneNode(true)));
+        return svg;
+      }
+    }
+    // Letter fallback while sprite is loading / failed
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 32 32');
+    svg.setAttribute('width', size);
+    svg.setAttribute('height', size);
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    Object.entries({width:'32',height:'32',rx:'6',fill:colorHex,opacity:'0.15'})
+      .forEach(([k,v]) => rect.setAttribute(k,v));
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    Object.entries({x:'16',y:'21','font-size':'13','font-weight':'700',
+      fill:colorHex,'text-anchor':'middle'})
+      .forEach(([k,v]) => text.setAttribute(k,v));
+    text.textContent = name.charAt(0).toUpperCase();
+    svg.appendChild(rect);
+    svg.appendChild(text);
+    return svg;
+  }
+
+  // ── Colors ────────────────────────────────────────────────────────────────
+  const COLOR_PALETTE = [
+    { hex: '#1a56db', label: 'Blue' },
+    { hex: '#374151', label: 'Slate' },
+    { hex: '#0f6e56', label: 'Green' },
+    { hex: '#9d174d', label: 'Pink' },
+    { hex: '#5b21b6', label: 'Purple' },
+    { hex: '#92400e', label: 'Amber' },
+    { hex: '#b91c1c', label: 'Red' },
+    { hex: '#0369a1', label: 'Sky' },
+    { hex: '#44474f', label: 'Gray' },
+    { hex: '#ffffff', label: 'White' },
+    { hex: '#000000', label: 'Black' },
+  ];
+
+  let currentColor    = COLOR_PALETTE[0].hex;
+  let selectedIcon    = null;
+  let currentCat      = 'all';
+  let currentCopyTab  = 'lwc';
+
+  const grid    = document.getElementById('icon-grid');
+  const countEl = document.getElementById('icon-count');
+
+  // ── Render grid ────────────────────────────────────────────────────────────
+  function renderIcons(filter = '') {
+    const q = filter.toLowerCase().trim();
+    const filtered = icons.filter(i => {
+      const matchCat    = currentCat === 'all' || i.cat === currentCat;
+      const matchSearch = !q || i.name.includes(q) || i.cat.includes(q);
+      return matchCat && matchSearch;
+    });
+
+    grid.innerHTML = '';
+
+    if (!filtered.length) {
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--md-on-surface-variant)">
+        <span class="material-symbols-rounded" style="font-size:40px;display:block;margin-bottom:8px;color:var(--md-outline-variant)">search_off</span>
+        No icons found for "<strong>${q}</strong>"</div>`;
+      countEl.textContent = '0 icons found';
+      return;
+    }
+
+    filtered.forEach(i => {
+      const card = document.createElement('div');
+      card.className = 'icon-card' +
+        (selectedIcon && selectedIcon.name === i.name && selectedIcon.cat === i.cat ? ' selected' : '');
+      card.dataset.name = i.name;
+      card.dataset.cat  = i.cat;
+      card.title = `${i.cat}:${i.name}`;
+      card.onclick = () => selectIcon(i.name, i.cat);
+
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+      wrap.appendChild(makeIconSVG(i.name, i.cat, currentColor, 32));
+
+      const label = document.createElement('span');
+      label.className = 'icon-card-name';
+      label.textContent = i.name;
+
+      card.appendChild(wrap);
+      card.appendChild(label);
+      grid.appendChild(card);
+    });
+
+    countEl.textContent = `${filtered.length.toLocaleString()} icon${filtered.length !== 1 ? 's' : ''} found`;
+  }
+
+  // ── Select icon ────────────────────────────────────────────────────────────
+  function selectIcon(name, cat) {
+    selectedIcon = { name, cat };
+    document.getElementById('detail-placeholder').style.display = 'none';
+    document.getElementById('detail-content').style.display     = 'block';
+    updateDetailPanel();
+    document.querySelectorAll('.icon-card').forEach(c => c.classList.remove('selected'));
+    const match = document.querySelector(`.icon-card[data-name="${name}"][data-cat="${cat}"]`);
+    if (match) match.classList.add('selected');
+  }
+
+  function updateDetailPanel() {
+    if (!selectedIcon) return;
+    const { name, cat } = selectedIcon;
+    const fullName = `${cat}:${name}`;
+
+    const preview = document.getElementById('detail-preview');
+    preview.innerHTML = '';
+    preview.style.background = currentColor === '#ffffff' ? '#374151' : 'var(--md-primary-container)';
+    preview.appendChild(makeIconSVG(name, cat, currentColor === '#ffffff' ? '#ffffff' : currentColor, 40));
+
+    document.getElementById('detail-name').textContent = name;
+    document.getElementById('detail-fullname').textContent = fullName;
+    document.getElementById('detail-category').innerHTML =
+      `<span class="icon-category-badge cat-${cat}">${cat}</span>`;
+
+    updateCopyBlock(name, cat, fullName);
+  }
+
+  // ── Copy tabs ──────────────────────────────────────────────────────────────
+  function getUsageCode(name, cat, fullName, type) {
+    const slug = `${cat}-${name.replace(/_/g, '-')}`;
+    if (type === 'lwc')
+      return `<lightning-icon\n  icon-name="${fullName}"\n  size="medium"\n  alternative-text="${name}">\n</lightning-icon>`;
+    if (type === 'aura')
+      return `<lightning:icon\n  iconName="${fullName}"\n  size="medium"\n  alternativeText="${name}" />`;
+    if (type === 'slds')
+      return `<span class="slds-icon_container slds-icon-${slug}">\n  <svg class="slds-icon slds-icon-text-default" aria-hidden="true">\n    <use href="/assets/icons/${cat}-sprite/svg/symbols.svg#${name}"></use>\n  </svg>\n  <span class="slds-assistive-text">${name}</span>\n</span>`;
+    if (type === 'svg')
+      return `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true">\n  <use href="/assets/icons/${cat}-sprite/svg/symbols.svg#${name}"></use>\n</svg>`;
+    return '';
+  }
+
+  function updateCopyBlock(name, cat, fullName) {
+    document.getElementById('detail-code').textContent =
+      getUsageCode(name, cat, fullName, currentCopyTab);
+  }
+
+  function setCopyTab(tab) {
+    currentCopyTab = tab;
+    document.querySelectorAll('.copy-tab').forEach(t =>
+      t.classList.toggle('active', t.dataset.tab === tab));
+    if (selectedIcon)
+      updateCopyBlock(selectedIcon.name, selectedIcon.cat, `${selectedIcon.cat}:${selectedIcon.name}`);
+  }
+
+  function copyCurrentUsage() {
+    const code = document.getElementById('detail-code').textContent;
+    if (!code) return;
+    navigator.clipboard.writeText(code);
+    showToast(`${currentCopyTab.toUpperCase()} code copied!`);
+  }
+
+  function copyIconName() {
+    const name = document.getElementById('detail-fullname').textContent;
+    if (!name) return;
+    navigator.clipboard.writeText(name);
+    showToast('Icon name copied!');
+  }
+
+  // ── Color picker ───────────────────────────────────────────────────────────
+  function buildColorPicker() {
+    const container = document.getElementById('color-swatches');
+    COLOR_PALETTE.forEach((c, i) => {
+      const sw = document.createElement('button');
+      sw.className = 'color-swatch' + (i === 0 ? ' active' : '');
+      sw.dataset.hex = c.hex;
+      sw.title = c.label;
+      sw.style.background = c.hex;
+      if (c.hex === '#ffffff') sw.style.outline = '1px solid var(--md-outline-variant)';
+      sw.onclick = () => {
+        currentColor = c.hex;
+        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+        renderIcons(document.getElementById('icon-search').value);
+        updateDetailPanel();
+      };
+      container.appendChild(sw);
+    });
+  }
+
+  // ── Category filter ────────────────────────────────────────────────────────
+  function filterCat(chip) {
+    document.querySelectorAll('#cat-filter .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentCat = chip.dataset.cat;
+    renderIcons(document.getElementById('icon-search').value);
+  }
+
+  // ── Category counts in filter buttons ─────────────────────────────────────
+  function updateCatCounts() {
+    document.querySelectorAll('#cat-filter .chip[data-cat]').forEach(chip => {
+      const cat = chip.dataset.cat;
+      if (cat === 'all') {
+        chip.textContent = `All (${icons.length})`;
+      } else {
+        const count = icons.filter(i => i.cat === cat).length;
+        if (count > 0) chip.textContent = `${cat.charAt(0).toUpperCase() + cat.slice(1)} (${count})`;
+      }
+    });
+  }
+
+  // ── Skeleton loader while sprites fetch ───────────────────────────────────
+  function showSkeleton() {
+    grid.innerHTML = Array(24).fill(0).map(() => `
+      <div style="height:110px;border-radius:var(--md-shape-lg);background:var(--md-surface-container);
+        animation:shimmer 1.5s infinite;background-size:200% 100%;
+        background-image:linear-gradient(90deg,var(--md-surface-container) 25%,
+        var(--md-surface-container-high) 50%,var(--md-surface-container) 75%)">
+      </div>`).join('');
+    countEl.textContent = 'Loading icons…';
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  async function init() {
+    showSkeleton();
+    buildColorPicker();
+
+    // Load all sprites in parallel — icons[] is populated as each resolves
+    await Promise.all(Object.keys(SPRITE_PATHS).map(loadSprite));
+
+    if (!icons.length) {
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:64px;text-align:center;color:var(--md-on-surface-variant)">
+        <span class="material-symbols-rounded" style="font-size:48px;display:block;margin-bottom:12px;color:var(--md-outline-variant)">folder_off</span>
+        <strong>Sprites not found.</strong><br>
+        <span style="font-size:0.875rem;margin-top:8px;display:block">
+          Make sure the sprite files are at<br>
+          <code style="font-size:0.8rem">icons/{category}-sprite/svg/symbols.svg</code>
+        </span></div>`;
+      countEl.textContent = '0 icons loaded';
+      return;
+    }
+
+    updateCatCounts();
+    renderIcons();
+  }
+
+  document.getElementById('icon-search').addEventListener('input', e => renderIcons(e.target.value));
+  init();
+</script>
+</body>
+</html>

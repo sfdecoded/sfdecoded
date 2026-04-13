@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce ID Converter — Convert 15 to 18 Character IDs | Salesforce Decoded</title>
+  <meta name="description" content="Free online Salesforce ID converter. Convert 15-character case-sensitive IDs to 18-character case-insensitive format. Supports bulk conversion.">
+  <meta name="keywords" content="salesforce id converter, 15 to 18 character id, salesforce id tool, convert salesforce id">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/salesforce-id-converter.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+         <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+    <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html" class="active">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../tools.html">Tools</a><span class="separator">/</span>
+        <span class="current">Salesforce ID Converter</span>
+      </div>
+      <h1 class="display-medium reveal stagger-2">Salesforce ID Converter</h1>
+      <p class="reveal stagger-3">Convert 15-character case-sensitive Salesforce IDs to 18-character case-insensitive format. Supports bulk conversion.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- Tool Area -->
+      <div class="tool-area reveal-scale">
+        <div class="tool-area-header">
+          <div class="flex items-center gap-12">
+            <span class="material-symbols-rounded" style="color:var(--md-primary)">swap_horiz</span>
+            <span class="title-medium">ID Converter</span>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-tonal" onclick="convertIds()" style="padding:8px 20px">
+              <span class="material-symbols-rounded" style="font-size:18px">swap_horiz</span>
+              Convert
+            </button>
+            <button class="btn btn-text" onclick="clearAll()" style="padding:8px 16px">Clear</button>
+          </div>
+        </div>
+        <div class="tool-area-body">
+          <div>
+            <label class="label-medium text-outline" style="display:block;margin-bottom:8px">Input — 15 or 18 Character IDs (one per line)</label>
+            <textarea id="id-input" placeholder="Paste Salesforce IDs here, one per line...
+
+Example:
+0015000000Gf1AB
+0015000000Gf2CD
+001Hn00001a2bCd"></textarea>
+          </div>
+          <div style="background:var(--md-surface-container-low)">
+            <label class="label-medium text-outline" style="display:block;margin-bottom:8px">Converted Output</label>
+            <div style="position:relative">
+              <pre id="id-output" style="font-family:var(--font-mono);font-size:0.875rem;line-height:2;min-height:240px;white-space:pre-wrap;color:var(--md-on-surface)"></pre>
+              <button class="code-copy-btn" onclick="copyOutput()" style="position:absolute;top:0;right:0">
+                <span class="material-symbols-rounded">content_copy</span> Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Single Converter -->
+      <div class="card card-elevated mt-48 reveal" style="padding:32px;max-width:600px">
+        <h3 class="headline-small mb-16">Quick Single Convert</h3>
+        <div class="flex gap-12" style="flex-wrap:wrap">
+          <input type="text" id="single-id-input" placeholder="Enter a Salesforce ID" maxlength="18" style="flex:1;min-width:200px;padding:12px 16px;border:1px solid var(--md-outline-variant);border-radius:var(--md-shape-full);font-family:var(--font-mono);font-size:0.9375rem;background:var(--md-surface-container-lowest);color:var(--md-on-surface);outline:none">
+          <button class="btn btn-filled" onclick="convertSingle()">Convert</button>
+        </div>
+        <div id="single-result" class="mt-16" style="display:none">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--md-surface-container);border-radius:var(--md-shape-md)">
+            <span class="material-symbols-rounded text-primary" style="font-size:20px">check_circle</span>
+            <code id="single-output" style="font-size:1rem;flex:1"></code>
+            <button class="btn btn-icon" onclick="copySingle()" title="Copy"><span class="material-symbols-rounded" style="font-size:18px">content_copy</span></button>
+          </div>
+        </div>
+        <div id="single-error" class="mt-16" style="display:none">
+          <div class="callout callout-error" style="margin:0"><span class="material-symbols-rounded">error</span><p id="single-error-msg"></p></div>
+        </div>
+      </div>
+
+      <!-- How it Works -->
+      <div class="mt-48">
+        <h2 class="headline-large reveal">How Salesforce IDs Work</h2>
+        <div class="article-content">
+          <p class="reveal">Salesforce uses two ID formats: a 15-character case-sensitive format and an 18-character case-insensitive format. The 18-character version appends a 3-character checksum suffix to make the ID safe for use in systems that don't preserve case (like Excel or some databases).</p>
+
+          <div class="grid grid-2 mt-24">
+            <div class="card reveal stagger-1" style="text-align:center;padding:28px">
+              <div style="font-family:var(--font-mono);font-size:1.5rem;font-weight:700;color:var(--md-primary);margin-bottom:8px;letter-spacing:0.05em">0015000000Gf1AB</div>
+              <div class="label-medium text-outline">15-Character (Case-Sensitive)</div>
+            </div>
+            <div class="card reveal stagger-2" style="text-align:center;padding:28px">
+              <div style="font-family:var(--font-mono);font-size:1.5rem;font-weight:700;color:var(--md-primary);margin-bottom:8px;letter-spacing:0.05em">0015000000Gf1AB<span style="color:var(--accent-blue)">AAE</span></div>
+              <div class="label-medium text-outline">18-Character (Case-Insensitive)</div>
+            </div>
+          </div>
+
+          <div class="callout callout-info mt-24 reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <p><strong>Tip:</strong> Always use 18-character IDs in formulas, reports, data migrations, and external integrations to avoid case-sensitivity bugs.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Algorithm Explanation -->
+      <div class="mt-48">
+        <h2 class="headline-large reveal">Conversion Algorithm</h2>
+        <div class="grid grid-3 mt-24">
+          <div class="feature-item reveal stagger-1">
+            <div class="feature-item-icon"><span class="material-symbols-rounded">looks_one</span></div>
+            <div><h3>Split into chunks</h3><p>Divide the 15-char ID into three 5-character chunks.</p></div>
+          </div>
+          <div class="feature-item reveal stagger-2">
+            <div class="feature-item-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">looks_two</span></div>
+            <div><h3>Map uppercase chars</h3><p>For each chunk, build a 5-bit number where uppercase = 1, other = 0.</p></div>
+          </div>
+          <div class="feature-item reveal stagger-3">
+            <div class="feature-item-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">looks_3</span></div>
+            <div><h3>Append suffix</h3><p>Map each 5-bit number to a character (A-Z, 0-5) and append all three.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+          <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+     <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li>
+      <li><a href="../extensions.html">Extensions</a></li></ul></div>
+  <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+  <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+</div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+
+  <script src="../js/main.js"></script>
+  <script>
+    const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ012345';
+
+    function convert15to18(id15) {
+      id15 = id15.trim();
+      if (id15.length === 18) return id15;
+      if (id15.length !== 15) return null;
+      if (!/^[a-zA-Z0-9]{15}$/.test(id15)) return null;
+
+      let suffix = '';
+      for (let i = 0; i < 3; i++) {
+        let flags = 0;
+        for (let j = 0; j < 5; j++) {
+          const ch = id15.charAt(i * 5 + j);
+          if (ch >= 'A' && ch <= 'Z') {
+            flags += (1 << j);
+          }
+        }
+        suffix += CHARS.charAt(flags);
+      }
+      return id15 + suffix;
+    }
+
+    function convertIds() {
+      const input = document.getElementById('id-input').value.trim();
+      if (!input) return;
+
+      const lines = input.split('\n').filter(l => l.trim());
+      const results = lines.map(line => {
+        const id = line.trim();
+        const converted = convert15to18(id);
+        if (converted) return converted;
+        if (id.length === 18 && /^[a-zA-Z0-9]{18}$/.test(id)) return id;
+        return `⚠ Invalid: ${id}`;
+      });
+
+      document.getElementById('id-output').textContent = results.join('\n');
+    }
+
+    function convertSingle() {
+      const input = document.getElementById('single-id-input').value.trim();
+      const resultEl = document.getElementById('single-result');
+      const errorEl = document.getElementById('single-error');
+      const outputEl = document.getElementById('single-output');
+      const errorMsg = document.getElementById('single-error-msg');
+
+      resultEl.style.display = 'none';
+      errorEl.style.display = 'none';
+
+      if (!input) return;
+
+      const converted = convert15to18(input);
+      if (converted) {
+        outputEl.textContent = converted;
+        resultEl.style.display = 'block';
+        resultEl.style.animation = 'fadeIn 0.3s ease';
+      } else if (input.length === 18 && /^[a-zA-Z0-9]{18}$/.test(input)) {
+        outputEl.textContent = input + ' (already 18 chars)';
+        resultEl.style.display = 'block';
+      } else {
+        errorMsg.textContent = 'Invalid Salesforce ID. Must be 15 or 18 alphanumeric characters.';
+        errorEl.style.display = 'block';
+      }
+    }
+
+    function copyOutput() {
+      const output = document.getElementById('id-output').textContent;
+      if (output) { navigator.clipboard.writeText(output); showToast('IDs copied!'); }
+    }
+
+    function copySingle() {
+      const output = document.getElementById('single-output').textContent;
+      if (output) { navigator.clipboard.writeText(output); showToast('ID copied!'); }
+    }
+
+    function clearAll() {
+      document.getElementById('id-input').value = '';
+      document.getElementById('id-output').textContent = '';
+    }
+
+    document.getElementById('single-id-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') convertSingle();
+    });
+  </script>
+</body>
+</html>

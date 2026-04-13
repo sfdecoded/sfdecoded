@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOQL Query Analyzer — Salesforce Decoded</title>
+  <meta name="description" content="Analyze SOQL queries for performance issues, non-selectivity, missing indexes, and optimization opportunities.">
+  <meta name="keywords" content="soql analyzer, soql performance, salesforce query optimization, non-selective query">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/soql-query-analyzer.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+  <link rel="manifest" href="../site.webmanifest">
+  <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+  <!-- End Google Tag Manager -->
+  <style>
+    /* Material Design You 3 - Analyzer Page */
+    
+    /* Improved heading spacing */
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+      line-height: 1.2;
+    }
+    
+    .display-medium {
+      margin-top: 0.75em !important;
+      margin-bottom: 0.75em !important;
+      letter-spacing: -0.5px;
+    }
+    
+    .display-small {
+      margin-top: 1em !important;
+      margin-bottom: 0.75em !important;
+    }
+    
+    p {
+      line-height: 1.6;
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+    
+    /* Breadcrumbs */
+    .breadcrumbs {
+      color: var(--md-on-surface-variant);
+      font-size: 0.875rem;
+      margin-bottom: 16px;
+    }
+    
+    .breadcrumbs a {
+      color: var(--md-primary);
+      text-decoration: none;
+    }
+    
+    .breadcrumbs a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Page header improvements */
+    .page-header {
+      padding: 120px 0 48px;
+      background: linear-gradient(135deg, var(--md-surface-container-lowest) 0%, var(--md-surface-container-low) 100%);
+    }
+    
+    .page-header p {
+      font-size: 1.0625rem;
+      color: var(--md-on-surface-variant);
+      max-width: 700px;
+    }
+    
+    /* Analyzer container improvements */
+    .analyzer-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 32px 0;
+    }
+    
+    .analyzer-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .analyzer-label {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--md-on-surface);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    
+    textarea {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      padding: 16px;
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+      background: var(--md-surface-container-lowest);
+      color: var(--md-on-surface);
+      resize: vertical;
+      min-height: 300px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    textarea:hover {
+      border-color: var(--md-outline);
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--md-primary);
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+    }
+    
+    .analyze-btn {
+      padding: 12px 24px;
+      background: var(--md-primary);
+      color: var(--md-on-primary);
+      border: none;
+      border-radius: var(--md-shape-md);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .analyze-btn:hover {
+      background: #0a3fb8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(26, 86, 219, 0.2);
+    }
+    
+    .analyze-btn:active {
+      transform: translateY(0);
+    }
+    
+    /* Chip styling */
+    .chip {
+      padding: 8px 16px;
+      background: var(--md-surface-container);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: 24px;
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--md-on-surface-variant);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .chip:hover {
+      background: var(--md-surface-container-high);
+      border-color: var(--md-primary);
+      color: var(--md-primary);
+    }
+    
+    /* Issue styling */
+    .issue {
+      padding: 16px;
+      border-radius: var(--md-shape-md);
+      border-left: 4px solid;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+    
+    .issue:hover {
+      transform: translateX(4px);
+    }
+    
+    .issue-error {
+      background: #fef2f2;
+      border-left-color: #dc2626;
+    }
+    
+    .issue-warning {
+      background: #fffbeb;
+      border-left-color: #d97706;
+    }
+    
+    .issue-info {
+      background: #eff6ff;
+      border-left-color: #0284c7;
+    }
+    
+    .issue-success {
+      background: #f0fdf4;
+      border-left-color: #16a34a;
+    }
+    
+    .issue-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: var(--md-on-surface);
+    }
+    
+    .issue-desc {
+      font-size: 0.8875rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.5;
+    }
+    
+    .analysis-results {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .result-section {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+      padding: 20px;
+    }
+    
+    .result-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 16px;
+      color: var(--md-on-surface);
+    }
+    
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--md-outline-variant);
+      font-size: 0.9rem;
+    }
+    
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+    
+    .stat-label {
+      color: var(--md-on-surface-variant);
+      font-weight: 500;
+    }
+    
+    .stat-value {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--md-primary);
+    }
+    
+    /* Card styling */
+    .card {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-lg);
+      transition: all 0.2s ease;
+    }
+    
+    .card:hover {
+      border-color: var(--md-primary);
+      box-shadow: 0 4px 16px rgba(26, 86, 219, 0.12);
+      transform: translateY(-2px);
+    }
+    
+    .card h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--md-on-surface);
+    }
+    
+    .card p {
+      margin: 0;
+      color: var(--md-on-surface-variant);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    /* Section spacing */
+    .section {
+      padding: 80px 0;
+    }
+    
+    .mt-48 {
+      margin-top: 48px;
+    }
+    
+    .pt-48 {
+      padding-top: 48px;
+    }
+    
+    .mb-24 {
+      margin-bottom: 24px;
+    }
+    
+    .mt-16 {
+      margin-top: 16px;
+    }
+    
+    .gap-24 {
+      gap: 24px;
+    }
+    
+    .gap-12 {
+      gap: 12px;
+    }
+    
+    .mb-12 {
+      margin-bottom: 12px;
+    }
+    
+    /* Grid system */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    
+    @media (min-width: 768px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    /* Flex utilities */
+    .flex {
+      display: flex;
+    }
+    
+    .items-center {
+      align-items: center;
+    }
+    
+    /* Callout styling */
+    .callout {
+      padding: 24px;
+      border-radius: var(--md-shape-lg);
+      border: 1px solid var(--md-outline-variant);
+    }
+    
+    .callout-info {
+      background: #eff6ff;
+      border-color: #0284c7;
+    }
+    
+    .callout span.material-symbols-rounded {
+      color: #0284c7;
+      font-size: 24px;
+      margin-right: 16px;
+      display: inline-flex;
+      vertical-align: middle;
+    }
+    
+    .callout p {
+      margin: 12px 0;
+      line-height: 1.6;
+      color: var(--md-on-surface-variant);
+    }
+    
+    .callout p:first-child {
+      margin-top: 0;
+    }
+    
+    .callout strong {
+      color: var(--md-on-surface);
+      font-weight: 600;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 1024px) {
+      .analyzer-container {
+        grid-template-columns: 1fr;
+      }
+      
+      #results {
+        max-height: 400px !important;
+      }
+    }
+    
+    /* Reveal animation support */
+    .reveal {
+      opacity: 1;
+      animation: fadeIn 0.6s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html" class="active">Tools</a></li>
+        <li><a href="../errors.html">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../prompts.html">Prompts</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search tools..."></div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../tools.html">Tools</a><span class="separator">/</span>
+        <span class="current">SOQL Query Analyzer</span>
+      </div>
+      <h1 class="display-medium reveal stagger-2">SOQL Query Analyzer</h1>
+      <p class="reveal stagger-3">Analyze your SOQL queries for performance issues, detect non-selectivity, identify missing indexes, and get optimization suggestions.</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <div class="analyzer-container reveal">
+        <!-- Input Panel -->
+        <div class="analyzer-panel">
+          <label class="analyzer-label">Paste your SOQL query</label>
+          <textarea id="soql-input" placeholder="SELECT Id, Name, Email FROM Account WHERE Industry = 'Technology' AND Status = 'Active'" spellcheck="false"></textarea>
+          <button class="analyze-btn" onclick="analyzeQuery()">Analyze Query</button>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="chip" onclick="loadExample(1)" style="background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); cursor: pointer;">Example 1</button>
+            <button class="chip" onclick="loadExample(2)" style="background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); cursor: pointer;">Example 2</button>
+            <button class="chip" onclick="loadExample(3)" style="background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); cursor: pointer;">Example 3</button>
+          </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="analyzer-panel">
+          <label class="analyzer-label">Analysis Results</label>
+          <div id="results" style="flex: 1; overflow-y: auto; max-height: 500px;">
+            <div style="text-align: center; padding: 32px 16px; color: var(--md-on-surface-variant);">
+              <span class="material-symbols-rounded" style="font-size: 40px; display: block; margin-bottom: 12px;">help</span>
+              <p>Paste a SOQL query and click "Analyze Query" to see results</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Section -->
+      <div class="mt-48 pt-48" style="border-top: 1px solid var(--md-outline-variant);">
+        <h2 class="display-small reveal mb-24">What This Tool Checks</h2>
+        <div class="grid grid-2 gap-24">
+          <div class="card reveal stagger-1" style="padding: 24px;">
+            <div class="flex items-center gap-12 mb-12">
+              <span class="material-symbols-rounded" style="color: #dc2626; font-size: 24px;">error</span>
+              <h3 style="margin: 0; font-size: 1rem;">Performance Issues</h3>
+            </div>
+            <p style="margin: 0; color: var(--md-on-surface-variant); font-size: 0.9rem;">Detects non-selective queries that might hit production performance limits.</p>
+          </div>
+
+          <div class="card reveal stagger-2" style="padding: 24px;">
+            <div class="flex items-center gap-12 mb-12">
+              <span class="material-symbols-rounded" style="color: #d97706; font-size: 24px;">warning</span>
+              <h3 style="margin: 0; font-size: 1rem;">Index Usage</h3>
+            </div>
+            <p style="margin: 0; color: var(--md-on-surface-variant); font-size: 0.9rem;">Analyzes whether your WHERE clauses are using indexed fields effectively.</p>
+          </div>
+
+          <div class="card reveal stagger-3" style="padding: 24px;">
+            <div class="flex items-center gap-12 mb-12">
+              <span class="material-symbols-rounded" style="color: #0284c7; font-size: 24px;">info</span>
+              <h3 style="margin: 0; font-size: 1rem;">Query Complexity</h3>
+            </div>
+            <p style="margin: 0; color: var(--md-on-surface-variant); font-size: 0.9rem;">Estimates complexity based on relationships, joins, and aggregations.</p>
+          </div>
+
+          <div class="card reveal stagger-4" style="padding: 24px;">
+            <div class="flex items-center gap-12 mb-12">
+              <span class="material-symbols-rounded" style="color: #16a34a; font-size: 24px;">done</span>
+              <h3 style="margin: 0; font-size: 1rem;">Optimization Tips</h3>
+            </div>
+            <p style="margin: 0; color: var(--md-on-surface-variant); font-size: 0.9rem;">Provides actionable recommendations to improve query performance.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips Section -->
+      <div class="mt-48">
+        <h2 class="display-small reveal mb-24">Query Optimization Tips</h2>
+        <div class="callout callout-info reveal">
+          <span class="material-symbols-rounded">lightbulb</span>
+          <div>
+            <p><strong>Use indexed fields in WHERE clauses:</strong> Standard indexed fields include Id, Name, Email. Always filter on these when possible for better selectivity.</p>
+            <p><strong>Avoid wildcards at the start:</strong> LIKE '%value' cannot use indexes. Use LIKE 'value%' instead for selective queries.</p>
+            <p><strong>Limit SOQL queries in loops:</strong> This is a common cause of governor limit errors. Use SOQL queries to fetch data first, then iterate.</p>
+            <p><strong>Use LIMIT clause:</strong> Always specify LIMIT, especially in loops and batch operations to control data volume.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+          <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+        <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="https://sfdecoded.netlify.app/"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+
+  <script src="../js/main.js"></script>
+  <script>
+    function analyzeQuery() {
+      const query = document.getElementById('soql-input').value.trim();
+      const resultsDiv = document.getElementById('results');
+
+      if (!query) {
+        resultsDiv.innerHTML = '<div style="color: var(--md-error); text-align: center;">Please enter a SOQL query</div>';
+        return;
+      }
+
+      const issues = [];
+      let score = 100;
+
+      // Analysis logic
+      if (!query.toUpperCase().includes('WHERE')) {
+        issues.push({ type: 'error', title: 'No WHERE Clause', desc: 'Queries without WHERE clauses can be non-selective. Add filtering conditions when possible.' });
+        score -= 20;
+      }
+
+      if (!query.toUpperCase().includes('LIMIT')) {
+        issues.push({ type: 'warning', title: 'Missing LIMIT Clause', desc: 'Add LIMIT to control result set size and avoid unexpected data volumes.' });
+        score -= 10;
+      }
+
+      if (query.includes('LIKE \'%')) {
+        issues.push({ type: 'error', title: 'Leading Wildcard Detected', desc: 'Queries using LIKE \'%value\' cannot use indexes efficiently. Use LIKE \'value%\' if possible, or consider alternative approaches.' });
+        score -= 15;
+      }
+
+      if (query.toUpperCase().includes('GROUP BY')) {
+        issues.push({ type: 'info', title: 'Aggregate Query', desc: 'Aggregate queries have their own performance characteristics. Ensure sufficient data volume to justify the aggregation.' });
+        score -= 5;
+      }
+
+      if ((query.match(/FROM/gi) || []).length > 1) {
+        issues.push({ type: 'warning', title: 'Multiple Objects (Join Detected)', desc: 'Queries with multiple objects may have higher complexity. Verify that relationships are indexed.' });
+        score -= 10;
+      }
+
+      const fieldCount = (query.match(/,/g) || []).length + 1;
+      if (fieldCount > 10) {
+        issues.push({ type: 'info', title: `${fieldCount} Fields Selected`, desc: 'Consider selecting only the fields you need to reduce payload size and improve performance.' });
+        score -= 5;
+      }
+
+      if (score > 80) {
+        issues.unshift({ type: 'success', title: 'Query Looks Good!', desc: 'Your query appears to be well-structured. Keep following best practices.' });
+      }
+
+      // Build HTML
+      let html = `
+        <div class="analysis-results">
+          <div class="result-section">
+            <div class="result-title">Query Score: ${Math.max(0, score)}/100</div>
+            <div style="background: linear-gradient(90deg, ${score > 70 ? '#16a34a' : score > 50 ? '#d97706' : '#dc2626'} 0%, ${score > 70 ? '#16a34a' : score > 50 ? '#d97706' : '#dc2626'} ${score}%, var(--md-surface-container-high) ${score}%, var(--md-surface-container-high) 100%); height: 8px; border-radius: 4px; margin-bottom: 16px;"></div>
+            <div class="stat-row">
+              <span class="stat-label">Objects:</span>
+              <span class="stat-value">${(query.match(/FROM/gi) || []).length}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Fields Selected:</span>
+              <span class="stat-value">${fieldCount}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Has WHERE:</span>
+              <span class="stat-value">${query.toUpperCase().includes('WHERE') ? '✓' : '✗'}</span>
+            </div>
+          </div>
+
+          <div class="result-section">
+            <div class="result-title">Issues & Recommendations</div>
+            ${issues.map(issue => `
+              <div class="issue issue-${issue.type}">
+                <div class="issue-title">${issue.title}</div>
+                <div class="issue-desc">${issue.desc}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      resultsDiv.innerHTML = html;
+    }
+
+    function loadExample(num) {
+      const examples = {
+        1: "SELECT Id, Name, Email, Phone FROM Account WHERE Industry = 'Technology' LIMIT 100",
+        2: "SELECT Id, OwnerId, Amount, StageName FROM Opportunity WHERE CreatedDate = THIS_FISCAL_YEAR",
+        3: "SELECT LeadSource, COUNT() FROM Lead WHERE Status != 'Converted' GROUP BY LeadSource LIMIT 50"
+      };
+      document.getElementById('soql-input').value = examples[num] || '';
+      analyzeQuery();
+    }
+  </script>
+</body>
+</html>

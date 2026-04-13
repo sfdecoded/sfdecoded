@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Field Dependency Viewer — Visualize Salesforce Field Dependencies | Salesforce Decoded</title>
+  <meta name="description" content="Visualize Salesforce field-level dependencies, picklist controlling-dependent relationships, and record type mappings. Paste metadata and explore.">
+  <meta name="keywords" content="salesforce field dependency viewer, picklist dependency, salesforce controlling field, dependent picklist salesforce">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/field-dependency-viewer.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <style>
+    .dep-matrix { overflow-x: auto; }
+    .dep-table { border-collapse: collapse; width: 100%; min-width: 600px; font-size: 0.8125rem; }
+    .dep-table th, .dep-table td { padding: 10px 14px; text-align: left; border: 1px solid var(--md-outline-variant); }
+    .dep-table th { background: var(--md-surface-container); font-family: var(--font-display); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--md-on-surface-variant); position: sticky; top: 0; z-index: 1; }
+    .dep-table td { background: var(--md-surface-container-lowest); }
+    .dep-cell { width: 40px; height: 40px; text-align: center; vertical-align: middle; cursor: default; transition: background 0.15s; }
+    .dep-cell.active { background: var(--md-primary-container); }
+    .dep-cell.active::after { content: '✓'; color: var(--md-primary); font-weight: 700; font-size: 1rem; }
+    .dep-cell:hover { background: var(--md-surface-container-high); }
+    .dep-row-header { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; white-space: nowrap; min-width: 140px; }
+    .dep-col-header { font-family: var(--font-mono); font-size: 0.75rem; writing-mode: vertical-lr; text-orientation: mixed; transform: rotate(180deg); min-width: 40px; height: 120px; vertical-align: bottom; }
+    .obj-selector { display: flex; gap: 8px; flex-wrap: wrap; }
+    .obj-btn { padding: 10px 20px; border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-md); background: var(--md-surface-container-lowest); font-family: var(--font-display); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; color: var(--md-on-surface); }
+    .obj-btn:hover { border-color: var(--md-primary); background: var(--md-primary-container); }
+    .obj-btn.active { border-color: var(--md-primary); background: var(--md-primary); color: var(--md-on-primary); }
+  </style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+          <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+    <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html" class="active">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal"><a href="../index.html">Home</a><span class="separator">/</span><a href="../tools.html">Tools</a><span class="separator">/</span><span class="current">Field Dependency Viewer</span></div>
+      <h1 class="display-medium reveal stagger-2">Field Dependency Viewer</h1>
+      <p class="reveal stagger-3">Visualize controlling-dependent picklist relationships, field dependencies, and record type mappings in a clear matrix view.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- Object Selector -->
+      <div class="mb-32 reveal">
+        <label class="label-large" style="display:block;margin-bottom:12px">Select an Object (Sample Data)</label>
+        <div class="obj-selector">
+          <button class="obj-btn active" onclick="loadObject('opportunity', this)">Opportunity</button>
+          <button class="obj-btn" onclick="loadObject('case', this)">Case</button>
+          <button class="obj-btn" onclick="loadObject('lead', this)">Lead</button>
+          <button class="obj-btn" onclick="loadObject('account', this)">Account</button>
+        </div>
+      </div>
+
+      <!-- Dependency Info -->
+      <div class="card card-elevated mb-32 reveal-scale" id="dep-info" style="padding:28px">
+        <div class="flex items-center gap-16 mb-16" style="flex-wrap:wrap">
+          <div class="card-icon" style="margin:0"><span class="material-symbols-rounded">account_tree</span></div>
+          <div style="flex:1">
+            <h3 class="headline-small" id="dep-title">Opportunity — Stage / Type Dependency</h3>
+            <p class="body-small text-muted" id="dep-desc">Controlling field: <strong>Type</strong> → Dependent field: <strong>Stage</strong></p>
+          </div>
+          <div class="flex gap-8">
+            <span class="tag tag-primary" id="dep-ctrl-count">6 controlling values</span>
+            <span class="tag tag-success" id="dep-dep-count">8 dependent values</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Matrix View -->
+      <div class="dep-matrix reveal" id="matrix-container">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Custom Input -->
+      <div class="mt-48">
+        <h2 class="headline-large mb-16 reveal">Custom Dependency Input</h2>
+        <p class="body-large text-muted mb-24 reveal">Paste your own controlling/dependent picklist values in JSON format to visualize custom dependencies.</p>
+
+        <div class="tool-area reveal-scale">
+          <div class="tool-area-header">
+            <div class="flex items-center gap-12">
+              <span class="material-symbols-rounded" style="color:var(--md-primary)">data_object</span>
+              <span class="title-medium">Custom Dependency JSON</span>
+            </div>
+            <div class="flex gap-8">
+              <button class="btn btn-tonal" onclick="parseCustom()" style="padding:8px 20px">
+                <span class="material-symbols-rounded" style="font-size:18px">visibility</span> Visualize
+              </button>
+            </div>
+          </div>
+          <div style="padding:20px">
+            <textarea id="custom-input" style="width:100%;min-height:200px;border:none;outline:none;resize:vertical;font-family:var(--font-mono);font-size:0.8125rem;line-height:1.7;background:transparent;color:var(--md-on-surface)" placeholder='{
+  "controllingField": "Region",
+  "dependentField": "Country",
+  "controlling": ["North America", "Europe", "Asia"],
+  "dependent": ["USA", "Canada", "UK", "Germany", "France", "Japan", "China"],
+  "matrix": {
+    "North America": ["USA", "Canada"],
+    "Europe": ["UK", "Germany", "France"],
+    "Asia": ["Japan", "China"]
+  }
+}'></textarea>
+          </div>
+        </div>
+        <div id="custom-error" style="display:none" class="mt-16">
+          <div class="callout callout-error"><span class="material-symbols-rounded">error</span><p id="custom-error-msg"></p></div>
+        </div>
+      </div>
+
+      <!-- How it helps -->
+      <div class="mt-48">
+        <h2 class="headline-large reveal">Why Visualize Dependencies?</h2>
+        <div class="grid grid-3 mt-24">
+          <div class="card reveal stagger-1"><div class="card-icon"><span class="material-symbols-rounded">bug_report</span></div><h3>Debug Picklist Issues</h3><p>Quickly identify why certain picklist values don't appear for specific controlling field selections.</p></div>
+          <div class="card reveal stagger-2"><div class="card-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">architecture</span></div><h3>Plan Data Models</h3><p>Understand field relationships before building automation, validation rules, or flows.</p></div>
+          <div class="card reveal stagger-3"><div class="card-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">description</span></div><h3>Document Dependencies</h3><p>Export clear visual documentation for stakeholders and business analysts.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+          <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+     <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+
+  <script src="../js/main.js"></script>
+  <script>
+    // Sample dependency data
+    const sampleData = {
+      opportunity: {
+        controllingField: 'Type',
+        dependentField: 'Stage',
+        controlling: ['New Customer', 'Existing Customer - Upgrade', 'Existing Customer - Replacement', 'Existing Customer - Downgrade', 'New Business', 'Renewal'],
+        dependent: ['Prospecting', 'Qualification', 'Needs Analysis', 'Value Proposition', 'Negotiation', 'Closed Won', 'Closed Lost', 'Pending'],
+        matrix: {
+          'New Customer': ['Prospecting', 'Qualification', 'Needs Analysis', 'Value Proposition', 'Negotiation', 'Closed Won', 'Closed Lost'],
+          'Existing Customer - Upgrade': ['Qualification', 'Needs Analysis', 'Value Proposition', 'Negotiation', 'Closed Won', 'Closed Lost'],
+          'Existing Customer - Replacement': ['Needs Analysis', 'Value Proposition', 'Negotiation', 'Closed Won', 'Closed Lost'],
+          'Existing Customer - Downgrade': ['Needs Analysis', 'Negotiation', 'Closed Won', 'Closed Lost'],
+          'New Business': ['Prospecting', 'Qualification', 'Needs Analysis', 'Value Proposition', 'Negotiation', 'Closed Won', 'Closed Lost', 'Pending'],
+          'Renewal': ['Qualification', 'Negotiation', 'Closed Won', 'Closed Lost', 'Pending']
+        }
+      },
+      case: {
+        controllingField: 'Type',
+        dependentField: 'Reason',
+        controlling: ['Mechanical', 'Electrical', 'Electronic', 'Structural', 'Other'],
+        dependent: ['Installation', 'Equipment Complexity', 'Performance', 'Breakdown', 'Design', 'Feedback', 'Other'],
+        matrix: {
+          'Mechanical': ['Installation', 'Performance', 'Breakdown', 'Other'],
+          'Electrical': ['Installation', 'Equipment Complexity', 'Performance', 'Breakdown'],
+          'Electronic': ['Equipment Complexity', 'Performance', 'Breakdown', 'Design'],
+          'Structural': ['Installation', 'Design', 'Other'],
+          'Other': ['Feedback', 'Other']
+        }
+      },
+      lead: {
+        controllingField: 'Industry',
+        dependentField: 'Rating',
+        controlling: ['Technology', 'Healthcare', 'Finance', 'Manufacturing', 'Retail', 'Education'],
+        dependent: ['Hot', 'Warm', 'Cold'],
+        matrix: {
+          'Technology': ['Hot', 'Warm'],
+          'Healthcare': ['Hot', 'Warm', 'Cold'],
+          'Finance': ['Hot', 'Warm'],
+          'Manufacturing': ['Warm', 'Cold'],
+          'Retail': ['Warm', 'Cold'],
+          'Education': ['Cold']
+        }
+      },
+      account: {
+        controllingField: 'Industry',
+        dependentField: 'Account Source',
+        controlling: ['Technology', 'Healthcare', 'Finance', 'Energy', 'Retail'],
+        dependent: ['Web', 'Phone', 'Partner', 'Trade Show', 'Advertisement', 'Employee Referral'],
+        matrix: {
+          'Technology': ['Web', 'Partner', 'Employee Referral'],
+          'Healthcare': ['Phone', 'Trade Show', 'Partner'],
+          'Finance': ['Web', 'Phone', 'Partner', 'Employee Referral'],
+          'Energy': ['Trade Show', 'Advertisement', 'Partner'],
+          'Retail': ['Web', 'Advertisement', 'Trade Show']
+        }
+      }
+    };
+
+    function renderMatrix(data) {
+  const container = document.getElementById('matrix-container');
+  const {
+    controllingField = 'Controlling Field',
+    dependentField   = 'Dependent Field',
+    controlling = [],
+    dependent   = [],
+    matrix      = {}
+  } = data;
+
+  document.getElementById('dep-title').textContent =
+    `${controllingField} → ${dependentField} Dependency`;
+  document.getElementById('dep-desc').innerHTML =
+    `Controlling field: <strong>${controllingField}</strong> → Dependent field: <strong>${dependentField}</strong>`;
+  document.getElementById('dep-ctrl-count').textContent =
+    `${controlling.length} controlling value${controlling.length !== 1 ? 's' : ''}`;
+  document.getElementById('dep-dep-count').textContent =
+    `${dependent.length} dependent value${dependent.length !== 1 ? 's' : ''}`;
+
+  if (!controlling.length || !dependent.length) {
+    container.innerHTML = `
+      <div class="callout callout-warning" style="margin-top:0">
+        <span class="material-symbols-rounded">warning</span>
+        <p>No values to display — make sure "controlling" and "dependent" arrays are not empty.</p>
+      </div>`;
+    return;
+  }
+
+  let html = `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;font-size:0.8125rem;color:var(--md-on-surface-variant)">
+      <span style="display:inline-flex;align-items:center;gap:6px">
+        <span style="width:14px;height:14px;border-radius:3px;background:var(--md-primary-container);border:1px solid var(--md-outline-variant);display:inline-block"></span>
+        Enabled
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:6px">
+        <span style="width:14px;height:14px;border-radius:3px;background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);display:inline-block"></span>
+        Not available
+      </span>
+    </div>
+    <table class="dep-table"><thead><tr>
+      <th style="min-width:140px">${controllingField} ↓ &nbsp;/&nbsp; ${dependentField} →</th>`;
+
+  for (const dep of dependent) {
+    html += `<th class="dep-col-header">${dep}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+
+  for (const ctrl of controlling) {
+    const activeSet = new Set(matrix[ctrl] || []);
+    const enabledCount = activeSet.size;
+    html += `<tr>
+      <td class="dep-row-header">
+        ${ctrl}
+        <span style="font-size:0.7rem;font-weight:400;color:var(--md-outline);margin-left:6px">(${enabledCount})</span>
+      </td>`;
+    for (const dep of dependent) {
+      const isActive = activeSet.has(dep);
+      html += `<td class="dep-cell${isActive ? ' active' : ''}"
+        title="${ctrl} → ${dep}: ${isActive ? 'Enabled' : 'Not available'}"></td>`;
+    }
+    html += '</tr>';
+  }
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+    function loadObject(name, btn) {
+      document.querySelectorAll('.obj-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (sampleData[name]) renderMatrix(sampleData[name]);
+    }
+
+function parseCustom() {
+  const input = document.getElementById('custom-input').value.trim();
+  const errorEl  = document.getElementById('custom-error');
+  const errorMsg = document.getElementById('custom-error-msg');
+  errorEl.style.display = 'none';
+
+  if (!input) {
+    errorMsg.textContent = 'Please paste a JSON dependency definition first.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  try {
+    const data = JSON.parse(input);
+
+    const missing = [];
+    if (!data.controllingField) missing.push('"controllingField"');
+    if (!data.dependentField)   missing.push('"dependentField"');
+    if (!data.controlling)      missing.push('"controlling"');
+    if (!data.dependent)        missing.push('"dependent"');
+    if (!data.matrix)           missing.push('"matrix"');
+
+    if (missing.length) {
+      throw new Error('Missing required keys: ' + missing.join(', ') + '.');
+    }
+    if (!Array.isArray(data.controlling)) {
+      throw new Error('"controlling" must be an array of strings.');
+    }
+    if (!Array.isArray(data.dependent)) {
+      throw new Error('"dependent" must be an array of strings.');
+    }
+    if (typeof data.matrix !== 'object' || Array.isArray(data.matrix)) {
+      throw new Error('"matrix" must be an object mapping controlling values to arrays.');
+    }
+
+    document.querySelectorAll('.obj-btn').forEach(b => b.classList.remove('active'));
+    renderMatrix(data);
+    document.getElementById('matrix-container').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (e) {
+    errorMsg.textContent = e instanceof SyntaxError
+      ? 'Invalid JSON syntax — ' + e.message
+      : e.message;
+    errorEl.style.display = 'block';
+  }
+}
+
+    // Initial load
+    renderMatrix(sampleData.opportunity);
+  </script>
+</body>
+</html>

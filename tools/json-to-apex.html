@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON to Apex Converter — Generate Apex Classes from JSON | Salesforce Decoded</title>
+  <meta name="description" content="Free JSON to Apex converter. Paste any JSON payload and get a fully typed Apex wrapper class with deserialization support. No signup required.">
+  <meta name="keywords" content="json to apex, json to apex converter, salesforce json parser, apex wrapper class generator, json deserialize apex">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/json-to-apex.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+          <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+    <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html" class="active">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal"><a href="../index.html">Home</a><span class="separator">/</span><a href="../tools.html">Tools</a><span class="separator">/</span><span class="current">JSON to Apex Converter</span></div>
+      <h1 class="display-medium reveal stagger-2">JSON to Apex Converter</h1>
+      <p class="reveal stagger-3">Paste any JSON payload and get a fully typed Apex wrapper class with deserialization method.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- Options -->
+      <div class="flex items-center gap-16 mb-24 reveal" style="flex-wrap:wrap">
+        <div>
+          <label class="label-large" style="display:block;margin-bottom:6px">Root Class Name</label>
+          <input type="text" id="root-class" value="ApiResponse" placeholder="e.g. ApiResponse" style="padding:10px 16px;border:1px solid var(--md-outline-variant);border-radius:var(--md-shape-md);font-family:var(--font-mono);font-size:0.875rem;background:var(--md-surface-container-lowest);color:var(--md-on-surface);outline:none;width:220px">
+        </div>
+        <div style="display:flex;gap:12px;align-self:flex-end">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.875rem">
+            <input type="checkbox" id="opt-serializable" checked style="width:18px;height:18px;accent-color:var(--md-primary)">
+            Add parse() method
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.875rem">
+            <input type="checkbox" id="opt-annotations" style="width:18px;height:18px;accent-color:var(--md-primary)">
+            Add @JsonProperty names
+          </label>
+        </div>
+      </div>
+
+      <!-- Tool Area -->
+      <div class="tool-area reveal-scale">
+        <div class="tool-area-header">
+          <div class="flex items-center gap-12">
+            <span class="material-symbols-rounded" style="color:var(--md-primary)">transform</span>
+            <span class="title-medium">JSON → Apex</span>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-tonal" onclick="convertToApex()" style="padding:8px 20px">
+              <span class="material-symbols-rounded" style="font-size:18px">auto_fix_high</span>
+              Convert
+            </button>
+            <button class="btn btn-text" onclick="loadSample()" style="padding:8px 16px">Load Sample</button>
+            <button class="btn btn-text" onclick="clearAll()" style="padding:8px 16px">Clear</button>
+          </div>
+        </div>
+        <div class="tool-area-body">
+          <div>
+            <label class="label-medium text-outline" style="display:block;margin-bottom:8px">JSON Input</label>
+            <textarea id="json-input" placeholder='Paste your JSON here...
+
+Example:
+{
+  "id": 123,
+  "name": "Acme Corp",
+  "active": true,
+  "contacts": [
+    {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "jane@acme.com"
+    }
+  ]
+}'></textarea>
+          </div>
+          <div style="background:var(--md-surface-container-low)">
+            <label class="label-medium text-outline" style="display:block;margin-bottom:8px">Generated Apex Class</label>
+            <div style="position:relative">
+              <pre id="apex-output" style="font-family:var(--font-mono);font-size:0.8125rem;line-height:1.7;min-height:240px;white-space:pre;overflow-x:auto;color:var(--md-on-surface)"></pre>
+              <button class="code-copy-btn" onclick="copyOutput()" style="position:absolute;top:0;right:0">
+                <span class="material-symbols-rounded">content_copy</span> Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Display -->
+      <div id="parse-error" style="display:none" class="mt-16">
+        <div class="callout callout-error"><span class="material-symbols-rounded">error</span><p id="parse-error-msg"></p></div>
+      </div>
+
+      <!-- How it Works -->
+      <div class="mt-48">
+        <h2 class="headline-large reveal">How It Works</h2>
+        <div class="grid grid-3 mt-24">
+          <div class="feature-item reveal stagger-1"><div class="feature-item-icon"><span class="material-symbols-rounded">data_object</span></div><div><h3>Parse JSON structure</h3><p>Analyzes key names, value types, nested objects, and arrays recursively.</p></div></div>
+          <div class="feature-item reveal stagger-2"><div class="feature-item-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">code</span></div><div><h3>Map to Apex types</h3><p>Maps JSON types to Apex: string → String, number → Integer/Decimal, boolean → Boolean, object → inner class.</p></div></div>
+          <div class="feature-item reveal stagger-3"><div class="feature-item-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">auto_fix_high</span></div><div><h3>Generate typed class</h3><p>Outputs a clean Apex wrapper class with inner classes, proper types, and a deserialization method.</p></div></div>
+        </div>
+      </div>
+
+      <!-- Type Mapping -->
+      <div class="mt-48">
+        <h2 class="headline-large reveal">Type Mapping Reference</h2>
+        <div class="card reveal mt-24" style="overflow:hidden;padding:0">
+          <table style="width:100%;border-collapse:collapse;font-size:0.9375rem">
+            <thead>
+              <tr style="background:var(--md-surface-container)">
+                <th style="text-align:left;padding:14px 20px;font-family:var(--font-display);font-weight:600;font-size:0.8125rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--md-on-surface-variant)">JSON Type</th>
+                <th style="text-align:left;padding:14px 20px;font-family:var(--font-display);font-weight:600;font-size:0.8125rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--md-on-surface-variant)">Apex Type</th>
+                <th style="text-align:left;padding:14px 20px;font-family:var(--font-display);font-weight:600;font-size:0.8125rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--md-on-surface-variant)">Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-top:1px solid var(--md-outline-variant)"><td style="padding:12px 20px"><code>string</code></td><td style="padding:12px 20px"><code>String</code></td><td style="padding:12px 20px;color:var(--md-outline)"><code>"hello"</code></td></tr>
+              <tr style="border-top:1px solid var(--md-outline-variant)"><td style="padding:12px 20px"><code>integer</code></td><td style="padding:12px 20px"><code>Integer</code></td><td style="padding:12px 20px;color:var(--md-outline)"><code>42</code></td></tr>
+              <tr style="border-top:1px solid var(--md-outline-variant)"><td style="padding:12px 20px"><code>decimal</code></td><td style="padding:12px 20px"><code>Decimal</code></td><td style="padding:12px 20px;color:var(--md-outline)"><code>3.14</code></td></tr>
+              <tr style="border-top:1px solid var(--md-outline-variant)"><td style="padding:12px 20px"><code>boolean</code></td><td style="padding:12px 20px"><code>Boolean</code></td><td style="padding:12px 20px;color:var(--md-outline)"><code>true</code></td></tr>
+              <tr style="border-top:1px solid var(--md-outline-variant)"><td style="padding:12px 20px"><code>object</code></td><td style="padding:12px 20px"><code>Inner Class</code></td><td style="padding:12px 20px;color:var(--md-outline)"><code>{"key": "val"}</code></td></tr>
+              <tr style="border-top:1px solid var(--md-outline-variant)"><td style="padding:12px 20px"><code>array</code></td><td style="padding:12px 20px"><code>List&lt;T&gt;</code></td><td style="padding:12px 20px;color:var(--md-outline)"><code>[1, 2, 3]</code></td></tr>
+              <tr style="border-top:1px solid var(--md-outline-variant)"><td style="padding:12px 20px"><code>null</code></td><td style="padding:12px 20px"><code>Object</code></td><td style="padding:12px 20px;color:var(--md-outline)"><code>null</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+         <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+     <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+
+  <script src="../js/main.js"></script>
+  <script>
+    function loadSample() {
+      document.getElementById('json-input').value = JSON.stringify({
+        "id": 123,
+        "name": "Acme Corp",
+        "active": true,
+        "revenue": 5400000.50,
+        "website": null,
+        "address": {
+          "street": "123 Main St",
+          "city": "San Francisco",
+          "state": "CA",
+          "zip": "94105"
+        },
+        "contacts": [
+          {
+            "firstName": "Jane",
+            "lastName": "Doe",
+            "email": "jane@acme.com",
+            "isPrimary": true
+          }
+        ],
+        "tags": ["enterprise", "active"]
+      }, null, 2);
+    }
+
+    function getApexType(val) {
+      if (val === null || val === undefined) return 'Object';
+      if (typeof val === 'string') return 'String';
+      if (typeof val === 'boolean') return 'Boolean';
+      if (typeof val === 'number') return Number.isInteger(val) ? 'Integer' : 'Decimal';
+      return null; // object or array handled separately
+    }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function generateClass(name, obj, innerClasses, indent, useAnnotations) {
+      const ind = '    '.repeat(indent);
+      let lines = [];
+
+      for (const [key, val] of Object.entries(obj)) {
+        if (useAnnotations) {
+          lines.push(`${ind}    // JSON key: "${key}"`);
+        }
+
+        if (val === null || val === undefined) {
+          lines.push(`${ind}    public Object ${key};`);
+        } else if (Array.isArray(val)) {
+          if (val.length === 0) {
+            lines.push(`${ind}    public List<Object> ${key};`);
+          } else if (typeof val[0] === 'object' && val[0] !== null) {
+            const innerName = capitalize(key.replace(/s$/, ''));
+            generateClass(innerName, val[0], innerClasses, indent + 1, useAnnotations);
+            lines.push(`${ind}    public List<${innerName}> ${key};`);
+          } else {
+            const t = getApexType(val[0]) || 'Object';
+            lines.push(`${ind}    public List<${t}> ${key};`);
+          }
+        } else if (typeof val === 'object') {
+          const innerName = capitalize(key);
+          generateClass(innerName, val, innerClasses, indent + 1, useAnnotations);
+          lines.push(`${ind}    public ${innerName} ${key};`);
+        } else {
+          const t = getApexType(val);
+          lines.push(`${ind}    public ${t} ${key};`);
+        }
+      }
+
+      innerClasses.push({ name, lines, indent });
+    }
+
+    function convertToApex() {
+      const jsonStr = document.getElementById('json-input').value.trim();
+      const rootClass = document.getElementById('root-class').value.trim() || 'ApiResponse';
+      const addParse = document.getElementById('opt-serializable').checked;
+      const useAnnotations = document.getElementById('opt-annotations').checked;
+      const errorEl = document.getElementById('parse-error');
+      const errorMsg = document.getElementById('parse-error-msg');
+      const output = document.getElementById('apex-output');
+
+      errorEl.style.display = 'none';
+
+      if (!jsonStr) return;
+
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonStr);
+      } catch (e) {
+        errorMsg.textContent = 'Invalid JSON: ' + e.message;
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      if (typeof parsed !== 'object' || parsed === null) {
+        errorMsg.textContent = 'JSON root must be an object or array.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      // Handle array root
+      let rootObj = parsed;
+      let isArray = false;
+      if (Array.isArray(parsed)) {
+        if (parsed.length > 0 && typeof parsed[0] === 'object') {
+          rootObj = parsed[0];
+          isArray = true;
+        } else {
+          errorMsg.textContent = 'Array root must contain objects.';
+          errorEl.style.display = 'block';
+          return;
+        }
+      }
+
+      const innerClasses = [];
+      generateClass(rootClass, rootObj, innerClasses, 0, useAnnotations);
+
+      // Build output — root class wraps inner classes
+      let code = `public class ${rootClass} {\n\n`;
+
+      // Inner classes first (in reverse so nested ones come first)
+      const root = innerClasses.pop();
+      for (const cls of innerClasses) {
+        code += `    public class ${cls.name} {\n`;
+        code += cls.lines.join('\n') + '\n';
+        code += `    }\n\n`;
+      }
+
+      // Root properties
+      code += root.lines.join('\n') + '\n';
+
+      if (addParse) {
+        code += `\n    /**\n     * Deserialize JSON string to ${rootClass}\n     */\n`;
+        if (isArray) {
+          code += `    public static List<${rootClass}> parse(String jsonString) {\n`;
+          code += `        return (List<${rootClass}>) JSON.deserialize(\n`;
+          code += `            jsonString, List<${rootClass}>.class\n`;
+          code += `        );\n`;
+        } else {
+          code += `    public static ${rootClass} parse(String jsonString) {\n`;
+          code += `        return (${rootClass}) JSON.deserialize(\n`;
+          code += `            jsonString, ${rootClass}.class\n`;
+          code += `        );\n`;
+        }
+        code += `    }\n`;
+      }
+
+      code += `}`;
+
+      output.textContent = code;
+    }
+
+    function copyOutput() {
+      const t = document.getElementById('apex-output').textContent;
+      if (t) { navigator.clipboard.writeText(t); showToast('Apex class copied!'); }
+    }
+
+    function clearAll() {
+      document.getElementById('json-input').value = '';
+      document.getElementById('apex-output').textContent = '';
+      document.getElementById('parse-error').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

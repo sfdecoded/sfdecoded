@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XML to JSON Converter — Salesforce Decoded</title>
+  <meta name="description" content="Convert Salesforce metadata XML to readable JSON and vice versa. Free browser-based tool for Salesforce API integrations and metadata workflows.">
+  <meta name="keywords" content="xml to json, json to xml, salesforce metadata, salesforce xml converter, apex xml parser">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/xml-to-json-converter.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <style>
+    .tool-area-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 440px;
+    }
+    .tool-panel {
+      display: flex;
+      flex-direction: column;
+    }
+    .tool-panel-label {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--md-outline);
+      padding: 12px 20px 8px;
+      border-bottom: 1px solid var(--md-outline-variant);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-format-tag {
+      font-size: 0.6875rem;
+      padding: 2px 8px;
+      border-radius: var(--md-shape-full);
+      font-weight: 600;
+      background: var(--md-surface-container-high);
+      color: var(--md-outline);
+      letter-spacing: 0.04em;
+    }
+    .tool-panel textarea {
+      flex: 1;
+      width: 100%;
+      min-height: 380px;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.75;
+      background: transparent;
+      color: var(--md-on-surface);
+      padding: 16px 20px;
+    }
+    .tool-panel textarea::placeholder { color: var(--md-outline); }
+    .output-area {
+      flex: 1;
+      min-height: 380px;
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.75;
+      color: var(--md-on-surface);
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .output-area.error-state { color: var(--md-error); }
+
+    /* direction toggle */
+    .dir-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--md-surface-container);
+      padding: 4px;
+      border-radius: var(--md-shape-md);
+    }
+    .dir-btn {
+      padding: 6px 16px;
+      border-radius: var(--md-shape-sm);
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--md-on-surface-variant);
+      cursor: pointer;
+      transition: all var(--md-duration-short) var(--md-motion-standard);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dir-btn.active {
+      background: var(--md-surface-container-lowest);
+      color: var(--md-primary);
+      box-shadow: var(--md-elevation-1);
+      font-weight: 600;
+    }
+
+    .swap-icon-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      color: var(--md-outline);
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--md-shape-full);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .status-valid   { background: #d1fae5; color: #065f46; }
+    .status-invalid { background: var(--md-error-container); color: var(--md-on-error-container); }
+    .status-idle    { background: var(--md-surface-container-high); color: var(--md-outline); }
+
+    @media (max-width: 768px) {
+      .tool-area-body { grid-template-columns: 1fr; }
+      .tool-panel:first-child { border-right: none !important; border-bottom: 1px solid var(--md-outline-variant); }
+    }
+
+    /* sample buttons */
+    .sample-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px 20px;
+      background: var(--md-surface-container-low);
+      border-bottom: 1px solid var(--md-outline-variant);
+      font-size: 0.8125rem;
+      color: var(--md-outline);
+    }
+    .sample-bar span { font-family: var(--font-display); font-weight: 500; }
+    .sample-chip {
+      padding: 4px 12px;
+      border-radius: var(--md-shape-full);
+      border: 1px solid var(--md-outline-variant);
+      background: var(--md-surface-container-lowest);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--md-primary);
+      cursor: pointer;
+      transition: all var(--md-duration-short) var(--md-motion-standard);
+    }
+    .sample-chip:hover { background: var(--md-primary-container); border-color: var(--md-primary); }
+
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
+    @media (max-width: 640px) { .info-grid { grid-template-columns: 1fr; } }
+    .info-card {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-lg);
+      padding: 20px;
+    }
+    .info-card h4 { font-family: var(--font-display); font-size: 0.9375rem; font-weight: 600; margin-bottom: 6px; }
+    .info-card p { font-size: 0.875rem; color: var(--md-on-surface-variant); line-height: 1.55; }
+
+    /* json / xml syntax */
+    .json-key    { color: #82aaff; }
+    .json-string { color: #c3e88d; }
+    .json-number { color: #f78c6c; }
+    .json-bool   { color: #c792ea; }
+    .json-null   { color: #676e95; }
+  </style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html" class="active">Tools</a></li>
+        <li><a href="../errors.html">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../prompts.html">Prompts</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search tools, errors, guides..."></div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <nav class="breadcrumbs reveal">
+        <a href="../index.html">Home</a>
+        <span class="separator">/</span>
+        <a href="../tools.html">Tools</a>
+        <span class="separator">/</span>
+        <span class="current">XML ↔ JSON Converter</span>
+      </nav>
+      <div class="overline reveal stagger-2">
+        <span>Converter</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">XML ↔ JSON Converter</h1>
+      <p class="reveal stagger-4">Convert Salesforce metadata XML to readable JSON and vice versa. Perfect for API integrations, CI/CD pipelines, and metadata analysis.</p>
+    </div>
+  </header>
+
+  <!-- Tool Section -->
+  <section class="section">
+    <div class="container">
+
+      <div class="tool-area reveal">
+
+        <!-- Direction toggle + actions bar -->
+        <div class="tool-area-header">
+          <div class="dir-toggle">
+            <button class="dir-btn active" id="dir-xml2json" onclick="setDirection('xml2json')">
+              <span class="material-symbols-rounded" style="font-size:16px">code</span> XML → JSON
+            </button>
+            <div class="swap-icon-wrap">
+              <span class="material-symbols-rounded" style="font-size:18px">swap_horiz</span>
+            </div>
+            <button class="dir-btn" id="dir-json2xml" onclick="setDirection('json2xml')">
+              <span class="material-symbols-rounded" style="font-size:16px">data_array</span> JSON → XML
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="btn btn-filled" onclick="convert()">
+              <span class="material-symbols-rounded">compare_arrows</span> Convert
+            </button>
+            <button class="btn btn-tonal" onclick="copyOutput()">
+              <span class="material-symbols-rounded">content_copy</span> Copy
+            </button>
+            <button class="btn btn-text" onclick="clearAll()">
+              <span class="material-symbols-rounded">delete_sweep</span> Clear
+            </button>
+            <span class="status-chip status-idle" id="status-chip">
+              <span class="material-symbols-rounded" style="font-size:14px">radio_button_unchecked</span> Ready
+            </span>
+          </div>
+        </div>
+
+        <!-- Sample presets bar -->
+        <div class="sample-bar">
+          <span>Try a sample:</span>
+          <button class="sample-chip" onclick="loadSample('customObject')">Custom Object</button>
+          <button class="sample-chip" onclick="loadSample('profile')">Profile</button>
+          <button class="sample-chip" onclick="loadSample('flow')">Flow</button>
+          <button class="sample-chip" onclick="loadSample('permSet')">Permission Set</button>
+        </div>
+
+        <!-- Panels -->
+        <div class="tool-area-body">
+          <div class="tool-panel" style="border-right:1px solid var(--md-outline-variant)">
+            <div class="tool-panel-label">
+              <span id="label-input">Input — XML</span>
+              <span class="panel-format-tag" id="tag-input">XML</span>
+            </div>
+            <textarea id="input-area" spellcheck="false"
+              placeholder="Paste your XML here...&#10;&#10;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;CustomObject xmlns=&quot;http://soap.sforce.com/2006/04/metadata&quot;&gt;&#10;  &lt;label&gt;My Object&lt;/label&gt;&#10;&lt;/CustomObject&gt;"></textarea>
+          </div>
+          <div class="tool-panel">
+            <div class="tool-panel-label">
+              <span id="label-output">Output — JSON</span>
+              <span class="panel-format-tag" id="tag-output">JSON</span>
+            </div>
+            <div class="output-area" id="output-area">Converted output will appear here.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Info cards -->
+      <div class="info-grid">
+        <div class="info-card reveal stagger-1">
+          <div class="card-icon" style="background:#eef2ff;color:#3730a3;width:40px;height:40px;border-radius:var(--md-shape-sm);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <span class="material-symbols-rounded" style="font-size:20px">account_tree</span>
+          </div>
+          <h4>Metadata Support</h4>
+          <p>Handles Salesforce metadata XML formats including CustomObject, Profile, Flow, PermissionSet, and more.</p>
+        </div>
+        <div class="info-card reveal stagger-2">
+          <div class="card-icon" style="background:#fce7f3;color:#9d174d;width:40px;height:40px;border-radius:var(--md-shape-sm);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <span class="material-symbols-rounded" style="font-size:20px">compare_arrows</span>
+          </div>
+          <h4>Bidirectional</h4>
+          <p>Switch between XML→JSON and JSON→XML with a single click. Both directions produce clean, readable output.</p>
+        </div>
+        <div class="info-card reveal stagger-3">
+          <div class="card-icon" style="background:#d1fae5;color:#065f46;width:40px;height:40px;border-radius:var(--md-shape-sm);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <span class="material-symbols-rounded" style="font-size:20px">lock</span>
+          </div>
+          <h4>100% Client-Side</h4>
+          <p>All conversions run in your browser. No server, no upload, no data ever leaves your machine.</p>
+        </div>
+      </div>
+
+      <!-- Usage tips -->
+      <div class="mt-48 reveal">
+        <div class="callout callout-info">
+          <span class="material-symbols-rounded">info</span>
+          <div>
+            <p><strong>Tip:</strong> To inspect Salesforce metadata, retrieve it via SFDX (<code>sf project retrieve</code>), then paste the resulting <code>.xml</code> file into this tool to explore it as structured JSON — much easier to read and diff.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+           <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4>
+          <ul><li><a href="../tools.html">Tools</a></li>
+            <li><a href="../errors.html">Errors</a></li>
+            <li><a href="../guides.html">Guides</a></li>
+            <li><a href="../extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Resources</h4>
+          <ul>
+            <li><a href="../tips.html">Tips</a></li>
+            <li><a href="../resources.html">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+  <script>
+    /* ── Direction state ──────────────────────────────────────────────── */
+    let direction = 'xml2json'; // or 'json2xml'
+
+    function setDirection(dir) {
+      direction = dir;
+      document.getElementById('dir-xml2json').classList.toggle('active', dir === 'xml2json');
+      document.getElementById('dir-json2xml').classList.toggle('active', dir === 'json2xml');
+
+      if (dir === 'xml2json') {
+        document.getElementById('label-input').textContent  = 'Input — XML';
+        document.getElementById('tag-input').textContent    = 'XML';
+        document.getElementById('label-output').textContent = 'Output — JSON';
+        document.getElementById('tag-output').textContent   = 'JSON';
+        document.getElementById('input-area').placeholder   = 'Paste your XML here...';
+      } else {
+        document.getElementById('label-input').textContent  = 'Input — JSON';
+        document.getElementById('tag-input').textContent    = 'JSON';
+        document.getElementById('label-output').textContent = 'Output — XML';
+        document.getElementById('tag-output').textContent   = 'XML';
+        document.getElementById('input-area').placeholder   = 'Paste your JSON here...';
+      }
+
+      // Clear output when switching
+      document.getElementById('output-area').textContent = 'Converted output will appear here.';
+      document.getElementById('output-area').classList.remove('error-state');
+      setChip('idle');
+    }
+
+    /* ── Conversion entry ─────────────────────────────────────────────── */
+    function convert() {
+      const input = document.getElementById('input-area').value.trim();
+      const outputEl = document.getElementById('output-area');
+      if (!input) {
+        outputEl.textContent = 'Please paste some content first.';
+        return;
+      }
+      try {
+        if (direction === 'xml2json') {
+          const json = xmlToJson(input);
+          outputEl.textContent = JSON.stringify(json, null, 2);
+          outputEl.classList.remove('error-state');
+        } else {
+          const json = JSON.parse(input);
+          outputEl.textContent = jsonToXml(json);
+          outputEl.classList.remove('error-state');
+        }
+        setChip('valid');
+      } catch (e) {
+        outputEl.classList.add('error-state');
+        outputEl.textContent = '✕ ' + e.message;
+        setChip('invalid');
+      }
+    }
+
+    /* ── XML → JSON ───────────────────────────────────────────────────── */
+    function xmlToJson(xmlStr) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(xmlStr, 'application/xml');
+      const errorNode = doc.querySelector('parsererror');
+      if (errorNode) throw new Error('Invalid XML: ' + errorNode.textContent.split('\n')[0]);
+      return nodeToObj(doc.documentElement);
+    }
+
+    function nodeToObj(node) {
+      const obj = {};
+      // attributes
+      if (node.attributes && node.attributes.length) {
+        obj['@attributes'] = {};
+        Array.from(node.attributes).forEach(a => { obj['@attributes'][a.name] = a.value; });
+      }
+      // children
+      if (node.hasChildNodes()) {
+        Array.from(node.childNodes).forEach(child => {
+          if (child.nodeType === 3) { // text
+            const text = child.nodeValue.trim();
+            if (text) obj['#text'] = text;
+          } else if (child.nodeType === 1) {
+            const tag = child.tagName;
+            const val = nodeToObj(child);
+            if (obj[tag] !== undefined) {
+              if (!Array.isArray(obj[tag])) obj[tag] = [obj[tag]];
+              obj[tag].push(val);
+            } else {
+              obj[tag] = val;
+            }
+          }
+        });
+      }
+      // flatten single #text
+      if (Object.keys(obj).length === 1 && obj['#text'] !== undefined) return obj['#text'];
+      return obj;
+    }
+
+    /* ── JSON → XML ───────────────────────────────────────────────────── */
+    function jsonToXml(obj, rootTag = 'root', indent = 0) {
+      const pad = '  '.repeat(indent);
+      if (typeof obj !== 'object' || obj === null) {
+        return `${pad}<${rootTag}>${escapeXml(String(obj))}</${rootTag}>`;
+      }
+      if (Array.isArray(obj)) {
+        return obj.map(item => jsonToXml(item, rootTag, indent)).join('\n');
+      }
+      const attrs = obj['@attributes']
+        ? ' ' + Object.entries(obj['@attributes']).map(([k,v]) => `${k}="${escapeXml(v)}"`).join(' ')
+        : '';
+      const children = Object.entries(obj)
+        .filter(([k]) => k !== '@attributes' && k !== '#text')
+        .map(([k, v]) => jsonToXml(v, k, indent + 1))
+        .join('\n');
+      const text = obj['#text'] ? escapeXml(String(obj['#text'])) : '';
+
+      if (!children && !text) return `${pad}<${rootTag}${attrs}/>`;
+      if (!children) return `${pad}<${rootTag}${attrs}>${text}</${rootTag}>`;
+      return `${pad}<${rootTag}${attrs}>\n${children}\n${pad}</${rootTag}>`;
+    }
+
+    function escapeXml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+    }
+
+    /* ── Chip ─────────────────────────────────────────────────────────── */
+    function setChip(state) {
+      const chip = document.getElementById('status-chip');
+      if (state === 'valid') {
+        chip.className = 'status-chip status-valid';
+        chip.innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">check_circle</span> Success';
+      } else if (state === 'invalid') {
+        chip.className = 'status-chip status-invalid';
+        chip.innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">error</span> Error';
+      } else {
+        chip.className = 'status-chip status-idle';
+        chip.innerHTML = '<span class="material-symbols-rounded" style="font-size:14px">radio_button_unchecked</span> Ready';
+      }
+    }
+
+    /* ── Clear ────────────────────────────────────────────────────────── */
+    function clearAll() {
+      document.getElementById('input-area').value = '';
+      const out = document.getElementById('output-area');
+      out.textContent = 'Converted output will appear here.';
+      out.classList.remove('error-state');
+      setChip('idle');
+    }
+
+    /* ── Copy ─────────────────────────────────────────────────────────── */
+    function copyOutput() {
+      const text = document.getElementById('output-area').textContent;
+      if (!text || text === 'Converted output will appear here.') return;
+      navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+    }
+
+    /* ── Sample presets ───────────────────────────────────────────────── */
+    const SAMPLES = {
+      customObject: `<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>Project</label>
+  <pluralLabel>Projects</pluralLabel>
+  <nameField>
+    <label>Project Name</label>
+    <type>Text</type>
+  </nameField>
+  <deploymentStatus>Deployed</deploymentStatus>
+  <sharingModel>ReadWrite</sharingModel>
+  <fields>
+    <fullName>Status__c</fullName>
+    <label>Status</label>
+    <type>Picklist</type>
+    <required>false</required>
+  </fields>
+  <fields>
+    <fullName>Budget__c</fullName>
+    <label>Budget</label>
+    <type>Currency</type>
+    <required>false</required>
+  </fields>
+</CustomObject>`,
+      profile: `<?xml version="1.0" encoding="UTF-8"?>
+<Profile xmlns="http://soap.sforce.com/2006/04/metadata">
+  <classAccesses>
+    <apexClass>AccountService</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>ContactTriggerHandler</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <object>Account</object>
+  </objectPermissions>
+  <userLicense>Salesforce</userLicense>
+</Profile>`,
+      flow: `<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>59.0</apiVersion>
+  <label>New Account Notification</label>
+  <processType>AutoLaunchedFlow</processType>
+  <start>
+    <locationX>56</locationX>
+    <locationY>0</locationY>
+  </start>
+  <status>Active</status>
+  <variables>
+    <name>AccountId</name>
+    <dataType>String</dataType>
+    <isCollection>false</isCollection>
+    <isInput>true</isInput>
+    <isOutput>false</isOutput>
+  </variables>
+</Flow>`,
+      permSet: `<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>Salesforce Developer Access</label>
+  <hasActivationRequired>false</hasActivationRequired>
+  <classAccesses>
+    <apexClass>BatchAccountUpdate</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Case</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+</PermissionSet>`,
+    };
+
+    function loadSample(key) {
+      // Always load as xml2json direction
+      setDirection('xml2json');
+      document.getElementById('input-area').value = SAMPLES[key];
+      convert();
+    }
+  </script>
+</body>
+</html>

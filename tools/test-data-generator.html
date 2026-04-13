@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Data Generator — Salesforce Decoded</title>
+  <meta name="description" content="Generate realistic Salesforce test data for standard and custom objects. Produces ready-to-use Apex insert statements and JSON payloads.">
+  <meta name="keywords" content="salesforce test data, apex test data, salesforce data factory, mock data generator, salesforce developer">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools/test-data-generator.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <style>
+    /* ── Config panel ───────────────────────────────────────────── */
+    .generator-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .generator-layout { grid-template-columns: 1fr; }
+    }
+
+    .config-panel {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-xl);
+      overflow: hidden;
+      position: sticky;
+      top: 88px;
+    }
+    .config-panel-header {
+      padding: 16px 20px;
+      background: var(--md-surface-container-low);
+      border-bottom: 1px solid var(--md-outline-variant);
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--md-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .config-panel-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label {
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--md-on-surface);
+    }
+    .form-select, .form-input {
+      padding: 10px 14px;
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      color: var(--md-on-surface);
+      background: var(--md-surface-container-lowest);
+      outline: none;
+      transition: border-color var(--md-duration-short) var(--md-motion-standard);
+      width: 100%;
+    }
+    .form-select:focus, .form-input:focus { border-color: var(--md-primary); }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .toggle-label {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--md-on-surface);
+    }
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--md-surface-container-highest);
+      border-radius: var(--md-shape-full);
+      cursor: pointer;
+      transition: background var(--md-duration-short) var(--md-motion-standard);
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: var(--md-outline);
+      border-radius: 50%;
+      transition: transform var(--md-duration-short) var(--md-motion-standard), background var(--md-duration-short);
+    }
+    .toggle input:checked + .toggle-slider { background: var(--md-primary-container); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: var(--md-primary); }
+
+    .divider-sm { border: none; border-top: 1px solid var(--md-outline-variant); margin: 4px 0; }
+
+    /* ── Output panel ───────────────────────────────────────────── */
+    .output-panel {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-xl);
+      overflow: hidden;
+    }
+    .output-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--md-surface-container-low);
+      border-bottom: 1px solid var(--md-outline-variant);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tab-group {
+      display: flex;
+      gap: 4px;
+      background: var(--md-surface-container);
+      padding: 4px;
+      border-radius: var(--md-shape-md);
+    }
+    .tab-btn {
+      padding: 6px 14px;
+      border-radius: var(--md-shape-sm);
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--md-on-surface-variant);
+      cursor: pointer;
+      transition: all var(--md-duration-short) var(--md-motion-standard);
+    }
+    .tab-btn.active {
+      background: var(--md-surface-container-lowest);
+      color: var(--md-primary);
+      box-shadow: var(--md-elevation-1);
+      font-weight: 600;
+    }
+    .output-code {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.75;
+      padding: 20px 24px;
+      min-height: 400px;
+      overflow: auto;
+      white-space: pre;
+      color: var(--md-on-surface);
+      background: var(--md-inverse-surface);
+      color: var(--md-inverse-on-surface);
+    }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
+    @media (max-width: 640px) { .info-grid { grid-template-columns: 1fr; } }
+    .info-card {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-lg);
+      padding: 20px;
+    }
+    .info-card h4 {
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .info-card p { font-size: 0.875rem; color: var(--md-on-surface-variant); line-height: 1.55; }
+    .placeholder-msg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-height: 400px;
+      color: var(--md-outline);
+      background: var(--md-inverse-surface);
+    }
+    .placeholder-msg .material-symbols-rounded { font-size: 48px; opacity: 0.4; }
+    .placeholder-msg span { font-size: 0.9375rem; opacity: 0.6; }
+  </style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html" class="active">Tools</a></li>
+        <li><a href="../errors.html">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../prompts.html">Prompts</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search tools, errors, guides..."></div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <nav class="breadcrumbs reveal">
+        <a href="../index.html">Home</a>
+        <span class="separator">/</span>
+        <a href="../tools.html">Tools</a>
+        <span class="separator">/</span>
+        <span class="current">Test Data Generator</span>
+      </nav>
+      <div class="overline reveal stagger-2">
+        <span>Generator</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">Test Data Generator</h1>
+      <p class="reveal stagger-4">Generate realistic test data for Salesforce objects. Choose your object, record count, and output format — get ready-to-use Apex or JSON instantly.</p>
+    </div>
+  </header>
+
+  <!-- Tool Section -->
+  <section class="section">
+    <div class="container">
+      <div class="generator-layout reveal">
+
+        <!-- Config Panel -->
+        <div class="config-panel">
+          <div class="config-panel-header">
+            <span class="material-symbols-rounded" style="color:var(--md-primary);font-size:18px">tune</span>
+            Configuration
+          </div>
+          <div class="config-panel-body">
+
+            <div class="form-group">
+              <label class="form-label">Salesforce Object</label>
+              <select class="form-select" id="sel-object" onchange="onObjectChange()">
+                <optgroup label="Standard Objects">
+                  <option value="Account">Account</option>
+                  <option value="Contact">Contact</option>
+                  <option value="Lead">Lead</option>
+                  <option value="Opportunity">Opportunity</option>
+                  <option value="Case">Case</option>
+                  <option value="Task">Task</option>
+                  <option value="Event">Event</option>
+                </optgroup>
+                <optgroup label="Custom (example)">
+                  <option value="Project__c">Project__c</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Number of Records</label>
+              <input type="number" class="form-input" id="inp-count" value="5" min="1" max="200">
+            </div>
+
+            <hr class="divider-sm">
+
+            <div class="toggle-row">
+              <span class="toggle-label">Include null values</span>
+              <label class="toggle"><input type="checkbox" id="tog-nulls"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Realistic names</span>
+              <label class="toggle"><input type="checkbox" id="tog-names" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Include fake IDs</span>
+              <label class="toggle"><input type="checkbox" id="tog-ids"><span class="toggle-slider"></span></label>
+            </div>
+
+            <hr class="divider-sm">
+
+            <button class="btn btn-filled w-full" onclick="generate()" style="justify-content:center;padding:12px 0;">
+              <span class="material-symbols-rounded">generating_tokens</span> Generate Data
+            </button>
+            <button class="btn btn-text w-full" onclick="clearOutput()" style="justify-content:center;">
+              <span class="material-symbols-rounded">delete_sweep</span> Clear
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="output-panel">
+          <div class="output-panel-header">
+            <div class="tab-group">
+              <button class="tab-btn active" id="tab-apex" onclick="switchTab('apex')">Apex</button>
+              <button class="tab-btn" id="tab-json" onclick="switchTab('json')">JSON</button>
+              <button class="tab-btn" id="tab-csv"  onclick="switchTab('csv')">CSV</button>
+            </div>
+            <button class="btn btn-tonal" onclick="copyOutput()">
+              <span class="material-symbols-rounded">content_copy</span> Copy
+            </button>
+          </div>
+          <div id="output-placeholder" class="placeholder-msg">
+            <span class="material-symbols-rounded">generating_tokens</span>
+            <span>Configure options and click Generate Data</span>
+          </div>
+          <pre class="output-code" id="output-code" style="display:none"></pre>
+        </div>
+
+      </div>
+
+      <!-- Info cards -->
+      <div class="info-grid">
+        <div class="info-card reveal stagger-1">
+          <div class="card-icon" style="background:#f0fdf4;color:#166534;width:40px;height:40px;border-radius:var(--md-shape-sm);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <span class="material-symbols-rounded" style="font-size:20px">code</span>
+          </div>
+          <h4>Ready-to-use Apex</h4>
+          <p>Generated code uses a <code>TestDataFactory</code> pattern — paste it directly into your test class.</p>
+        </div>
+        <div class="info-card reveal stagger-2">
+          <div class="card-icon" style="background:#fff7ed;color:#c2410c;width:40px;height:40px;border-radius:var(--md-shape-sm);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <span class="material-symbols-rounded" style="font-size:20px">data_array</span>
+          </div>
+          <h4>JSON & CSV Export</h4>
+          <p>Export as JSON for REST API integration testing, or as CSV for Data Loader import scenarios.</p>
+        </div>
+        <div class="info-card reveal stagger-3">
+          <div class="card-icon" style="background:#dbeafe;color:#1e40af;width:40px;height:40px;border-radius:var(--md-shape-sm);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <span class="material-symbols-rounded" style="font-size:20px">shuffle</span>
+          </div>
+          <h4>Realistic Values</h4>
+          <p>Each generation uses randomized but realistic values: names, amounts, stages, and dates.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+           <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+        <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li>/ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+  <script>
+    /* ── Data dictionaries ──────────────────────────────────────────────── */
+    const FIRST = ['James','Maria','David','Sarah','Robert','Jennifer','Michael','Linda','William','Patricia','Carlos','Aisha','Lena','Takuya','Priya'];
+    const LAST  = ['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Wilson','Moore','Taylor','Anderson','Thomas','Jackson','White'];
+    const COMPANIES = ['Acme Corp','Globex','Initech','Umbrella Ltd','Stark Industries','Wayne Enterprises','Massive Dynamic','Hooli','Pied Piper','Veridian Dynamics'];
+    const STAGES = ['Prospecting','Qualification','Needs Analysis','Value Proposition','Id. Decision Makers','Perception Analysis','Proposal/Price Quote','Negotiation/Review','Closed Won','Closed Lost'];
+    const PRIORITIES = ['High','Medium','Low'];
+    const CASE_STATUSES = ['New','Working','Escalated','Closed'];
+    const CASE_ORIGINS = ['Phone','Email','Web'];
+    const INDUSTRIES = ['Technology','Finance','Healthcare','Retail','Manufacturing','Education','Government','Media','Transportation','Energy'];
+
+    function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function randFloat(min, max) { return parseFloat((Math.random() * (max - min) + min).toFixed(2)); }
+    function randDate(yearsBack = 1) {
+      const d = new Date();
+      d.setDate(d.getDate() - randInt(0, yearsBack * 365));
+      return d.toISOString().split('T')[0];
+    }
+    function fakeId(prefix = '001') {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      return prefix + Array.from({length: 15}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    }
+
+    const SCHEMAS = {
+      Account: (i, cfg) => ({
+        ...(cfg.ids ? {Id: fakeId('001')} : {}),
+        Name: `${rand(COMPANIES)}`,
+        Type: rand(['Prospect','Customer - Direct','Customer - Channel','Partner','Competitor']),
+        Industry: rand(INDUSTRIES),
+        AnnualRevenue: randFloat(100000, 50000000),
+        NumberOfEmployees: randInt(10, 10000),
+        Phone: `+1-${randInt(200,999)}-${randInt(200,999)}-${randInt(1000,9999)}`,
+        BillingCity: rand(['San Francisco','New York','Chicago','Austin','Seattle','Boston','Denver','Atlanta']),
+        ...(cfg.nulls && Math.random() > 0.7 ? {Website: null} : {Website: `https://www.${rand(COMPANIES).toLowerCase().replace(/[^a-z]/g,'')}.com`}),
+      }),
+      Contact: (i, cfg) => {
+        const first = rand(FIRST), last = rand(LAST);
+        return {
+          ...(cfg.ids ? {Id: fakeId('003')} : {}),
+          FirstName: first,
+          LastName: last,
+          Email: `${first.toLowerCase()}.${last.toLowerCase()}${randInt(1,99)}@example.com`,
+          Phone: `+1-${randInt(200,999)}-${randInt(200,999)}-${randInt(1000,9999)}`,
+          Title: rand(['Developer','Manager','Director','VP','CTO','CEO','Analyst','Consultant','Engineer']),
+          Department: rand(['IT','Sales','Marketing','Finance','Engineering','Operations','HR']),
+          ...(cfg.nulls && Math.random() > 0.7 ? {MobilePhone: null} : {MobilePhone: `+1-${randInt(200,999)}-${randInt(200,999)}-${randInt(1000,9999)}`}),
+        };
+      },
+      Lead: (i, cfg) => {
+        const first = rand(FIRST), last = rand(LAST);
+        return {
+          ...(cfg.ids ? {Id: fakeId('00Q')} : {}),
+          FirstName: first,
+          LastName: last,
+          Company: rand(COMPANIES),
+          Email: `${first.toLowerCase()}.${last.toLowerCase()}@${rand(['gmail','yahoo','hotmail','company'])}.com`,
+          Phone: `+1-${randInt(200,999)}-${randInt(200,999)}-${randInt(1000,9999)}`,
+          Status: rand(['Open - Not Contacted','Working - Contacted','Closed - Converted','Closed - Not Converted']),
+          LeadSource: rand(['Web','Phone Inquiry','Partner Referral','Purchased List','Other']),
+          Industry: rand(INDUSTRIES),
+        };
+      },
+      Opportunity: (i, cfg) => ({
+        ...(cfg.ids ? {Id: fakeId('006')} : {}),
+        Name: `${rand(COMPANIES)} - ${rand(['Q1','Q2','Q3','Q4'])} ${new Date().getFullYear()}`,
+        StageName: rand(STAGES),
+        Amount: randFloat(5000, 500000),
+        Probability: randInt(10, 100),
+        CloseDate: randDate(1),
+        Type: rand(['New Business','Existing Business','Renewal']),
+        LeadSource: rand(['Web','Cold Call','Email','Partner','Other']),
+      }),
+      Case: (i, cfg) => ({
+        ...(cfg.ids ? {Id: fakeId('500')} : {}),
+        Subject: `Issue with ${rand(['integration','deployment','report','flow','trigger','API','data','permission'])}`,
+        Status: rand(CASE_STATUSES),
+        Priority: rand(PRIORITIES),
+        Origin: rand(CASE_ORIGINS),
+        Type: rand(['Problem','Feature Request','Question']),
+        ...(cfg.nulls && Math.random() > 0.6 ? {Description: null} : {Description: 'Auto-generated test case description.'}),
+      }),
+      Task: (i, cfg) => ({
+        ...(cfg.ids ? {Id: fakeId('00T')} : {}),
+        Subject: `${rand(['Call','Email','Follow up','Meeting','Review','Send'])} ${rand(['prospect','client','partner','report','proposal'])}`,
+        Status: rand(['Not Started','In Progress','Completed','Waiting on someone else','Deferred']),
+        Priority: rand(PRIORITIES),
+        ActivityDate: randDate(0.5),
+      }),
+      Event: (i, cfg) => ({
+        ...(cfg.ids ? {Id: fakeId('00U')} : {}),
+        Subject: `${rand(['Meeting','Demo','Call','Workshop','Review'])} with ${rand(COMPANIES)}`,
+        StartDateTime: new Date(Date.now() + randInt(-30,30) * 86400000).toISOString(),
+        EndDateTime: new Date(Date.now() + randInt(1,60) * 86400000).toISOString(),
+        Location: rand(['Zoom','Google Meet','Office','Salesforce Tower','On-site']),
+        Description: 'Auto-generated test event.',
+      }),
+      Project__c: (i, cfg) => ({
+        ...(cfg.ids ? {Id: fakeId('a0A')} : {}),
+        Name: `Project ${String.fromCharCode(65 + i % 26)}-${randInt(100,999)}`,
+        Status__c: rand(['Planning','In Progress','On Hold','Completed','Cancelled']),
+        Budget__c: randFloat(10000, 1000000),
+        Start_Date__c: randDate(1),
+        End_Date__c: randDate(0),
+        Owner_Name__c: `${rand(FIRST)} ${rand(LAST)}`,
+      }),
+    };
+
+    let currentTab = 'apex';
+    let generatedRecords = [];
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      if (generatedRecords.length) renderOutput();
+    }
+
+    function onObjectChange() { /* could auto-generate on change */ }
+
+    function generate() {
+      const obj = document.getElementById('sel-object').value;
+      const count = Math.min(Math.max(parseInt(document.getElementById('inp-count').value) || 5, 1), 200);
+      const cfg = {
+        nulls: document.getElementById('tog-nulls').checked,
+        names: document.getElementById('tog-names').checked,
+        ids:   document.getElementById('tog-ids').checked,
+      };
+      const schema = SCHEMAS[obj];
+      if (!schema) return;
+      generatedRecords = Array.from({length: count}, (_, i) => schema(i, cfg));
+      renderOutput();
+    }
+
+    function renderOutput() {
+      const obj = document.getElementById('sel-object').value;
+      let text = '';
+      if (currentTab === 'apex') {
+        text = buildApex(obj, generatedRecords);
+      } else if (currentTab === 'json') {
+        text = JSON.stringify(generatedRecords, null, 2);
+      } else {
+        text = buildCSV(generatedRecords);
+      }
+      document.getElementById('output-placeholder').style.display = 'none';
+      const codeEl = document.getElementById('output-code');
+      codeEl.style.display = 'block';
+      codeEl.textContent = text;
+    }
+
+    function buildApex(obj, records) {
+      const varName = obj.replace('__c','').toLowerCase() + 'List';
+      let lines = [`List<${obj}> ${varName} = new List<${obj}>();\n`];
+      records.forEach((r, i) => {
+        const varI = `${obj.replace('__c','').toLowerCase()}${i + 1}`;
+        lines.push(`${obj} ${varI} = new ${obj}(`);
+        const entries = Object.entries(r);
+        entries.forEach(([k, v], idx) => {
+          const comma = idx < entries.length - 1 ? ',' : '';
+          if (v === null) lines.push(`    ${k} = null${comma}`);
+          else if (typeof v === 'string') lines.push(`    ${k} = '${v.replace(/'/g, "\\'")}'${comma}`);
+          else lines.push(`    ${k} = ${v}${comma}`);
+        });
+        lines.push(`);`);
+        lines.push(`${varName}.add(${varI});\n`);
+      });
+      lines.push(`insert ${varName};`);
+      return lines.join('\n');
+    }
+
+    function buildCSV(records) {
+      if (!records.length) return '';
+      const headers = Object.keys(records[0]);
+      const rows = records.map(r =>
+        headers.map(h => {
+          const v = r[h];
+          if (v === null || v === undefined) return '';
+          const s = String(v);
+          return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g,'""')}"` : s;
+        }).join(',')
+      );
+      return [headers.join(','), ...rows].join('\n');
+    }
+
+    function clearOutput() {
+      generatedRecords = [];
+      document.getElementById('output-placeholder').style.display = 'flex';
+      document.getElementById('output-code').style.display = 'none';
+      document.getElementById('output-code').textContent = '';
+    }
+
+    function copyOutput() {
+      const text = document.getElementById('output-code').textContent;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+    }
+  </script>
+</body>
+</html>
