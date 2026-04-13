@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Too Many Future Calls: 51 — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce 'Too many future calls: 51' error. Learn how to replace @future with Queueable Apex and batch processing.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/too-many-future-calls-51.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <nav class="navbar"><div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+<ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html" class="active">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+<div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+<div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">Too Many Future Calls: 51</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-error">Governor Limit</span><span class="tag tag-primary">Runtime Error</span></div>
+      <h1 class="display-medium reveal stagger-3">Too Many Future Calls: 51</h1>
+      <p class="reveal stagger-4">System.LimitException — Your transaction enqueued more than 50 @future method invocations, exceeding the per-transaction future call limit.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+          <div class="callout callout-error reveal">
+  <span class="material-symbols-rounded">error</span>
+  <div><p><strong>System.LimitException:</strong> Too many future calls: 51</p></div>
+</div>
+          
+<h2 id="what" class="reveal">What does this error mean?</h2>
+<p class="reveal">Salesforce allows a maximum of <strong>50 <code>@future</code> method calls</strong> per transaction. Each call to a method annotated with <code>@future</code> increments this counter regardless of which class or method is called. When the 51st call is attempted, Salesforce throws this uncatchable exception and rolls back the transaction.</p>
+<p class="reveal">This limit exists because <code>@future</code> jobs are queued resources. Enqueuing 50+ jobs from a single transaction can flood the async queue and starve other orgs in the multitenant environment.</p>
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+<h3 class="reveal">1. @future call inside a trigger loop</h3>
+<p class="reveal">Calling a <code>@future</code> method once per record in a trigger is the most common pattern. With bulk loads of 51+ records, you immediately exceed the limit.</p>
+<h3 class="reveal">2. Multiple trigger handlers each calling @future</h3>
+<p class="reveal">Different trigger handlers on the same object each calling separate <code>@future</code> methods — the total across all of them counts against one limit per transaction.</p>
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+<h3 class="reveal">Solution 1: Collect IDs and call @future once</h3>
+<p class="reveal">Pass a <code>Set&lt;Id&gt;</code> to a single <code>@future</code> call instead of calling it once per record.</p>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-comment">// ❌ BAD — @future per record</span>
+<span class="code-keyword">for</span> (<span class="code-type">Account</span> acc : Trigger.new) {{
+    MyFutureClass.<span class="code-function">doWork</span>(acc.Id); <span class="code-comment">// 51 records = error</span>
+}}
+
+<span class="code-comment">// ✅ GOOD — single @future with all IDs</span>
+Set&lt;Id&gt; ids = Trigger.newMap.keySet();
+MyFutureClass.<span class="code-function">doWork</span>(ids); <span class="code-comment">// one call, any size</span>
+
+<span class="code-comment">// The @future method handles the set</span>
+@future
+<span class="code-keyword">public static void</span> <span class="code-function">doWork</span>(Set&lt;Id&gt; accountIds) {{
+    List&lt;Account&gt; accs = [<span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> Account <span class="code-keyword">WHERE</span> Id <span class="code-keyword">IN</span> :accountIds];
+    <span class="code-comment">// process...</span>
+}}</code></pre>
+</div>
+<h3 class="reveal">Solution 2: Switch to Queueable Apex</h3>
+<p class="reveal">Queueable Apex is the modern replacement for <code>@future</code>. It supports chaining, accepts non-primitive parameters, and has the same limit of 50 enqueues per transaction — but with much better flexibility.</p>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-keyword">public class</span> <span class="code-type">AccountQueueable</span> <span class="code-keyword">implements</span> Queueable {{
+    <span class="code-keyword">private</span> Set&lt;Id&gt; accountIds;
+
+    <span class="code-keyword">public</span> <span class="code-type">AccountQueueable</span>(Set&lt;Id&gt; ids) {{
+        <span class="code-keyword">this</span>.accountIds = ids;
+    }}
+
+    <span class="code-keyword">public void</span> <span class="code-function">execute</span>(QueueableContext ctx) {{
+        <span class="code-comment">// Process all accounts in one async execution</span>
+        List&lt;Account&gt; accs = [<span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> Account <span class="code-keyword">WHERE</span> Id <span class="code-keyword">IN</span> :accountIds];
+    }}
+}}
+
+<span class="code-comment">// Enqueue once from trigger</span>
+System.<span class="code-function">enqueueJob</span>(<span class="code-keyword">new</span> <span class="code-type">AccountQueueable</span>(Trigger.newMap.keySet()));</code></pre>
+</div>
+<div class="callout callout-info reveal">
+  <span class="material-symbols-rounded">lightbulb</span>
+  <div><p><strong>Pro Tip:</strong> Use <code>Limits.getFutureCalls()</code> to check how many @future calls have been made in the current transaction. If you have multiple handlers, centralise all async dispatching in one place to avoid accidentally compounding calls.</p></div>
+</div>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+ <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+  <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+<div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+<div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

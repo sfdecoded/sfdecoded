@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fix: Too Many Email Invocations — Salesforce Error Solution | Salesforce Decoded</title>
+
+<meta name="description" content="Fix the Salesforce Too Many Email Invocations error. Learn why Apex exceeds the sendEmail governor limit and how to resolve it.">
+
+<link rel="canonical" href="https://sfdecoded.netlify.app/errors/too-many-email-invocations.html">
+
+<link rel="stylesheet" href="../css/style.css">
+
+<link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+
+<meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+
+</head>
+
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+
+<nav class="navbar">
+<div class="navbar-inner">
+
+<a href="../index.html" class="nav-logo">
+<div class="nav-logo-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+</svg>
+</div>
+<div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+</a>
+
+<ul class="navbar-links">
+<li><a href="../index.html">Home</a></li>
+<li><a href="../tools.html">Tools</a></li>
+<li><a href="../errors.html" class="active">Errors</a></li>
+<li><a href="../guides.html">Guides</a></li>
+<li><a href="../tips.html">Tips</a></li>
+<li><a href="../prompts.html">Prompts</a></li>
+<li><a href="../extensions.html">Extensions</a></li>
+<li><a href="../resources.html">Resources</a></li>
+<li><a href="../about.html">About</a></li>
+</ul>
+
+<div class="navbar-search" role="button" tabindex="0">
+<span class="material-symbols-rounded">search</span>
+<span>Search...</span>
+<kbd>⌘K</kbd>
+</div>
+
+<button class="navbar-mobile-toggle" aria-label="Toggle menu">
+<span class="material-symbols-rounded">menu</span>
+</button>
+
+</div>
+</nav>
+
+
+
+<header class="page-header">
+
+<div class="container">
+
+<div class="breadcrumbs reveal">
+<a href="../index.html">Home</a>
+<span class="separator">/</span>
+<a href="../errors.html">Errors</a>
+<span class="separator">/</span>
+<span class="current">Too Many Email Invocations</span>
+</div>
+
+<div class="flex items-center gap-12 mb-16 reveal stagger-2">
+<span class="tag tag-error">Governor Limit</span>
+</div>
+
+<h1 class="display-medium reveal stagger-3">Too Many Email Invocations</h1>
+
+<p class="reveal stagger-4">
+System.LimitException — Apex attempted to send more emails than the allowed limit within a single transaction.
+</p>
+
+</div>
+
+</header>
+
+
+
+<section class="section">
+
+<div class="container">
+
+<div class="article-layout">
+
+<div class="article-content">
+
+
+<div class="callout callout-error reveal">
+<span class="material-symbols-rounded">error</span>
+<div>
+<p><strong>System.LimitException:</strong> Too many Email Invocations: 11</p>
+</div>
+</div>
+
+
+
+<h2 id="what" class="reveal">What does this error mean?</h2>
+
+<p class="reveal">
+Salesforce enforces a governor limit of <strong>10 email sendEmail() calls per Apex transaction</strong>.
+</p>
+
+<p class="reveal">
+If your code attempts to send emails more than 10 times in a single transaction, Salesforce throws the <code>Too many Email Invocations</code> error.
+</p>
+
+
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+
+<h3 class="reveal">1. Sending emails inside loops</h3>
+
+<p class="reveal">
+Calling <code>Messaging.sendEmail()</code> for every record inside a loop can quickly exceed the governor limit.
+</p>
+
+<h3 class="reveal">2. Multiple automation processes sending emails</h3>
+
+<p class="reveal">
+Triggers, flows, and workflows may all send emails within the same transaction.
+</p>
+
+<h3 class="reveal">3. Recursive triggers</h3>
+
+<p class="reveal">
+Recursive triggers may repeatedly send emails when records update multiple times.
+</p>
+
+
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+
+
+
+<h3 class="reveal">Solution 1 — Send emails in bulk</h3>
+
+<div class="code-block reveal">
+
+<div class="code-block-header">
+<span class="code-block-lang">Apex</span>
+<button class="code-copy-btn">
+<span class="material-symbols-rounded">content_copy</span> Copy
+</button>
+</div>
+
+<pre><code>
+List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
+
+for(Account acc : accounts){
+
+    Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+    email.setToAddresses(new String[]{'test@example.com'});
+    email.setSubject('Notification');
+    email.setPlainTextBody('Account created');
+
+    emails.add(email);
+
+}
+
+Messaging.sendEmail(emails);
+</code></pre>
+
+</div>
+
+
+
+<h3 class="reveal">Solution 2 — Avoid email calls inside loops</h3>
+
+<p class="reveal">
+Always collect email messages first, then send them in a single <code>Messaging.sendEmail()</code> call.
+</p>
+
+
+
+<h3 class="reveal">Solution 3 — Use asynchronous processing</h3>
+
+<div class="code-block reveal">
+
+<div class="code-block-header">
+<span class="code-block-lang">Apex</span>
+</div>
+
+<pre><code>
+System.enqueueJob(new SendEmailQueueable());
+</code></pre>
+
+</div>
+
+
+
+<div class="callout callout-info reveal">
+<span class="material-symbols-rounded">lightbulb</span>
+<div>
+<p>
+<strong>Pro Tip:</strong> Always bulkify email logic in Apex triggers to prevent exceeding the governor limit.
+</p>
+</div>
+</div>
+
+
+
+</div>
+
+
+
+<aside>
+
+<nav class="toc">
+
+<h4>On this page</h4>
+
+<a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+
+</nav>
+
+</aside>
+
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<footer class="footer">
+
+<div class="container">
+
+<div class="footer-grid">
+
+<div class="footer-brand">
+
+<a href="../index.html" class="nav-logo">
+
+<div class="nav-logo-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+</svg>
+</div>
+
+<div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+
+</a>
+
+<p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+
+</div>
+
+</div>
+
+<div class="footer-bottom">
+
+<p>&copy; 2026 Salesforce Decoded.</p>
+
+<div class="footer-social">
+<a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+<a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+</div>
+
+</div>
+
+</div>
+
+</footer>
+
+
+<button class="back-to-top" aria-label="Back to top">
+<span class="material-symbols-rounded">arrow_upward</span>
+</button>
+
+
+<script src="../js/main.js"></script>
+
+</body>
+</html>

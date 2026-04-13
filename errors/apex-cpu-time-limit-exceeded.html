@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Apex CPU Time Limit Exceeded — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce 'Apex CPU Time Limit Exceeded' error. Learn why it happens, common causes in Apex code, and proven solutions with examples.">
+  <meta name="keywords" content="apex cpu time limit exceeded, salesforce cpu limit, apex governor limit, salesforce performance fix">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/apex-cpu-time-limit-exceeded.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html">Tools</a></li>
+        <li><a href="../errors.html" class="active">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0">
+        <span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd>
+      </div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap">
+        <span class="material-symbols-rounded">search</span>
+        <input type="text" placeholder="Search errors...">
+      </div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a>
+        <span class="separator">/</span>
+        <a href="../errors.html">Errors</a>
+        <span class="separator">/</span>
+        <span class="current">Apex CPU Time Limit Exceeded</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-error">Governor Limit</span>
+        <span class="tag tag-primary">Runtime Error</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">Apex CPU Time Limit Exceeded</h1>
+      <p class="reveal stagger-4">System.LimitException — Your Apex code used more than the allowed CPU time in a single transaction.</p>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+
+        <!-- Main Content -->
+        <div class="article-content">
+
+          <!-- Error callout -->
+          <div class="callout callout-error reveal">
+            <span class="material-symbols-rounded">error</span>
+            <div>
+              <p style="font-family:var(--font-mono);font-size:0.875rem">
+                <strong>System.LimitException:</strong> Apex CPU time limit exceeded
+              </p>
+            </div>
+          </div>
+
+          <!-- What does it mean -->
+          <h2 id="what" class="reveal">What does this error mean?</h2>
+          <p class="reveal">Salesforce limits how long Apex code can run in a single transaction. When your code exceeds the CPU time allocation, the platform throws a <code>System.LimitException</code> and rolls back the entire transaction.</p>
+          <p class="reveal">CPU time counts the time your Apex code is <em>actively executing</em> — time spent waiting on callouts or database I/O is excluded. All code running in the transaction shares this pool: triggers, flows invoked from triggers, validation rules, and any Apex called within.</p>
+
+          <!-- Limits table -->
+          <div class="grid grid-2 reveal" style="margin:24px 0;gap:16px">
+            <div class="card" style="text-align:center;padding:24px 16px">
+              <div style="font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--md-primary);line-height:1">10s</div>
+              <div style="font-size:0.875rem;color:var(--md-on-surface-variant);margin-top:6px">Synchronous limit</div>
+            </div>
+            <div class="card" style="text-align:center;padding:24px 16px">
+              <div style="font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--md-primary);line-height:1">60s</div>
+              <div style="font-size:0.875rem;color:var(--md-on-surface-variant);margin-top:6px">Asynchronous limit</div>
+            </div>
+          </div>
+
+          <!-- Common Causes -->
+          <h2 id="causes" class="reveal">Common Causes</h2>
+
+          <h3 class="reveal">1. Nested or Complex Loops</h3>
+          <p class="reveal">Quadratic or cubic time complexity (nested loops over large collections) is the most frequent cause. Each extra loop multiplies CPU cost rapidly as record volume grows.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Bad Example</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// ❌ BAD: O(n²) — nested loop over large lists</span>
+<span class="code-keyword">for</span> (Account acc : allAccounts) {
+    <span class="code-keyword">for</span> (Contact con : allContacts) {
+        <span class="code-comment">// Runs accounts.size() × contacts.size() times</span>
+        <span class="code-keyword">if</span> (con.AccountId == acc.Id) {
+            <span class="code-comment">// ... expensive logic here</span>
+        }
+    }
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">2. String Manipulation in Loops</h3>
+          <p class="reveal">String concatenation using <code>+</code> inside a loop creates a new String object on every iteration, rapidly consuming CPU and heap. Use <code>String.join()</code> or a <code>List&lt;String&gt;</code> instead.</p>
+
+          <h3 class="reveal">3. JSON Serialization of Large Objects</h3>
+          <p class="reveal">Calling <code>JSON.serialize()</code> or <code>JSON.deserialize()</code> on deeply nested or very large objects is CPU-intensive. Limit the object graph before serializing.</p>
+
+          <h3 class="reveal">4. Excessive Flow + Apex Combinations</h3>
+          <p class="reveal">Record-triggered Flows that call Apex actions or invocable methods share the same CPU budget. A trigger and a flow running on the same record both draw from the 10-second pool simultaneously.</p>
+
+          <h3 class="reveal">5. SOQL for() Loops with Complex Body Logic</h3>
+          <p class="reveal">SOQL <code>for()</code> loops (chunked iteration) are designed for heap efficiency, but if the loop body contains expensive operations, CPU will accumulate across all chunks.</p>
+
+          <!-- Solutions -->
+          <h2 id="solution" class="reveal">How to Fix It</h2>
+
+          <h3 class="reveal">Solution 1: Replace Nested Loops with Maps</h3>
+          <p class="reveal">Replace O(n²) nested loops with a Map lookup, reducing the complexity to O(n). Build the map once, then access it in constant time.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Correct</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// ✅ GOOD: O(n) — map lookup instead of inner loop</span>
+Map&lt;Id, List&lt;Contact&gt;&gt; contactsByAccount = <span class="code-keyword">new</span> Map&lt;Id, List&lt;Contact&gt;&gt;();
+<span class="code-keyword">for</span> (Contact con : allContacts) {
+    <span class="code-keyword">if</span> (!contactsByAccount.containsKey(con.AccountId)) {
+        contactsByAccount.put(con.AccountId, <span class="code-keyword">new</span> List&lt;Contact&gt;());
+    }
+    contactsByAccount.get(con.AccountId).add(con);
+}
+
+<span class="code-comment">// Single loop with O(1) map lookup</span>
+<span class="code-keyword">for</span> (Account acc : allAccounts) {
+    List&lt;Contact&gt; contacts = contactsByAccount.get(acc.Id);
+    <span class="code-keyword">if</span> (contacts != <span class="code-keyword">null</span>) {
+        <span class="code-comment">// process contacts...</span>
+    }
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 2: Fix String Concatenation in Loops</h3>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Correct</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// ❌ BAD: String + in a loop</span>
+String result = <span class="code-string">''</span>;
+<span class="code-keyword">for</span> (String s : values) {
+    result += s + <span class="code-string">','</span>;  <span class="code-comment">// New object every iteration</span>
+}
+
+<span class="code-comment">// ✅ GOOD: List + String.join()</span>
+List&lt;String&gt; parts = <span class="code-keyword">new</span> List&lt;String&gt;();
+<span class="code-keyword">for</span> (String s : values) {
+    parts.add(s);
+}
+String result = String.join(parts, <span class="code-string">','</span>);</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 3: Move Heavy Work to Async</h3>
+          <p class="reveal">For genuinely expensive operations — large-scale data processing, complex calculations over thousands of records — move the work to asynchronous context where the limit is 60,000ms.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Move heavy processing to a Queueable</span>
+<span class="code-keyword">public class</span> <span class="code-type">HeavyProcessingJob</span> <span class="code-keyword">implements</span> <span class="code-type">Queueable</span> {
+    <span class="code-keyword">private</span> List&lt;Id&gt; recordIds;
+
+    <span class="code-keyword">public</span> <span class="code-function">HeavyProcessingJob</span>(List&lt;Id&gt; ids) {
+        <span class="code-keyword">this</span>.recordIds = ids;
+    }
+
+    <span class="code-keyword">public void</span> <span class="code-function">execute</span>(QueueableContext ctx) {
+        <span class="code-comment">// 60s CPU limit here — process away</span>
+        List&lt;Account&gt; records = [
+            <span class="code-keyword">SELECT</span> Id, Name <span class="code-keyword">FROM</span> Account
+            <span class="code-keyword">WHERE</span> Id <span class="code-keyword">IN</span> :recordIds
+        ];
+        <span class="code-comment">// ... complex logic ...</span>
+    }
+}
+
+<span class="code-comment">// Enqueue from trigger</span>
+System.enqueueJob(<span class="code-keyword">new</span> HeavyProcessingJob(Trigger.newMap.keySet()));</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 4: Monitor CPU Consumption</h3>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Check CPU usage at key points to find bottlenecks</span>
+System.debug(<span class="code-string">'CPU before: '</span> + Limits.getCpuTime() + <span class="code-string">'ms'</span>);
+doExpensiveWork();
+System.debug(<span class="code-string">'CPU after: '</span> + Limits.getCpuTime() + <span class="code-string">'ms'</span>);
+System.debug(<span class="code-string">'Remaining: '</span> + (Limits.getLimitCpuTime() - Limits.getCpuTime()) + <span class="code-string">'ms'</span>);</code></pre>
+          </div>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <div>
+              <p><strong>Pro Tip:</strong> In your debug log, search for <code>CUMULATIVE_LIMIT_USAGE</code> near the end of the transaction. The <code>Maximum CPU Time</code> line shows your exact consumption. Use <code>Limits.getCpuTime()</code> strategically to isolate which method is the bottleneck.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Table of Contents -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+            <a href="#causes">Common Causes</a>
+            <a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+           <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="../tools.html">Tools</a></li>
+            <li><a href="../errors.html">Errors</a></li>
+            <li><a href="../guides.html">Guides</a></li>
+            <li><a href="../extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="../tips.html">Tips</a></li>
+            <li><a href="../resources.html">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="../about.html">About</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html""><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top">
+    <span class="material-symbols-rounded">arrow_upward</span>
+  </button>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

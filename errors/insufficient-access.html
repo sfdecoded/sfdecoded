@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Insufficient Access / Cross Reference Entity — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce 'Insufficient Access on Cross Reference Entity' DML error. Learn causes, sharing model fixes, and tested Apex solutions.">
+  <meta name="keywords" content="insufficient access cross reference entity, salesforce dml error, salesforce sharing, apex permission error, salesforce owd">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/insufficient-access.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <style>
+    /* Scenario table */
+    .error-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 0.875rem;
+      border-radius: var(--md-shape-md);
+      overflow: hidden;
+      border: 1px solid var(--md-outline-variant);
+    }
+    .error-table thead {
+      background: var(--md-surface-container);
+    }
+    .error-table th {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--md-on-surface-variant);
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .error-table td {
+      padding: 12px 16px;
+      color: var(--md-on-surface-variant);
+      border-bottom: 1px solid var(--md-outline-variant);
+      line-height: 1.55;
+      vertical-align: top;
+    }
+    .error-table tr:last-child td { border-bottom: none; }
+    .error-table tr:nth-child(even) td { background: var(--md-surface-container-low); }
+    .error-table code {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      padding: 1px 6px;
+      background: var(--md-surface-container-high);
+      border-radius: var(--md-shape-xs);
+      color: var(--md-primary);
+    }
+  </style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html">Tools</a></li>
+        <li><a href="../errors.html" class="active">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0">
+        <span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd>
+      </div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap">
+        <span class="material-symbols-rounded">search</span>
+        <input type="text" placeholder="Search errors...">
+      </div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a>
+        <span class="separator">/</span>
+        <a href="../errors.html">Errors</a>
+        <span class="separator">/</span>
+        <span class="current">Insufficient Access / Cross Reference Entity</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-error">Permission Error</span>
+        <span class="tag tag-primary">DML</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">Insufficient Access / Cross Reference Entity</h1>
+      <p class="reveal stagger-4">System.DmlException — Permission, sharing, or ownership issues are preventing a DML operation on one or more records.</p>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+
+        <!-- Main Content -->
+        <div class="article-content">
+
+          <!-- Error callout -->
+          <div class="callout callout-error reveal">
+            <span class="material-symbols-rounded">error</span>
+            <div>
+              <p style="font-family:var(--font-mono);font-size:0.875rem">
+                <strong>System.DmlException:</strong> Insert failed. First exception on row 0; first error: INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY, insufficient access rights on cross-reference id: []
+              </p>
+            </div>
+          </div>
+
+          <!-- What does it mean -->
+          <h2 id="what" class="reveal">What does this error mean?</h2>
+          <p class="reveal">This error occurs when Apex code (or an automated process) attempts to create or update a record that references another record the <em>running user</em> does not have read or edit access to. Salesforce enforces record-level security even in system context operations that involve cross-object relationships.</p>
+          <p class="reveal">The phrase "cross-reference entity" refers to a lookup or master-detail field pointing to a record in another object. If the running user cannot see that target record, the DML fails with this error.</p>
+
+          <div class="callout callout-warning reveal">
+            <span class="material-symbols-rounded">warning</span>
+            <div>
+              <p><strong>Important:</strong> This error fires based on the <strong>running user's</strong> access — not the org's OWD or the system admin's access. In triggers, the running user is whoever performed the triggering action. In scheduled jobs or future methods, it is the user who scheduled or invoked the job.</p>
+            </div>
+          </div>
+
+          <!-- Common Causes -->
+          <h2 id="causes" class="reveal">Common Causes</h2>
+
+          <h3 class="reveal">1. Lookup to a Record the User Cannot See</h3>
+          <p class="reveal">The most common cause. A trigger or automation creates a record with a lookup field pointing to a record (e.g., an Account) that the running user's sharing rules restrict. Even if the running user can create the child record, they cannot link it to a parent they cannot view.</p>
+
+          <h3 class="reveal">2. OWD Set to Private on the Parent Object</h3>
+          <p class="reveal">When the Organisation-Wide Default (OWD) for a parent object is set to <strong>Private</strong>, users only see records they own (or that sharing rules explicitly share with them). A lookup to a privately-owned record owned by another user will fail for users who don't have access.</p>
+
+          <h3 class="reveal">3. Running in User Mode Without Sufficient Access</h3>
+          <p class="reveal">Code that runs in <strong>User Mode</strong> (<code>WITH USER_MODE</code> SOQL clause or the <code>AccessLevel.USER_MODE</code> DML flag) inherits the running user's CRUD and FLS. If that user lacks access to the referenced record, the DML fails.</p>
+
+          <h3 class="reveal">4. Flow or Process Builder Automation</h3>
+          <p class="reveal">Record-triggered flows run in system context by default, but flows launched via <em>user interaction</em> (screen flows, quick actions) run as the current user. A cross-object update in a user-context flow can trigger this error for restricted users.</p>
+
+          <h3 class="reveal">5. Integration User with Restricted Profile</h3>
+          <p class="reveal">API integrations using a dedicated integration user profile may lack the sharing access required to reference records owned by other users, causing failures when creating related records.</p>
+
+          <!-- Scenario table -->
+          <table class="error-table reveal">
+            <thead>
+              <tr>
+                <th>Scenario</th>
+                <th>Root Cause</th>
+                <th>Fix Approach</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Trigger creates child record with Account lookup</td>
+                <td>OWD = Private on Account; running user doesn't own it</td>
+                <td>Add sharing rule or use <code>without sharing</code></td>
+              </tr>
+              <tr>
+                <td>Flow updates Opportunity related to restricted Account</td>
+                <td>User-context flow, user lacks Account access</td>
+                <td>Grant sharing or reconfigure flow context</td>
+              </tr>
+              <tr>
+                <td>Integration creates Case with Contact lookup</td>
+                <td>Integration user profile doesn't see Contact</td>
+                <td>Adjust integration user sharing settings</td>
+              </tr>
+              <tr>
+                <td><code>Database.update(record, AccessLevel.USER_MODE)</code></td>
+                <td>Explicit user-mode DML, user lacks access</td>
+                <td>Switch to <code>SYSTEM_MODE</code> or fix user's access</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Solutions -->
+          <h2 id="solution" class="reveal">How to Fix It</h2>
+
+          <h3 class="reveal">Solution 1: Use <code>without sharing</code> on the Handler Class</h3>
+          <p class="reveal">If your Apex logic is intentionally designed to operate with elevated access (e.g., system automation that should bypass record-level security), declare the class <code>without sharing</code>. Use this carefully — it bypasses all sharing rules for that class's execution.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Explicitly bypass sharing — use only when appropriate</span>
+<span class="code-keyword">public without sharing class</span> <span class="code-type">CaseCreationService</span> {
+
+    <span class="code-keyword">public static void</span> <span class="code-function">createRelatedCases</span>(List&lt;Account&gt; accounts) {
+        List&lt;Case&gt; cases = <span class="code-keyword">new</span> List&lt;Case&gt;();
+        <span class="code-keyword">for</span> (Account acc : accounts) {
+            cases.add(<span class="code-keyword">new</span> Case(
+                AccountId = acc.Id,
+                Subject = <span class="code-string">'Auto-generated: '</span> + acc.Name,
+                Status = <span class="code-string">'New'</span>
+            ));
+        }
+        <span class="code-keyword">insert</span> cases;
+    }
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 2: Diagnose Errors with <code>Database.insert(allOrNone:false)</code></h3>
+          <p class="reveal">Use partial DML with <code>allOrNone = false</code> to isolate which records are failing and log meaningful error information instead of letting the whole transaction roll back.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code>List&lt;Database.SaveResult&gt; results =
+    Database.insert(recordsToInsert, <span class="code-keyword">false</span>);
+
+<span class="code-keyword">for</span> (Integer i = <span class="code-number">0</span>; i &lt; results.size(); i++) {
+    <span class="code-keyword">if</span> (!results[i].isSuccess()) {
+        <span class="code-keyword">for</span> (Database.Error err : results[i].getErrors()) {
+            <span class="code-keyword">if</span> (err.getStatusCode() ==
+                StatusCode.INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY) {
+                System.debug(<span class="code-string">'Access error on record: '</span>
+                    + recordsToInsert[i].Id
+                    + <span class="code-string">' — '</span> + err.getMessage());
+            }
+        }
+    }
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 3: Add a Sharing Rule for the Referenced Object</h3>
+          <p class="reveal">If the OWD is Private and you need certain users or groups to see specific records, configure sharing rules in Setup. This is the safest approach — it preserves your security model while granting the required access.</p>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">info</span>
+            <div>
+              <p>Go to <strong>Setup → Security → Sharing Settings</strong>, find the object with OWD set to Private, and under <em>Sharing Rules</em> click <strong>New</strong>. Define the criteria (owner or record criteria) and grant Read or Read/Write access to the appropriate user group, role, or territory.</p>
+            </div>
+          </div>
+
+          <h3 class="reveal">Solution 4: Use <code>System.runAs()</code> in Tests to Reproduce</h3>
+          <p class="reveal">Always write tests that reproduce the sharing scenario to confirm your fix works correctly under the actual user context.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Test Class</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-keyword">@isTest</span>
+<span class="code-keyword">private class</span> <span class="code-type">CaseCreationServiceTest</span> {
+
+    <span class="code-keyword">@isTest</span>
+    <span class="code-keyword">static void</span> <span class="code-function">testCreateAsRestrictedUser</span>() {
+        <span class="code-comment">// Create a user with a restricted profile</span>
+        <span class="code-type">User</span> restrictedUser = [
+            <span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> User
+            <span class="code-keyword">WHERE</span> Profile.Name = <span class="code-string">'Standard User'</span>
+            <span class="code-keyword">LIMIT</span> <span class="code-number">1</span>
+        ];
+
+        Account acc = <span class="code-keyword">new</span> Account(Name = <span class="code-string">'Test Corp'</span>);
+        <span class="code-keyword">insert</span> acc;
+
+        <span class="code-comment">// Simulate running as the restricted user</span>
+        System.runAs(restrictedUser) {
+            Test.startTest();
+            CaseCreationService.createRelatedCases(
+                <span class="code-keyword">new</span> List&lt;Account&gt;{ acc }
+            );
+            Test.stopTest();
+        }
+
+        List&lt;Case&gt; cases = [<span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> Case];
+        System.assertEquals(<span class="code-number">1</span>, cases.size(), <span class="code-string">'Case should be created'</span>);
+    }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <div>
+              <p><strong>Pro Tip:</strong> Use <strong>Salesforce Inspector</strong> or <strong>Setup → Permission Set Assignments</strong> to quickly check what record access a specific user has. The <em>User Access Summary</em> in Setup (Lightning) shows exactly which sharing rules apply to a given user for any object.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Table of Contents -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+            <a href="#causes">Common Causes</a>
+            <a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+           <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="../tools.html">Tools</a></li>
+            <li><a href="../errors.html">Errors</a></li>
+            <li><a href="../guides.html">Guides</a></li>
+            <li><a href="../extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="../tips.html">Tips</a></li>
+            <li><a href="../resources.html">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="../about.html">About</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top">
+    <span class="material-symbols-rounded">arrow_upward</span>
+  </button>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

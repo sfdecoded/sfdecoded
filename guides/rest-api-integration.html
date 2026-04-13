@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REST API Integration Patterns — Complete Guide | Salesforce Decoded</title>
+  <meta name="description" content="Connect Salesforce with external systems using REST APIs. Covers authentication, HTTP callouts, named credentials, error handling and response parsing.">
+  <meta name="keywords" content="salesforce rest api, apex callouts, named credentials, salesforce integration, http callout apex">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/guides/rest-api-integration.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+    <ul class="navbar-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li>
+      <li><a href="../guides.html" class="active">Guides</a></li>
+      <li><a href="../tips.html">Tips</a></li>
+      <li><a href="../prompts.html">Prompts</a></li>
+      <li><a href="../extensions.html">Extensions</a></li>
+      <li><a href="../resources.html">Resources</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+    <div class="navbar-search" role="button" tabindex="0">
+      <span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd>
+    </div>
+    <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+  </div></nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html" class="active"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../guides.html">Guides</a><span class="separator">/</span>
+        <span class="current">REST API Integration Patterns</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-primary">Integration Guide</span>
+        <span class="body-small text-outline">18 min read</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">REST API Integration Patterns</h1>
+      <p class="reveal stagger-4">Connect Salesforce with external systems using REST APIs — authentication, callouts, named credentials, and handling responses.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+
+          <p class="body-large reveal">Salesforce integrations fall into two categories: <strong>outbound</strong> (Salesforce calls an external API) and <strong>inbound</strong> (an external system calls Salesforce). This guide covers both, with a focus on production-ready patterns, credential management, and resilient error handling.</p>
+
+          <h2 id="named-credentials" class="reveal">Named Credentials</h2>
+          <p class="reveal">Never hardcode API endpoints or credentials in Apex code. Named Credentials store the endpoint URL and authentication details securely in Setup, keeping secrets out of your codebase and making credential rotation trivial.</p>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lock</span>
+            <p><strong>Security Best Practice:</strong> Named Credentials abstract authentication completely. Even developers with code access cannot see the stored credentials. They also automatically handle OAuth token refresh.</p>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Using Named Credentials</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Setup > Named Credentials > New
+// Developer Name: MyExternalAPI
+// URL: https://api.example.com
+// Auth Protocol: OAuth 2.0 (configured in Setup)</span>
+
+<span class="code-keyword">public class</span> <span class="code-type">ExternalApiService</span> {
+
+    <span class="code-keyword">private static final</span> String ENDPOINT = <span class="code-string">'callout:MyExternalAPI'</span>;
+
+    <span class="code-keyword">public static</span> HttpResponse <span class="code-function">get</span>(String path) {
+        HttpRequest req = <span class="code-keyword">new</span> HttpRequest();
+        <span class="code-comment">// Named Credential handles the base URL + auth headers automatically</span>
+        req.setEndpoint(ENDPOINT + path);
+        req.setMethod(<span class="code-string">'GET'</span>);
+        req.setHeader(<span class="code-string">'Content-Type'</span>, <span class="code-string">'application/json'</span>);
+        req.setHeader(<span class="code-string">'Accept'</span>, <span class="code-string">'application/json'</span>);
+        req.setTimeout(<span class="code-number">30000</span>); <span class="code-comment">// 30 seconds</span>
+
+        <span class="code-keyword">return new</span> Http().send(req);
+    }
+
+    <span class="code-keyword">public static</span> HttpResponse <span class="code-function">post</span>(String path, String body) {
+        HttpRequest req = <span class="code-keyword">new</span> HttpRequest();
+        req.setEndpoint(ENDPOINT + path);
+        req.setMethod(<span class="code-string">'POST'</span>);
+        req.setHeader(<span class="code-string">'Content-Type'</span>, <span class="code-string">'application/json'</span>);
+        req.setBody(body);
+        req.setTimeout(<span class="code-number">30000</span>);
+
+        <span class="code-keyword">return new</span> Http().send(req);
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="http-callouts" class="reveal">HTTP Callout Pattern</h2>
+          <p class="reveal">Build a robust HTTP client with proper response handling, status code checking, and typed return values using the wrapper class pattern.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Typed API Client</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-keyword">public class</span> <span class="code-type">CustomerApiClient</span> {
+
+    <span class="code-comment">// Wrapper for API response</span>
+    <span class="code-keyword">public class</span> <span class="code-type">ApiResponse</span> {
+        <span class="code-keyword">public</span> Boolean success;
+        <span class="code-keyword">public</span> Integer statusCode;
+        <span class="code-keyword">public</span> String body;
+        <span class="code-keyword">public</span> String errorMessage;
+    }
+
+    <span class="code-comment">// Wrapper matching the API's JSON structure</span>
+    <span class="code-keyword">public class</span> <span class="code-type">Customer</span> {
+        <span class="code-keyword">public</span> String id;
+        <span class="code-keyword">public</span> String name;
+        <span class="code-keyword">public</span> String email;
+        <span class="code-keyword">public</span> String status;
+        <span class="code-keyword">public</span> Decimal balance;
+    }
+
+    <span class="code-keyword">public static</span> Customer <span class="code-function">getCustomer</span>(String customerId) {
+        ApiResponse response = <span class="code-function">makeCallout</span>(
+            <span class="code-string">'GET'</span>,
+            <span class="code-string">'/v1/customers/'</span> + EncodingUtil.urlEncode(customerId, <span class="code-string">'UTF-8'</span>),
+            <span class="code-keyword">null</span>
+        );
+
+        <span class="code-keyword">if</span> (!response.success) {
+            <span class="code-keyword">throw new</span> CalloutException(<span class="code-string">'Failed to get customer: '</span> + response.errorMessage);
+        }
+
+        <span class="code-keyword">return</span> (Customer) JSON.deserialize(response.body, Customer.class);
+    }
+
+    <span class="code-keyword">public static</span> Customer <span class="code-function">createCustomer</span>(Customer c) {
+        String payload = JSON.serialize(c);
+        ApiResponse response = <span class="code-function">makeCallout</span>(<span class="code-string">'POST'</span>, <span class="code-string">'/v1/customers'</span>, payload);
+
+        <span class="code-keyword">if</span> (!response.success) {
+            <span class="code-keyword">throw new</span> CalloutException(<span class="code-string">'Failed to create customer: '</span> + response.errorMessage);
+        }
+
+        <span class="code-keyword">return</span> (Customer) JSON.deserialize(response.body, Customer.class);
+    }
+
+    <span class="code-keyword">private static</span> ApiResponse <span class="code-function">makeCallout</span>(String method, String path, String body) {
+        ApiResponse result = <span class="code-keyword">new</span> ApiResponse();
+
+        <span class="code-keyword">try</span> {
+            HttpRequest req = <span class="code-keyword">new</span> HttpRequest();
+            req.setEndpoint(<span class="code-string">'callout:CustomerAPI'</span> + path);
+            req.setMethod(method);
+            req.setHeader(<span class="code-string">'Content-Type'</span>, <span class="code-string">'application/json'</span>);
+            req.setTimeout(<span class="code-number">30000</span>);
+            <span class="code-keyword">if</span> (body != <span class="code-keyword">null</span>) req.setBody(body);
+
+            HttpResponse res = <span class="code-keyword">new</span> Http().send(req);
+            result.statusCode = res.getStatusCode();
+            result.body = res.getBody();
+
+            <span class="code-comment">// 2xx = success</span>
+            result.success = result.statusCode >= <span class="code-number">200</span> &amp;&amp; result.statusCode &lt; <span class="code-number">300</span>;
+
+            <span class="code-keyword">if</span> (!result.success) {
+                result.errorMessage = <span class="code-string">'HTTP '</span> + result.statusCode + <span class="code-string">': '</span> + res.getBody();
+            }
+
+        } <span class="code-keyword">catch</span> (System.CalloutException e) {
+            result.success = <span class="code-keyword">false</span>;
+            result.errorMessage = e.getMessage();
+            System.debug(LoggingLevel.ERROR, <span class="code-string">'Callout failed: '</span> + e.getMessage());
+        }
+
+        <span class="code-keyword">return</span> result;
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="inbound-rest" class="reveal">Exposing Apex as REST API</h2>
+          <p class="reveal">Use <code>@RestResource</code> to expose Apex classes as REST endpoints that external systems can call. Your org's connected app manages authentication for inbound calls.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Custom REST Endpoint</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Accessible at: /services/apexrest/accounts/v1/*</span>
+<span class="code-keyword">@RestResource</span>(urlMapping=<span class="code-string">'/accounts/v1/*'</span>)
+<span class="code-keyword">global class</span> <span class="code-type">AccountRestService</span> {
+
+    <span class="code-keyword">@HttpGet</span>
+    <span class="code-keyword">global static</span> Account <span class="code-function">getAccount</span>() {
+        RestRequest req = RestContext.request;
+        String accountId = req.requestURI.substringAfterLast(<span class="code-string">'/'</span>);
+
+        <span class="code-keyword">try</span> {
+            <span class="code-keyword">return</span> [
+                <span class="code-keyword">SELECT</span> Id, Name, Industry, AnnualRevenue, Phone
+                <span class="code-keyword">FROM</span> Account
+                <span class="code-keyword">WHERE</span> Id = :accountId
+                <span class="code-keyword">LIMIT</span> <span class="code-number">1</span>
+            ];
+        } <span class="code-keyword">catch</span> (QueryException e) {
+            RestContext.response.statusCode = <span class="code-number">404</span>;
+            <span class="code-keyword">return null</span>;
+        }
+    }
+
+    <span class="code-keyword">@HttpPost</span>
+    <span class="code-keyword">global static</span> String <span class="code-function">createAccount</span>(String name, String industry, Decimal revenue) {
+        <span class="code-keyword">try</span> {
+            Account acc = <span class="code-keyword">new</span> Account(
+                Name = name,
+                Industry = industry,
+                AnnualRevenue = revenue
+            );
+            insert acc;
+
+            RestContext.response.statusCode = <span class="code-number">201</span>;
+            <span class="code-keyword">return</span> acc.Id;
+
+        } <span class="code-keyword">catch</span> (DmlException e) {
+            RestContext.response.statusCode = <span class="code-number">400</span>;
+            <span class="code-keyword">return</span> e.getMessage();
+        }
+    }
+
+    <span class="code-keyword">@HttpDelete</span>
+    <span class="code-keyword">global static</span> void <span class="code-function">deleteAccount</span>() {
+        String accountId = RestContext.request.requestURI.substringAfterLast(<span class="code-string">'/'</span>);
+        Account acc = <span class="code-keyword">new</span> Account(Id = accountId);
+        delete acc;
+        RestContext.response.statusCode = <span class="code-number">204</span>;
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="mock-callouts" class="reveal">Mocking Callouts in Tests</h2>
+          <p class="reveal">Apex tests cannot make real HTTP callouts. Use <code>HttpCalloutMock</code> to simulate API responses and test all code paths including errors.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — HttpCalloutMock & Test</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Mock class — simulates a successful API response</span>
+<span class="code-keyword">@isTest</span>
+<span class="code-keyword">global class</span> <span class="code-type">CustomerApiMock</span> <span class="code-keyword">implements</span> HttpCalloutMock {
+    <span class="code-keyword">private</span> Integer statusCode;
+    <span class="code-keyword">private</span> String body;
+
+    <span class="code-keyword">global</span> <span class="code-function">CustomerApiMock</span>(Integer code, String responseBody) {
+        <span class="code-keyword">this</span>.statusCode = code;
+        <span class="code-keyword">this</span>.body = responseBody;
+    }
+
+    <span class="code-keyword">global</span> HTTPResponse <span class="code-function">respond</span>(HTTPRequest req) {
+        HttpResponse res = <span class="code-keyword">new</span> HttpResponse();
+        res.setHeader(<span class="code-string">'Content-Type'</span>, <span class="code-string">'application/json'</span>);
+        res.setBody(<span class="code-keyword">this</span>.body);
+        res.setStatusCode(<span class="code-keyword">this</span>.statusCode);
+        <span class="code-keyword">return</span> res;
+    }
+}
+
+<span class="code-comment">// Test class using the mock</span>
+<span class="code-keyword">@isTest</span>
+<span class="code-keyword">private class</span> <span class="code-type">CustomerApiClientTest</span> {
+
+    <span class="code-keyword">@isTest</span>
+    <span class="code-keyword">static void</span> <span class="code-function">testGetCustomer_success</span>() {
+        String mockBody = <span class="code-string">'{"id":"C001","name":"Acme Corp","email":"info@acme.com","status":"active","balance":5000}'</span>;
+        Test.setMock(HttpCalloutMock.class, <span class="code-keyword">new</span> CustomerApiMock(<span class="code-number">200</span>, mockBody));
+
+        Test.startTest();
+        CustomerApiClient.Customer customer = CustomerApiClient.getCustomer(<span class="code-string">'C001'</span>);
+        Test.stopTest();
+
+        System.assertNotEquals(<span class="code-keyword">null</span>, customer);
+        System.assertEquals(<span class="code-string">'Acme Corp'</span>, customer.name);
+        System.assertEquals(<span class="code-number">5000</span>, customer.balance);
+    }
+
+    <span class="code-keyword">@isTest</span>
+    <span class="code-keyword">static void</span> <span class="code-function">testGetCustomer_notFound</span>() {
+        Test.setMock(HttpCalloutMock.class, <span class="code-keyword">new</span> CustomerApiMock(<span class="code-number">404</span>, <span class="code-string">'{"error":"Not found"}'</span>));
+
+        Test.startTest();
+        <span class="code-keyword">try</span> {
+            CustomerApiClient.getCustomer(<span class="code-string">'INVALID'</span>);
+            System.assert(<span class="code-keyword">false</span>, <span class="code-string">'Should have thrown'</span>);
+        } <span class="code-keyword">catch</span> (CalloutException e) {
+            System.assert(e.getMessage().contains(<span class="code-string">'404'</span>));
+        }
+        Test.stopTest();
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="retry-pattern" class="reveal">Retry & Resilience Patterns</h2>
+          <p class="reveal">External APIs are unreliable. Build retry logic with exponential backoff using Queueable chaining to handle transient failures gracefully.</p>
+
+          <div class="callout callout-warning reveal">
+            <span class="material-symbols-rounded">warning</span>
+            <p><strong>Idempotency:</strong> Before retrying, ensure the operation is idempotent — retrying a POST that creates a record might create duplicates. Use idempotency keys or check-then-act patterns.</p>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Retry with Queueable</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-keyword">public class</span> <span class="code-type">RetryableCalloutJob</span> <span class="code-keyword">implements</span> Queueable, Database.AllowsCallouts {
+    <span class="code-keyword">private</span> String recordId;
+    <span class="code-keyword">private</span> Integer attempts;
+    <span class="code-keyword">private static final</span> Integer MAX_ATTEMPTS = <span class="code-number">3</span>;
+
+    <span class="code-keyword">public</span> <span class="code-function">RetryableCalloutJob</span>(String recordId, Integer attempts) {
+        <span class="code-keyword">this</span>.recordId = recordId;
+        <span class="code-keyword">this</span>.attempts = attempts;
+    }
+
+    <span class="code-keyword">public void</span> <span class="code-function">execute</span>(QueueableContext ctx) {
+        <span class="code-keyword">try</span> {
+            <span class="code-comment">// Attempt the callout</span>
+            CustomerApiClient.Customer c = CustomerApiClient.getCustomer(recordId);
+            <span class="code-comment">// Process successful result...</span>
+            System.debug(<span class="code-string">'Success on attempt '</span> + attempts);
+
+        } <span class="code-keyword">catch</span> (Exception e) {
+            <span class="code-keyword">if</span> (attempts &lt; MAX_ATTEMPTS) {
+                <span class="code-comment">// Schedule retry (Queueable chaining)</span>
+                System.debug(<span class="code-string">'Attempt '</span> + attempts + <span class="code-string">' failed, retrying...'</span>);
+                System.enqueueJob(<span class="code-keyword">new</span> RetryableCalloutJob(recordId, attempts + <span class="code-number">1</span>));
+            } <span class="code-keyword">else</span> {
+                <span class="code-comment">// Max attempts reached — log and alert</span>
+                System.debug(LoggingLevel.ERROR, <span class="code-string">'All '</span> + MAX_ATTEMPTS + <span class="code-string">' attempts failed for '</span> + recordId);
+                <span class="code-comment">// Insert an error log custom record or send email alert</span>
+            }
+        }
+    }
+}</code></pre>
+          </div>
+
+          <div class="grid grid-2 mt-24 mb-32">
+            <div class="card reveal stagger-1" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">100</div>
+              <div class="body-small text-muted">Max callouts per transaction</div>
+            </div>
+            <div class="card reveal stagger-2" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">120s</div>
+              <div class="body-small text-muted">Max callout timeout</div>
+            </div>
+            <div class="card reveal stagger-3" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">6 MB</div>
+              <div class="body-small text-muted">Max response body size</div>
+            </div>
+            <div class="card reveal stagger-4" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">5</div>
+              <div class="body-small text-muted">Queueable chain depth (sandbox)</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TOC -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#named-credentials">Named Credentials</a>
+            <a href="#http-callouts">HTTP Callout Pattern</a>
+            <a href="#inbound-rest">Exposing REST APIs</a>
+            <a href="#mock-callouts">Mocking in Tests</a>
+            <a href="#retry-pattern">Retry &amp; Resilience</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid">
+    <div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

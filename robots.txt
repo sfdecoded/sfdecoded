@@ -1,0 +1,19 @@
+User-agent: *
+
+# Allow main sections
+Allow: /
+Allow: /tools
+Allow: /errors
+Allow: /guides
+Allow: /prompts
+
+# Allow assets required for rendering
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /icons/
+Allow: /favicons/
+
+
+# Sitemap
+Sitemap: https://sfdecoded.netlify.app/sitemap.xml

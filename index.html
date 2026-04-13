@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Decoded — Tools & Knowledge for Salesforce Developers</title>
+  <meta name="description" content="Salesforce Decoded provides developer tools, error fixes, guides, and productivity tips for Salesforce developers. Build faster on Salesforce.">
+  <meta name="keywords" content="salesforce developer tools, salesforce error fix, apex best practices, soql examples, salesforce chrome extension">
+  <meta property="og:title" content="Salesforce Decoded — Tools & Knowledge for Salesforce Developers">
+  <meta property="og:description" content="Developer tools, error fixes, guides, and productivity tips for Salesforce developers.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sfdecoded.netlify.app">
+  <link rel="canonical" href="https://sfdecoded.netlify.app">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Favicon -->
+ <link rel="icon" href="favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="favicons/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+  <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<style>
+  .float-card {
+    position: absolute;
+    background: var(--md-surface);
+    border-radius: var(--shape-lg);
+    padding: 10px 14px;
+    border: 1px solid var(--md-outline-variant);
+    box-shadow: var(--md-elevation-3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+  .fc1 { top: 54%; left: -10%; animation: float 7s ease-in-out infinite; animation-delay: -2s; }
+  .fc2 { bottom: 35px; right: -28px; animation: float 8s ease-in-out infinite; animation-delay: -4s; }
+  .fc3 { top: 30%; right: -38px; transform: translateY(-50%); animation: float 6s ease-in-out infinite; animation-delay: -1s; }
+  .fi { width: 34px; height: 34px; border-radius: var(--shape-sm); display: flex; align-items: center; justify-content: center; }
+  .fi svg { width: 17px; height: 17px; }
+  .fl { font-size: .8125rem; font-weight: 600; color: var(--md-on-surface); }
+  .fs { font-size: .75rem; color: var(--md-on-surface-variant); }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  /* Tablet: slightly tighter layout */
+  @media (max-width: 1100px) {
+    .hero-content { gap: 40px; }
+    .fc1 { left: -4%; }
+    .fc2 { right: -12px; }
+    .fc3 { right: -12px; }
+  }
+
+  /* Mobile: stack vertically, reposition float cards inside visual */
+  @media (max-width: 768px) {
+    .hero-content {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .hero-visual {
+      margin-top: 0 !important;
+      position: relative;
+    }
+
+    /* Tuck cards inside the visual bounds on mobile */
+    .fc1 { top: auto; left: 8px; bottom: -40px; font-size: 0.7rem; padding: 8px 10px; }
+    .fc2 { bottom: -40px; right: 8px; left: auto; font-size: 0.7rem; padding: 8px 10px; }
+    .fc3 { display: none; } /* hide the third to avoid crowding */
+
+    .fi { width: 26px; height: 26px; }
+    .fi svg { width: 13px; height: 13px; }
+    .fl { font-size: 0.7rem; }
+    .fs { font-size: 0.65rem; }
+  }
+
+  @media (max-width: 480px) {
+    /* Hide all float cards on very small screens */
+    .fc1, .fc2, .fc3 { display: none; }
+  }
+</style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <!-- Navbar -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar-inner">
+      <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+
+      <ul class="navbar-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="tools.html">Tools</a></li>
+        <li><a href="errors.html">Errors</a></li>
+        <li><a href="guides.html">Guides</a></li>
+        <li><a href="tips.html">Tips</a></li>
+        <li><a href="prompts.html">Prompts</a></li>
+        <li><a href="extensions.html">Extensions</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+
+      <div class="navbar-search" role="button" tabindex="0" aria-label="Search">
+        <span class="material-symbols-rounded">search</span>
+        <span>Search...</span>
+        <kbd>⌘K</kbd>
+      </div>
+
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav">
+    <a href="index.html" class="active"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap">
+        <span class="material-symbols-rounded">search</span>
+        <input type="text" placeholder="Search tools, errors, guides..." autofocus>
+        <kbd style="font-family:var(--font-mono);font-size:0.7rem;padding:2px 8px;background:var(--md-surface-container);border-radius:4px;color:var(--md-outline)">ESC</kbd>
+      </div>
+      <div class="search-results"></div>
+      <div class="search-footer">
+        <span>Type to search across all content</span>
+        <span><kbd>↑↓</kbd> Navigate &nbsp;<kbd>↵</kbd> Open</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+      <div class="hero-content">
+      <div>
+      <div class="hero-badge reveal">
+        <span>Salesforce Developer Platform</span>
+        <span class="badge-tag">New Tools</span>
+      </div>
+
+      <h1 class="display-large reveal stagger-2">
+        Build <span class="gradient-text">Faster</span><br>on Salesforce
+      </h1>
+
+      <p class="hero-subtitle reveal stagger-3">
+        Salesforce Decoded provides developer tools, error fixes, guides, and productivity tips to help you write better Apex, optimize SOQL, and ship faster.
+      </p>
+
+      <div class="hero-actions reveal stagger-4">
+        <a href="tools.html" class="btn btn-filled">
+          <span class="material-symbols-rounded" style="font-size:18px">build</span>
+          Explore Tools
+        </a>
+        <a href="errors.html" class="btn btn-outlined">
+          <span class="material-symbols-rounded" style="font-size:18px">bug_report</span>
+          Browse Error Library
+        </a>
+      </div>
+      </div>
+
+      <!-- Code Preview Visual -->
+      <div class="hero-visual reveal-scale stagger-5">
+        <div style="padding:16px 24px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--md-outline-variant)">
+          <div style="width:12px;height:12px;border-radius:50%;background:#ef4444"></div>
+          <div style="width:12px;height:12px;border-radius:50%;background:#f59e0b"></div>
+          <div style="width:12px;height:12px;border-radius:50%;background:#22c55e"></div>
+          <span style="margin-left:auto;font-family:var(--font-mono);font-size:0.75rem;color:var(--md-outline)">AccountService.cls</span>
+        </div>
+        <div class="code-block" style="border-radius:0;margin:0">
+<pre style="margin:0"><code><span class="code-keyword">public class</span> <span class="code-type">AccountService</span> {
+    <span class="code-comment">// ✅ Bulkified & Governor-Limit Safe</span>
+    <span class="code-keyword">public static</span> List&lt;Account&gt; <span class="code-function">getActiveAccounts</span>() {
+        <span class="code-keyword">return</span> [
+            <span class="code-keyword">SELECT</span> Id, Name, Industry, AnnualRevenue
+            <span class="code-keyword">FROM</span> Account
+            <span class="code-keyword">WHERE</span> IsActive__c = <span class="code-keyword">true</span>
+            <span class="code-keyword">ORDER BY</span> AnnualRevenue <span class="code-keyword">DESC</span>
+            <span class="code-keyword">LIMIT</span> <span class="code-number">200</span>
+        ];
+    }
+}</code></pre>
+        </div>
+                  <div class="float-card fc1">
+        <div class="fi" style="background:var(--md-success-container)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--md-success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        <div><div class="fl">No Limit Violation</div><div class="fs">SOQL: 1 / 100</div></div>
+      </div>
+      <div class="float-card fc2">
+        <div class="fi" style="background:var(--md-primary-container)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--md-primary)" stroke-width="2.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></div>
+        <div><div class="fl">Perf Score</div><div class="fs" style="color:var(--md-success);font-weight:600">98/100 ↑</div></div>
+      </div>
+      <div class="float-card fc3">
+        <div class="fi" style="background:var(--md-tertiary-container)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--md-tertiary)" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8"></path></svg></div>
+        <div><div class="fl">SF Revamp</div><div class="fs">4.9★ Extension</div></div>
+      </div>
+  </div>
+  </div>
+</div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="section-sm" style="background:var(--md-surface-container-low);border-top:1px solid var(--md-outline-variant);border-bottom:1px solid var(--md-outline-variant)">
+    <div class="container">
+      <div class="stats-bar reveal">
+        <div class="stat-item">
+          <div class="stat-number" data-target="50" data-suffix="+">0</div>
+          <div class="stat-label">Developer Tools</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-target="200" data-suffix="+">0</div>
+          <div class="stat-label">Error Solutions</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-target="30" data-suffix="+">0</div>
+          <div class="stat-label">In-Depth Guides</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-target="10000" data-suffix="+">0</div>
+          <div class="stat-label">Monthly Visitors</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools Section -->
+  <section class="section" id="tools">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline">
+          <span>Developer Tools</span>
+        </div>
+        <h2 class="display-small">Tools that save you hours</h2>
+        <p>Productivity utilities built for the Salesforce ecosystem. Format, convert, generate, and explore — all in your browser.</p>
+      </div>
+
+      <div class="grid grid-3">
+        <!-- Tool 1 -->
+        <a href="tools/soql-formatter.html" class="card-link reveal stagger-1">
+          <div class="card">
+            <div class="card-icon">
+              <span class="material-symbols-rounded">code</span>
+            </div>
+            <h3>SOQL Formatter</h3>
+            <p>Instantly format and beautify messy SOQL queries for readability and debugging.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="tag tag-primary">Popular</span>
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Tool 2 -->
+        <a href="tools/salesforce-id-converter.html" class="card-link reveal stagger-2">
+          <div class="card">
+            <div class="card-icon" style="background:#fef3c7;color:#92400e">
+              <span class="material-symbols-rounded">swap_horiz</span>
+            </div>
+            <h3>Salesforce ID Converter</h3>
+            <p>Convert 15-character Salesforce IDs to 18-character case-insensitive format.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Tool 3 -->
+        <a href="tools/apex-code-generator.html" class="card-link reveal stagger-3">
+          <div class="card">
+            <div class="card-icon" style="background:#dbeafe;color:#1e40af">
+              <span class="material-symbols-rounded">auto_fix_high</span>
+            </div>
+            <h3>Apex Code Generator</h3>
+            <p>Generate boilerplate Apex classes, triggers, test classes, and batch jobs quickly.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="tag tag-primary">New</span>
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Tool 4 -->
+        <a href="tools/json-to-apex-converter.html" class="card-link reveal stagger-4">
+          <div class="card">
+            <div class="card-icon" style="background:#d1fae5;color:#065f46">
+              <span class="material-symbols-rounded">transform</span>
+            </div>
+            <h3>JSON to Apex Converter</h3>
+            <p>Paste JSON and get a fully typed Apex wrapper class with serialization support.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Tool 5 -->
+        <a href="tools/salesforce-icon-explorer.html" class="card-link reveal stagger-5">
+          <div class="card">
+            <div class="card-icon" style="background:#ede9fe;color:#5b21b6">
+              <span class="material-symbols-rounded">palette</span>
+            </div>
+            <h3>Salesforce Icon Explorer</h3>
+            <p>Browse and search all Salesforce Lightning Design System icons in one place.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Tool 6 -->
+        <a href="tools/field-dependency-viewer.html" class="card-link reveal stagger-6">
+          <div class="card">
+            <div class="card-icon" style="background:#fce7f3;color:#9d174d">
+              <span class="material-symbols-rounded">data_object</span>
+            </div>
+            <h3>Field Dependency Viewer</h3>
+            <p>Visualize field-level dependencies and picklist values across your Salesforce org.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="text-center mt-48 reveal">
+        <a href="tools.html" class="btn btn-tonal">
+          View All Tools
+          <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Error Library Section -->
+  <section class="section" style="background:var(--md-surface-container-low)">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline">
+          <span>Error Reference Library</span>
+        </div>
+        <h2 class="display-small">Fix Salesforce errors fast</h2>
+        <p>Searchable library of common Salesforce errors with clear explanations, root causes, and tested solutions.</p>
+      </div>
+
+      <div class="grid grid-2">
+        <a href="errors/too-many-soql-queries-101.html" class="card-link reveal stagger-1">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-16">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>Too Many SOQL Queries: 101</h3>
+            <p>Triggered when Apex code exceeds 100 SOQL queries in a single transaction. Learn bulkification patterns and fixes.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">
+              Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="errors/apex-cpu-time-limit-exceeded.html" class="card-link reveal stagger-2">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-16">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Apex CPU Time Limit Exceeded</h3>
+            <p>Occurs when synchronous code takes over 10,000ms or async code exceeds 60,000ms. Optimize your logic.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">
+              Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="errors/insufficient-access.html" class="card-link reveal stagger-3">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-16">
+              <span class="tag tag-error">Permission Error</span>
+            </div>
+            <h3>Insufficient Access / Cross Reference Entity</h3>
+            <p>Permission, sharing, or ownership issues preventing DML operations. Diagnose access problems.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">
+              Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="errors/unable-to-lock-row.html" class="card-link reveal stagger-4">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-16">
+              <span class="tag tag-error">Database Lock</span>
+            </div>
+            <h3>Unable to Lock Row</h3>
+            <p>Row-level contention when multiple transactions modify the same record. Implement retry patterns.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">
+              Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="text-center mt-48 reveal">
+        <a href="errors.html" class="btn btn-tonal">
+          Browse All Errors
+          <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Guides Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline">
+          <span>Developer Guides</span>
+        </div>
+        <h2 class="display-small">Learn from in-depth guides</h2>
+        <p>Long-form technical guides covering Apex, SOQL, LWC, and platform fundamentals.</p>
+      </div>
+
+      <div class="grid grid-2">
+        <a href="guides/apex-best-practices.html" class="card-link reveal stagger-1">
+          <div class="card card-elevated" style="padding:32px">
+            <div class="flex items-center gap-12 mb-16">
+              <div class="card-icon" style="margin:0">
+                <span class="material-symbols-rounded">code</span>
+              </div>
+              <div>
+                <span class="label-medium text-primary">Guide</span>
+                <h3 style="margin:0;font-size:1.25rem">Apex Best Practices</h3>
+              </div>
+            </div>
+            <p>Write clean, scalable, governor-limit-safe Apex code. Covers design patterns, error handling, and testing strategies.</p>
+            <div class="mt-24 chip-group">
+              <span class="chip">Apex</span>
+              <span class="chip">Patterns</span>
+              <span class="chip">Testing</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="guides/soql-optimization.html" class="card-link reveal stagger-2">
+          <div class="card card-elevated" style="padding:32px">
+            <div class="flex items-center gap-12 mb-16">
+              <div class="card-icon" style="margin:0;background:#dbeafe;color:#1e40af">
+                <span class="material-symbols-rounded">database</span>
+              </div>
+              <div>
+                <span class="label-medium text-primary">Guide</span>
+                <h3 style="margin:0;font-size:1.25rem">SOQL Optimization Guide</h3>
+              </div>
+            </div>
+            <p>Master query performance with indexing strategies, selective queries, and relationship queries for large data volumes.</p>
+            <div class="mt-24 chip-group">
+              <span class="chip">SOQL</span>
+              <span class="chip">Performance</span>
+              <span class="chip">Indexing</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="guides/lwc-guide.html" class="card-link reveal stagger-3">
+          <div class="card card-elevated" style="padding:32px">
+            <div class="flex items-center gap-12 mb-16">
+              <div class="card-icon" style="margin:0;background:#fef3c7;color:#92400e">
+                <span class="material-symbols-rounded">web</span>
+              </div>
+              <div>
+                <span class="label-medium text-primary">Guide</span>
+                <h3 style="margin:0;font-size:1.25rem">Lightning Web Components Guide</h3>
+              </div>
+            </div>
+            <p>Build modern Salesforce UIs with LWC. From basics to advanced patterns, data services, and custom events.</p>
+            <div class="mt-24 chip-group">
+              <span class="chip">LWC</span>
+              <span class="chip">Frontend</span>
+              <span class="chip">JavaScript</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="guides/governor-limits.html" class="card-link reveal stagger-4">
+          <div class="card card-elevated" style="padding:32px">
+            <div class="flex items-center gap-12 mb-16">
+              <div class="card-icon" style="margin:0;background:#d1fae5;color:#065f46">
+                <span class="material-symbols-rounded">speed</span>
+              </div>
+              <div>
+                <span class="label-medium text-primary">Guide</span>
+                <h3 style="margin:0;font-size:1.25rem">Governor Limits Explained</h3>
+              </div>
+            </div>
+            <p>Understand every Salesforce governor limit, why they exist, and practical strategies to stay within bounds.</p>
+            <div class="mt-24 chip-group">
+              <span class="chip">Limits</span>
+              <span class="chip">Architecture</span>
+              <span class="chip">Platform</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tips Preview Section -->
+  <section class="section" style="background:var(--md-surface-container-low)">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline">
+          <span>Quick Tips</span>
+        </div>
+        <h2 class="display-small">Boost your productivity</h2>
+        <p>Bite-sized tips for shortcuts, debugging, and faster development workflows.</p>
+      </div>
+
+      <div class="grid grid-4">
+        <div class="feature-item reveal stagger-1">
+          <div class="feature-item-icon">
+            <span class="material-symbols-rounded">keyboard</span>
+          </div>
+          <div>
+            <h3>Salesforce Shortcuts</h3>
+            <p>Navigate the Setup menu and developer console 2× faster.</p>
+          </div>
+        </div>
+
+        <div class="feature-item reveal stagger-2">
+          <div class="feature-item-icon" style="background:#dbeafe;color:#1e40af">
+            <span class="material-symbols-rounded">terminal</span>
+          </div>
+          <div>
+            <h3>VS Code Tips</h3>
+            <p>Essential extensions and shortcuts for Salesforce DX development.</p>
+          </div>
+        </div>
+
+        <div class="feature-item reveal stagger-3">
+          <div class="feature-item-icon" style="background:#fef3c7;color:#92400e">
+            <span class="material-symbols-rounded">pest_control</span>
+          </div>
+          <div>
+            <h3>Debugging Techniques</h3>
+            <p>Master debug logs, checkpoints, and trace flags effectively.</p>
+          </div>
+        </div>
+
+        <div class="feature-item reveal stagger-4">
+          <div class="feature-item-icon" style="background:#d1fae5;color:#065f46">
+            <span class="material-symbols-rounded">rocket_launch</span>
+          </div>
+          <div>
+            <h3>Deployment Tips</h3>
+            <p>Smooth deployments with CI/CD pipelines and change sets.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-48 reveal">
+        <a href="tips.html" class="btn btn-tonal">
+          All Tips
+          <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Extensions Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header text-center reveal" style="max-width:600px;margin:0 auto 48px">
+        <div class="overline justify-center">
+          <span>Chrome Extensions</span>
+        </div>
+        <h2 class="display-small">Supercharge your browser</h2>
+        <p style="max-width:100%">Chrome extensions designed for Salesforce developers to speed up daily workflows.</p>
+      </div>
+
+      <div class="grid grid-3 reveal">
+        <div class="card card-elevated text-center" style="padding:32px">
+          <div class="card-icon" style="margin:0 auto 16px;width:56px;height:56px;border-radius:var(--md-shape-lg)">
+            <span class="material-symbols-rounded" style="font-size:28px">code</span>
+          </div>
+          <h3>Salesforce Revamp</h3>
+          <p class="mb-24">Quick access to org info, SOQL runner, field inspector, and debug tools right from your browser.</p>
+          <a href="extensions.html" class="btn btn-filled w-full">
+            <span class="material-symbols-rounded" style="font-size:18px">download</span>
+            Install Extension
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+      <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+          <p>Tools & knowledge for Salesforce developers. Built by developers, for developers.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="tools.html">Developer Tools</a></li>
+            <li><a href="errors.html">Error Library</a></li>
+            <li><a href="guides.html">Guides</a></li>
+            <li><a href="prompts.html">Prompts</a></li>
+            <li><a href="extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="tips.html">Developer Tips</a></li>
+            <li><a href="resources.html">Resources</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="https://sfdecoded.netlify.app/" aria-label="GitHub"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com" aria-label="Email"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" aria-label="Back to top">
+    <span class="material-symbols-rounded">arrow_upward</span>
+  </button>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

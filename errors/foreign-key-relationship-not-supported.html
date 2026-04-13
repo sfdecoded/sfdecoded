@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fix: Foreign Key Relationship Not Supported — Salesforce Error Solution | Salesforce Decoded</title>
+
+<meta name="description" content="Fix the Salesforce Foreign Key Relationship Not Supported error in SOQL queries. Learn why certain relationship traversals fail and how to resolve them.">
+
+<link rel="canonical" href="https://sfdecoded.netlify.app/errors/foreign-key-relationship-not-supported.html">
+
+<link rel="stylesheet" href="../css/style.css">
+
+<link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+
+<meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+
+</head>
+
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+
+<nav class="navbar">
+<div class="navbar-inner">
+
+<a href="../index.html" class="nav-logo">
+<div class="nav-logo-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+</svg>
+</div>
+<div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+</a>
+
+<ul class="navbar-links">
+<li><a href="../index.html">Home</a></li>
+<li><a href="../tools.html">Tools</a></li>
+<li><a href="../errors.html" class="active">Errors</a></li>
+<li><a href="../guides.html">Guides</a></li>
+<li><a href="../tips.html">Tips</a></li>
+<li><a href="../prompts.html">Prompts</a></li>
+<li><a href="../extensions.html">Extensions</a></li>
+<li><a href="../resources.html">Resources</a></li>
+<li><a href="../about.html">About</a></li>
+</ul>
+
+<div class="navbar-search" role="button" tabindex="0">
+<span class="material-symbols-rounded">search</span>
+<span>Search...</span>
+<kbd>⌘K</kbd>
+</div>
+
+<button class="navbar-mobile-toggle" aria-label="Toggle menu">
+<span class="material-symbols-rounded">menu</span>
+</button>
+
+</div>
+</nav>
+
+
+
+<header class="page-header">
+
+<div class="container">
+
+<div class="breadcrumbs reveal">
+<a href="../index.html">Home</a>
+<span class="separator">/</span>
+<a href="../errors.html">Errors</a>
+<span class="separator">/</span>
+<span class="current">Foreign Key Relationship Not Supported</span>
+</div>
+
+<div class="flex items-center gap-12 mb-16 reveal stagger-2">
+<span class="tag tag-warning">Query Syntax</span>
+</div>
+
+<h1 class="display-medium reveal stagger-3">Foreign Key Relationship Not Supported</h1>
+
+<p class="reveal stagger-4">
+Salesforce rejected the SOQL query because the relationship traversal used is not supported.
+</p>
+
+</div>
+
+</header>
+
+
+
+<section class="section">
+
+<div class="container">
+
+<div class="article-layout">
+
+<div class="article-content">
+
+
+<div class="callout callout-error reveal">
+<span class="material-symbols-rounded">error</span>
+<div>
+<p><strong>Foreign key relationship not supported</strong></p>
+</div>
+</div>
+
+
+
+<h2 id="what" class="reveal">What does this error mean?</h2>
+
+<p class="reveal">
+This error occurs when a SOQL query attempts to traverse a relationship that Salesforce does not support.
+</p>
+
+<p class="reveal">
+SOQL supports parent-to-child and child-to-parent relationships, but only when those relationships are defined and supported by the object schema.
+</p>
+
+
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+
+<h3 class="reveal">1. Incorrect relationship name</h3>
+
+<p class="reveal">
+Using an incorrect relationship name in a SOQL query.
+</p>
+
+<h3 class="reveal">2. Querying unsupported relationships</h3>
+
+<p class="reveal">
+Some objects do not support direct relationship traversal.
+</p>
+
+<h3 class="reveal">3. Using wrong child relationship name</h3>
+
+<p class="reveal">
+The child relationship name defined in the lookup or master-detail field may be different.
+</p>
+
+<h3 class="reveal">4. Querying polymorphic relationships incorrectly</h3>
+
+<p class="reveal">
+Objects like Task or Event may reference multiple object types.
+</p>
+
+
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+
+
+
+<h3 class="reveal">Solution 1 — Check relationship name</h3>
+
+<div class="code-block reveal">
+
+<div class="code-block-header">
+<span class="code-block-lang">SOQL</span>
+<button class="code-copy-btn">
+<span class="material-symbols-rounded">content_copy</span> Copy
+</button>
+</div>
+
+<pre><code>
+SELECT Id, Account.Name
+FROM Contact
+</code></pre>
+
+</div>
+
+
+
+<h3 class="reveal">Solution 2 — Use correct child relationship name</h3>
+
+<div class="code-block reveal">
+
+<div class="code-block-header">
+<span class="code-block-lang">SOQL</span>
+</div>
+
+<pre><code>
+SELECT Id,
+       (SELECT Id, Name FROM Contacts)
+FROM Account
+</code></pre>
+
+</div>
+
+
+
+<h3 class="reveal">Solution 3 — Query objects separately</h3>
+
+<div class="code-block reveal">
+
+<div class="code-block-header">
+<span class="code-block-lang">Apex</span>
+</div>
+
+<pre><code>
+Map<Id, Account> accountMap = new Map<Id, Account>(
+    [SELECT Id, Name FROM Account]
+);
+</code></pre>
+
+</div>
+
+
+
+<h3 class="reveal">Solution 4 — Check Object Manager</h3>
+
+<p class="reveal">
+Verify relationship names in:
+</p>
+
+<div class="code-block reveal">
+<pre><code>
+Setup → Object Manager → Fields & Relationships
+</code></pre>
+</div>
+
+
+
+<div class="callout callout-info reveal">
+<span class="material-symbols-rounded">lightbulb</span>
+<div>
+<p>
+<strong>Pro Tip:</strong> Use the Schema Builder or describe metadata to identify correct relationship names before writing SOQL queries.
+</p>
+</div>
+</div>
+
+
+
+</div>
+
+
+
+<aside>
+
+<nav class="toc">
+
+<h4>On this page</h4>
+
+<a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+
+</nav>
+
+</aside>
+
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<footer class="footer">
+
+<div class="container">
+
+<div class="footer-grid">
+
+<div class="footer-brand">
+
+<a href="../index.html" class="nav-logo">
+
+<div class="nav-logo-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+</svg>
+</div>
+
+<div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+
+</a>
+
+<p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+
+</div>
+
+</div>
+
+<div class="footer-bottom">
+
+<p>&copy; 2026 Salesforce Decoded.</p>
+
+<div class="footer-social">
+<a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+<a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+</div>
+
+</div>
+
+</div>
+
+</footer>
+
+
+<button class="back-to-top" aria-label="Back to top">
+<span class="material-symbols-rounded">arrow_upward</span>
+</button>
+
+
+<script src="../js/main.js"></script>
+
+</body>
+</html>

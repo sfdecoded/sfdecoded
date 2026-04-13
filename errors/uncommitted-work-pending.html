@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fix: You Have Uncommitted Work Pending — Salesforce Error | Salesforce Decoded</title>
+<meta name="description" content="Fix the 'You have uncommitted work pending. Please commit or rollback before calling out' error in Salesforce Apex."/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',system-ui,sans-serif;background:#f8fafc;color:#0f172a;line-height:1.7;font-size:16px}
+nav{background:#0f172a;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;gap:2rem;height:60px}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.nav-logo-icon{width:30px;height:30px;background:#0070d2;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff}
+.nav-logo-text{font-weight:600;font-size:15px;color:#f1f5f9;letter-spacing:-0.01em}
+.nav-links{display:flex;gap:0;list-style:none;margin-left:auto}
+.nav-links a{color:#94a3b8;text-decoration:none;font-size:13.5px;padding:0 12px;height:60px;display:flex;align-items:center;transition:color .15s;border-bottom:2px solid transparent}
+.nav-links a:hover{color:#e2e8f0}
+.nav-links a.active{color:#fff;border-bottom-color:#0070d2}
+.page-wrap{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+.breadcrumb{padding:1.25rem 0 0;font-size:13px;color:#64748b;display:flex;align-items:center;gap:6px}
+.breadcrumb a{color:#64748b;text-decoration:none}.breadcrumb a:hover{color:#0070d2}
+.breadcrumb span{color:#94a3b8}
+.content-grid{display:grid;grid-template-columns:1fr 220px;gap:3rem;padding:1.5rem 0 4rem;align-items:start}
+@media(max-width:900px){.content-grid{grid-template-columns:1fr}.sidebar{display:none}}
+article{min-width:0}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem}
+.badge{display:inline-flex;align-items:center;font-size:12px;font-weight:500;padding:3px 10px;border-radius:99px;letter-spacing:0.01em}
+.badge-runtime{background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe}
+.badge-code{background:#fef2f2;color:#9f1239;border:1px solid #fecdd3;font-family:'SF Mono','Fira Code',monospace;font-size:11px}
+h1{font-size:2rem;font-weight:700;line-height:1.2;color:#0f172a;margin-bottom:.75rem;letter-spacing:-0.02em}
+.subtitle{font-size:1rem;color:#475569;margin-bottom:1.75rem;line-height:1.6}
+.err-box{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:1rem 1.25rem;margin-bottom:2rem;display:flex;align-items:flex-start;gap:10px}
+.err-icon{color:#f87171;font-size:13px;font-weight:600;background:#3f0f0f;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.err-msg{font-family:'SF Mono','Fira Code','Courier New',monospace;font-size:13.5px;color:#fca5a5;line-height:1.5}
+.err-msg strong{color:#f87171;font-weight:600}
+h2{font-size:1.2rem;font-weight:700;color:#0f172a;margin:2.25rem 0 .9rem;padding-bottom:.6rem;border-bottom:2px solid #e2e8f0;letter-spacing:-0.01em}
+h3{font-size:1rem;font-weight:600;color:#1e293b;margin:1.5rem 0 .6rem}
+p{color:#374151;margin-bottom:1rem;font-size:.9625rem}
+ul,ol{padding-left:1.5rem;margin-bottom:1rem}
+li{color:#374151;font-size:.9625rem;margin-bottom:.35rem}
+code{font-family:'SF Mono','Fira Code','Courier New',monospace;font-size:.835rem;background:#f1f5f9;color:#1e40af;padding:1px 5px;border-radius:4px;border:1px solid #e2e8f0}
+.code-block{margin:1rem 0 1.5rem;border-radius:10px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#1e293b;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.code-lang{font-size:12px;color:#94a3b8;font-weight:500}
+.code-copy{font-size:11px;color:#64748b;background:none;border:1px solid #334155;border-radius:4px;padding:2px 8px;cursor:pointer;font-family:inherit}
+pre{background:#0f172a;padding:1.15rem 1.25rem;overflow-x:auto;margin:0}
+pre code{background:none;border:none;color:#e2e8f0;font-size:13px;padding:0;border-radius:0;line-height:1.65}
+.kw{color:#7dd3fc}.str{color:#86efac}.cm{color:#64748b;font-style:italic}.cls{color:#fde68a}.fn{color:#c4b5fd}.num{color:#fb923c}.ann{color:#fbbf24}
+.tip-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem 1.25rem;margin:1.75rem 0;display:flex;gap:10px}
+.tip-icon{color:#1d4ed8;font-size:16px;flex-shrink:0;margin-top:2px}
+.tip-content{font-size:.9rem;color:#1e3a8a;line-height:1.6}
+.tip-content strong{color:#1e40af}
+.flow-diagram{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1.25rem 1.5rem;margin:1.25rem 0 1.75rem;display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.flow-step{display:flex;align-items:center;gap:0}
+.flow-box{background:#f1f5f9;border:1px solid #cbd5e1;border-radius:7px;padding:6px 14px;font-size:13px;font-weight:500;color:#374151;white-space:nowrap}
+.flow-box.bad{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.flow-arrow{color:#94a3b8;font-size:18px;padding:0 6px}
+.sidebar{position:sticky;top:80px}
+.sidebar-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1.1rem 1.25rem}
+.sidebar-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin-bottom:.85rem}
+.sidebar-nav{list-style:none;padding:0;display:flex;flex-direction:column;gap:2px}
+.sidebar-nav a{display:block;font-size:13.5px;color:#475569;text-decoration:none;padding:5px 8px;border-radius:6px;border-left:2px solid transparent;transition:all .15s}
+.sidebar-nav a:hover{color:#0070d2;background:#eff6ff;border-left-color:#93c5fd}
+footer{background:#0f172a;border-top:1px solid #1e293b;padding:2.5rem 1.5rem}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem}
+.footer-brand p{font-size:13px;color:#64748b;margin-top:.5rem;line-height:1.6;max-width:240px}
+.footer-col h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#475569;margin-bottom:.85rem}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:.4rem}
+.footer-col a{font-size:13px;color:#64748b;text-decoration:none}
+.footer-col a:hover{color:#94a3b8}
+.footer-bottom{border-top:1px solid #1e293b;padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto}
+.footer-bottom span{font-size:13px;color:#475569}
+.footer-links{display:flex;gap:1rem}
+.footer-links a{font-size:13px;color:#475569;text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="https://sfdecoded.netlify.app/" class="nav-logo">
+      <div class="nav-logo-icon">SF</div>
+      <span class="nav-logo-text">SalesforceDecoded</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://sfdecoded.netlify.app/">Home</a></li>
+      <li><a href="https://sfdecoded.netlify.app/tools">Tools</a></li>
+      <li><a href="https://sfdecoded.netlify.app/errors" class="active">Errors</a></li>
+      <li><a href="https://sfdecoded.netlify.app/guides">Guides</a></li>
+      <li><a href="https://sfdecoded.netlify.app/tips">Tips</a></li>
+      <li><a href="https://sfdecoded.netlify.app/prompts">Prompts</a></li>
+      <li><a href="https://sfdecoded.netlify.app/extensions">Extensions</a></li>
+      <li><a href="https://sfdecoded.netlify.app/resources">Resources</a></li>
+      <li><a href="https://sfdecoded.netlify.app/about">About</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="https://sfdecoded.netlify.app/">Home</a>
+    <span>/</span>
+    <a href="https://sfdecoded.netlify.app/errors">Errors</a>
+    <span>/</span>
+    Uncommitted Work Pending
+  </div>
+
+  <div class="content-grid">
+    <article>
+      <div class="badges">
+        <span class="badge badge-runtime">Runtime Error</span>
+        <span class="badge badge-code">UNCOMMITTED_WORK_PENDING</span>
+      </div>
+
+      <h1>You Have Uncommitted Work Pending</h1>
+      <p class="subtitle">A DML operation was performed in the same transaction before an HTTP callout was attempted. Salesforce requires that all pending DML be committed or rolled back before issuing an external callout.</p>
+
+      <div class="err-box">
+        <span class="err-icon">error</span>
+        <div class="err-msg"><strong>System.CalloutException:</strong> You have uncommitted work pending. Please commit or rollback before calling out.</div>
+      </div>
+
+      <h2 id="what">What does this error mean?</h2>
+      <p>Salesforce enforces a strict ordering rule within a synchronous transaction: <strong>you cannot mix DML and callouts in the same transaction in the DML-first order</strong>. The moment any DML statement (<code>insert</code>, <code>update</code>, <code>delete</code>, <code>upsert</code>, <code>Database.insert()</code>, etc.) executes, an open database transaction begins. If your code then tries to issue an HTTP callout, Salesforce throws this error because the database lock from the uncommitted transaction could be held for an unbounded time while waiting for the external service to respond.</p>
+
+      <div class="flow-diagram">
+        <div class="flow-step"><div class="flow-box">DML (insert / update)</div><div class="flow-arrow">→</div></div>
+        <div class="flow-step"><div class="flow-box bad">Http.send() 💥</div><div class="flow-arrow">→</div></div>
+        <div class="flow-step"><div class="flow-box bad">CalloutException</div></div>
+      </div>
+
+      <p>Callouts <em>before</em> DML in the same transaction are permitted. The rule only applies when DML has already occurred prior to the callout in the same transaction context.</p>
+
+      <h2 id="causes">Common Causes</h2>
+
+      <h3>1. DML before a callout in the same method</h3>
+      <p>The most direct case: an Apex method inserts or updates records then calls an external API to notify a third-party system about those records.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Apex — Bad Example</span>
+          <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
+        </div>
+        <pre><code><span class="cm">// ❌ BAD: DML before callout in same transaction</span>
+<span class="kw">public static void</span> <span class="fn">createAndNotify</span>(<span class="cls">Account</span> acc) {
+    insert acc; <span class="cm">// DML — transaction begins</span>
+
+    <span class="cls">HttpRequest</span> req = <span class="kw">new</span> <span class="cls">HttpRequest</span>();
+    req.<span class="fn">setEndpoint</span>(<span class="str">'https://api.example.com/accounts'</span>);
+    req.<span class="fn">setMethod</span>(<span class="str">'POST'</span>);
+    req.<span class="fn">setBody</span>(<span class="cls">JSON</span>.<span class="fn">serialize</span>(acc));
+    <span class="kw">new</span> <span class="cls">Http</span>().<span class="fn">send</span>(req); <span class="cm">// 💥 CalloutException</span>
+}</code></pre>
+      </div>
+
+      <h3>2. DML inside a trigger, callout in a class called by the same trigger</h3>
+      <p>Trigger logic — or an automation like a Flow — performs DML. That same transaction then reaches an Apex action or invocable method that attempts a callout.</p>
+
+      <h3>3. Savepoint creation before the callout</h3>
+      <p><code>Database.setSavepoint()</code> also counts as uncommitted work. Setting a savepoint and then attempting a callout triggers the same error.</p>
+
+      <h2 id="solution">How to Fix It</h2>
+
+      <h3>Solution 1: Move the callout before the DML</h3>
+      <p>Reorder your logic so the external callout happens first. Use the response to populate field values, then perform the DML. This is valid because no database transaction is open yet when the callout is made.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Apex — Correct</span>
+          <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
+        </div>
+        <pre><code><span class="cm">// ✅ GOOD: callout first, DML after</span>
+<span class="kw">public static void</span> <span class="fn">createAndNotify</span>(<span class="cls">Account</span> acc) {
+    <span class="cm">// Callout BEFORE any DML</span>
+    <span class="cls">HttpRequest</span> req = <span class="kw">new</span> <span class="cls">HttpRequest</span>();
+    req.<span class="fn">setEndpoint</span>(<span class="str">'https://api.example.com/accounts/reserve'</span>);
+    req.<span class="fn">setMethod</span>(<span class="str">'POST'</span>);
+    <span class="cls">HttpResponse</span> res = <span class="kw">new</span> <span class="cls">Http</span>().<span class="fn">send</span>(req);
+
+    <span class="kw">if</span> (res.<span class="fn">getStatusCode</span>() == <span class="num">200</span>) {
+        <span class="cls">Map</span>&lt;<span class="cls">String</span>,<span class="cls">Object</span>&gt; body =
+            (<span class="cls">Map</span>&lt;<span class="cls">String</span>,<span class="cls">Object</span>&gt;) <span class="cls">JSON</span>.<span class="fn">deserializeUntyped</span>(res.<span class="fn">getBody</span>());
+        acc.<span class="cls">External_Id__c</span> = (<span class="cls">String</span>) body.<span class="fn">get</span>(<span class="str">'externalId'</span>);
+        insert acc; <span class="cm">// DML safely after callout</span>
+    }
+}</code></pre>
+      </div>
+
+      <h3>Solution 2: Delegate the callout to an async context</h3>
+      <p>When you cannot reorder (e.g., you need the record Id for the callout payload), perform the DML first, then enqueue a Queueable job with <code>Database.AllowsCallouts</code> to make the callout after the transaction commits.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Apex</span>
+          <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
+        </div>
+        <pre><code><span class="cm">// Step 1: DML first, then enqueue</span>
+<span class="kw">public static void</span> <span class="fn">createAndNotify</span>(<span class="cls">Account</span> acc) {
+    insert acc; <span class="cm">// DML — get the new Id</span>
+    <span class="cls">System</span>.<span class="fn">enqueueJob</span>(<span class="kw">new</span> <span class="cls">AccountNotifyJob</span>(acc.Id));
+}
+
+<span class="cm">// Step 2: Queueable with callout runs after transaction commits</span>
+<span class="kw">public class</span> <span class="cls">AccountNotifyJob</span>
+        <span class="kw">implements</span> <span class="cls">Queueable</span>, <span class="cls">Database</span>.<span class="cls">AllowsCallouts</span> {
+
+    <span class="kw">private</span> <span class="cls">Id</span> accountId;
+
+    <span class="kw">public</span> <span class="fn">AccountNotifyJob</span>(<span class="cls">Id</span> accId) {
+        <span class="kw">this</span>.accountId = accId;
+    }
+
+    <span class="kw">public void</span> <span class="fn">execute</span>(<span class="cls">QueueableContext</span> ctx) {
+        <span class="cls">Account</span> acc = [<span class="kw">SELECT</span> Id, Name <span class="kw">FROM</span> <span class="cls">Account</span>
+                        <span class="kw">WHERE</span> Id = :accountId];
+        <span class="cls">HttpRequest</span> req = <span class="kw">new</span> <span class="cls">HttpRequest</span>();
+        req.<span class="fn">setEndpoint</span>(<span class="str">'callout:ExternalAPI/accounts'</span>);
+        req.<span class="fn">setMethod</span>(<span class="str">'POST'</span>);
+        req.<span class="fn">setBody</span>(<span class="cls">JSON</span>.<span class="fn">serialize</span>(acc));
+        <span class="kw">new</span> <span class="cls">Http</span>().<span class="fn">send</span>(req);
+    }
+}</code></pre>
+      </div>
+
+      <div class="tip-box">
+        <span class="tip-icon">💡</span>
+        <div class="tip-content">
+          <strong>Pro Tip:</strong> Named Credentials (<code>callout:MyNamedCredential</code>) are best practice for the callout endpoint. They handle OAuth token management and store credentials securely in Setup — no hardcoded URLs or secrets in your Apex code. Always use Named Credentials for any outbound integration in production orgs.
+        </div>
+      </div>
+    </article>
+
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">On this page</div>
+        <ul class="sidebar-nav">
+          <li><a href="#what">What does this mean?</a></li>
+          <li><a href="#causes">Common Causes</a></li>
+          <li><a href="#solution">How to Fix It</a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="https://sfdecoded.netlify.app/" class="nav-logo">
+        <div class="nav-logo-icon">SF</div>
+        <span class="nav-logo-text">SalesforceDecoded</span>
+      </a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developers, for developers.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul>
+      <li><a href="https://sfdecoded.netlify.app/tools">Tools</a></li>
+      <li><a href="https://sfdecoded.netlify.app/errors">Errors</a></li>
+      <li><a href="https://sfdecoded.netlify.app/guides">Guides</a></li>
+      <li><a href="https://sfdecoded.netlify.app/extensions">Extensions</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul>
+      <li><a href="https://sfdecoded.netlify.app/tips">Tips</a></li>
+      <li><a href="https://sfdecoded.netlify.app/resources">Resources</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Community</h4><ul>
+      <li><a href="https://sfdecoded.netlify.app/about">About</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Salesforce Decoded.</span>
+    <div class="footer-links">
+      <a href="https://sfdecoded.netlify.app/">code</a>
+      <a href="mailto:sfdecoded@gmail.com">mail</a>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

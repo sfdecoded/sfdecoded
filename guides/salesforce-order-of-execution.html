@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Order of Execution (2026) — Complete Guide | Salesforce Decoded</title>
+  <meta name="description" content="The complete Salesforce order of execution — every step from before-save validation to after-commit post-processing. Essential for every Apex developer.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/guides/salesforce-order-of-execution.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+  <link rel="manifest" href="../site.webmanifest">
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+    <ul class="navbar-links">
+      <li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html" class="active">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li>
+    </ul>
+    <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+    <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+  </div></nav>
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html" class="active"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+  </div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../guides.html">Guides</a><span class="separator">/</span>
+        <span class="current">Order of Execution</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-primary">Apex</span><span class="tag tag-info">Reference</span></div>
+      <h1 class="display-medium reveal stagger-3">Salesforce Order of Execution</h1>
+      <p class="reveal stagger-4">The exact sequence Salesforce follows every time a record is saved — from system validation to post-commit processing. Know this, debug anything.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">info</span>
+            <div><p><strong>Why this matters:</strong> When automation doesn't behave as expected — validation firing at the wrong time, triggers seeing stale data, workflows not updating related records — the answer is almost always in the order of execution.</p></div>
+          </div>
+
+          <h2 id="overview" class="reveal">The Full Order of Execution</h2>
+          <p class="reveal">When a record save is initiated (insert, update, upsert, delete, undelete), Salesforce processes the following steps in order:</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Order</span></div>
+<pre><code> 1.  Load the original record from the database (or initialize for new inserts)
+ 2.  Apply new field values from the request
+ 3.  Execute system validation (required fields, field formats, max lengths)
+ 4.  Run before-save Record-Triggered Flows
+ 5.  Run before Apex triggers
+ 6.  Run custom validation rules
+ 7.  Run duplicate rules
+ 8.  Save the record to the database — NOT yet committed
+ 9.  Run after Apex triggers
+10.  Run assignment rules (Leads, Cases)
+11.  Run auto-response rules (Cases, Leads)
+12.  Run workflow rules (deprecated — prefer Flow)
+13.  Run processes (Process Builder — deprecated — prefer Flow)
+14.  Run escalation rules
+15.  Run after-save Record-Triggered Flows
+16.  Run entitlement rules
+17.  Roll up summary fields to parent records
+18.  Run criteria-based sharing rules
+19.  Commit all changes to the database
+20.  Run post-commit logic (emails, async Apex, platform events)</code></pre>
+          </div>
+
+          <h2 id="before-save" class="reveal">Before-Save vs After-Save</h2>
+          <p class="reveal">This distinction is critical for both triggers and Record-Triggered Flows.</p>
+
+          <h3 class="reveal">Before-save</h3>
+          <p class="reveal">Runs before the record is written to the database. You can modify field values directly on the record in context without an additional DML call. This is more efficient and is the preferred approach for field updates on the triggering record.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre><code><span class="code-comment">// Before trigger — no DML needed to update the triggering record</span>
+trigger AccountTrigger on Account (before insert, before update) {
+    for (Account acc : Trigger.new) {
+        <span class="code-comment">// Direct field assignment — efficient, no extra DML</span>
+        acc.Description = <span class="code-string">'Updated by trigger'</span>;
+    }
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">After-save</h3>
+          <p class="reveal">Runs after the record is saved to the database but before the transaction is committed. The record now has its Id (for inserts). Use this when you need to query the saved record or perform DML on related records.</p>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <div><p><strong>Rule of thumb:</strong> Update the triggering record in a before trigger or before-save Flow. Touch related records or run queries on the saved record in an after trigger or after-save Flow.</p></div>
+          </div>
+
+          <h2 id="triggers-vs-flows" class="reveal">Where Triggers Fit vs Flows</h2>
+          <p class="reveal">Before-save Record-Triggered Flows run <strong>before</strong> before-triggers. This means if both exist on the same object, the Flow fires first. Salesforce's recommendation is to keep automation consolidated — one tool per object where possible.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Execution Snapshot</span></div>
+<pre><code>Record save initiated
+  └─ [Step 4]  Before-save Record-Triggered Flow ← runs first
+  └─ [Step 5]  Before Apex Trigger              ← runs second
+  └─ [Step 6]  Custom Validation Rules
+  └─ [Step 8]  Record saved to DB (uncommitted)
+  └─ [Step 9]  After Apex Trigger
+  └─ [Step 15] After-save Record-Triggered Flow
+  └─ [Step 19] COMMIT</code></pre>
+          </div>
+
+          <h2 id="validation" class="reveal">Validation Rule Timing</h2>
+          <p class="reveal">Validation rules run at step 6 — after before-save Flows and before-triggers. This is why a before-trigger can set a field value that a validation rule then evaluates. If a validation rule fails, the entire transaction rolls back and no further steps execute.</p>
+
+          <h2 id="rollback" class="reveal">What Triggers a Rollback</h2>
+          <p class="reveal">Any unhandled exception or validation failure at any step rolls back the entire transaction to its last savepoint. This includes:</p>
+          <ul class="reveal" style="margin-left:1.5rem;line-height:2">
+            <li>Validation rule failures</li>
+            <li>Unhandled Apex exceptions in triggers</li>
+            <li>Flow faults without a fault path configured</li>
+            <li>DML errors (e.g., duplicate key, required field missing)</li>
+          </ul>
+
+          <h2 id="tips" class="reveal">Key Developer Tips</h2>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <div><p><strong>Debugging order of execution issues:</strong> Enable debug logs with <code>APEX_CODE FINEST</code> and <code>WORKFLOW FINER</code>. The log will show each step firing and the order in real time.</p></div>
+          </div>
+
+          <p class="reveal">Common gotchas to watch for:</p>
+          <ul class="reveal" style="margin-left:1.5rem;line-height:2">
+            <li>Querying <code>Trigger.new</code> records in an after-trigger returns the saved values including the auto-assigned Id.</li>
+            <li>Roll-up summary field recalculation (step 17) can fire its own triggers on the parent — watch for unintended recursion.</li>
+            <li>Post-commit email sends (step 20) will still complete even if subsequent code throws — emails can't be recalled once committed.</li>
+            <li>Platform events published in a trigger are delivered post-commit. They cannot be rolled back.</li>
+          </ul>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#overview">Full Order of Execution</a>
+            <a href="#before-save">Before-Save vs After-Save</a>
+            <a href="#triggers-vs-flows">Triggers vs Flows</a>
+            <a href="#validation">Validation Rule Timing</a>
+            <a href="#rollback">What Triggers a Rollback</a>
+            <a href="#tips">Key Developer Tips</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid">
+    <div class="footer-brand">
+      <a href="../index.html" class="nav-logo"><div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="navbar-brand-text">Salesforce<span>Decoded</span></div></a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+  </div><div class="footer-bottom"><p>&copy; 2026 Salesforce Decoded.</p><div class="footer-social"><a href="../index.html"><span class="material-symbols-rounded">code</span></a><a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a></div></div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

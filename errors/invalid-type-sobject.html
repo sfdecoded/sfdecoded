@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: INVALID_TYPE: sObject Type Not Supported — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce INVALID_TYPE 'sObject type not supported' error. Learn how to verify object API names and queryable status.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/invalid-type-sobject.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <nav class="navbar"><div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+<ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html" class="active">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+<div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+<div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">INVALID_TYPE: sObject Type Not Supported</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-error">API Error Code</span><span class="tag tag-primary">INVALID_TYPE</span></div>
+      <h1 class="display-medium reveal stagger-3">INVALID_TYPE: sObject Type Not Supported</h1>
+      <p class="reveal stagger-4">Salesforce API error — The object name in your SOQL query doesn't exist, is not queryable via the API, or has a typo in the API name.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+          <div class="callout callout-error reveal">
+  <span class="material-symbols-rounded">error</span>
+  <div><p><strong>INVALID_TYPE:</strong> sObject type 'ObjectName' is not supported</p></div>
+</div>
+          
+<h2 id="what" class="reveal">What does this error mean?</h2>
+<p class="reveal">This error is returned by the Salesforce REST or SOAP API (and by Apex dynamic SOQL) when the <code>FROM</code> clause references an object that the API cannot find, doesn't recognise at the current API version, or that isn't marked as queryable. It's the API-level equivalent of "no such table" in a relational database.</p>
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+<h3 class="reveal">1. Missing __c suffix on custom objects</h3>
+<p class="reveal">Custom objects must always include the <code>__c</code> suffix: <code>My_Object__c</code> not <code>My_Object</code>. The label shown in the UI is not the API name.</p>
+<h3 class="reveal">2. Querying a non-queryable object</h3>
+<p class="reveal">Some Salesforce objects (e.g., certain metadata objects, history objects) are not accessible via standard SOQL — they require the Tooling API or Metadata API.</p>
+<h3 class="reveal">3. Managed package namespace prefix missing</h3>
+<p class="reveal">Objects from installed managed packages require their namespace prefix: <code>namespace__ObjectName__c</code>.</p>
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+<h3 class="reveal">Solution 1: Verify the API name in Setup</h3>
+<p class="reveal">Go to Setup → Object Manager → find your object → the <strong>API Name</strong> field shows the exact string to use in SOQL.</p>
+<h3 class="reveal">Solution 2: Check the object's queryable status</h3>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-comment">// Check if an object is queryable in Apex</span>
+Schema.DescribeSObjectResult descr =
+    Schema.<span class="code-function">getGlobalDescribe</span>().<span class="code-function">get</span>(<span class="code-string">'My_Object__c'</span>).<span class="code-function">getDescribe</span>();
+
+System.<span class="code-function">debug</span>(<span class="code-string">'Queryable: '</span> + descr.<span class="code-function">isQueryable</span>());
+System.<span class="code-function">debug</span>(<span class="code-string">'API Name: '</span>  + descr.<span class="code-function">getName</span>());</code></pre>
+</div>
+<div class="callout callout-info reveal">
+  <span class="material-symbols-rounded">lightbulb</span>
+  <div><p><strong>Pro Tip:</strong> Use Workbench → Utilities → REST Explorer to call <code>/services/data/v59.0/sobjects/YourObject__c/describe</code>. If the object is valid and queryable, you'll get a full field list. If not, the error message will tell you exactly why.</p></div>
+</div>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+ <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+  <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+<div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+<div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

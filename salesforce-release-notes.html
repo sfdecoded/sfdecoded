@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Release Notes — Salesforce Decoded</title>
+  <meta name="description" content="Browse all Salesforce release notes — Spring, Summer, and Winter releases from 2018 to 2026. Click any card to open the official documentation.">
+  <link rel="stylesheet" href="css/style.css">
+      <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <style>
+    /* ── Season color tokens ── */
+    :root {
+      --spring:        #1a7f4b;
+      --spring-bg:     #e8f7ef;
+      --spring-border: #a8e0c1;
+      --spring-grad:   linear-gradient(135deg, #1a7f4b, #4ade80);
+
+      --summer:        #c06000;
+      --summer-bg:     #fff4e0;
+      --summer-border: #fcd18a;
+      --summer-grad:   linear-gradient(135deg, #c06000, #fb923c);
+
+      --winter:        #1a56db;
+      --winter-bg:     #dbeafe;
+      --winter-border: #93c5fd;
+      --winter-grad:   linear-gradient(135deg, #1a56db, #60a5fa);
+    }
+
+    /* ── Controls bar ── */
+    .controls-bar {
+      position: sticky;
+      top: 68px;
+      z-index: 90;
+      background: rgba(250, 248, 255, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--md-outline-variant);
+      padding: 14px 0;
+    }
+
+    .controls-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Search input */
+    .rn-search-wrap {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+
+    .rn-search-wrap .material-symbols-rounded {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      color: var(--md-outline);
+      pointer-events: none;
+    }
+
+    .rn-search-wrap input {
+      width: 100%;
+      padding: 10px 16px 10px 42px;
+      background: var(--md-surface-container);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-full);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      color: var(--md-on-surface);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .rn-search-wrap input:focus {
+      border-color: var(--md-primary);
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+      background: var(--md-surface-container-lowest);
+    }
+
+    .rn-search-wrap input::placeholder { color: var(--md-outline); }
+
+    /* Filter chips */
+    .filter-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: var(--md-shape-full);
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border: 1.5px solid var(--md-outline-variant);
+      background: transparent;
+      color: var(--md-on-surface-variant);
+      cursor: pointer;
+      transition: all 0.18s var(--md-motion-standard);
+    }
+
+    .filter-chip:hover {
+      background: var(--md-surface-container);
+      color: var(--md-on-surface);
+    }
+
+    .filter-chip .chip-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .filter-chip .chip-count {
+      padding: 1px 7px;
+      border-radius: var(--md-shape-full);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      background: rgba(0,0,0,0.07);
+    }
+
+    /* Active states */
+    .filter-chip.active-all {
+      background: var(--md-primary);
+      color: var(--md-on-primary);
+      border-color: var(--md-primary);
+    }
+    .filter-chip.active-all .chip-count { background: rgba(255,255,255,0.25); }
+
+    .filter-chip.active-spring {
+      background: var(--spring-bg);
+      color: var(--spring);
+      border-color: var(--spring-border);
+    }
+    .filter-chip.active-summer {
+      background: var(--summer-bg);
+      color: var(--summer);
+      border-color: var(--summer-border);
+    }
+    .filter-chip.active-winter {
+      background: var(--winter-bg);
+      color: var(--winter);
+      border-color: var(--winter-border);
+    }
+
+    /* Stats row */
+    .stats-row {
+      max-width: 1200px;
+      margin: 28px auto 0;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .stats-text {
+      font-size: 0.8125rem;
+      color: var(--md-outline);
+    }
+
+    .stats-text strong {
+      color: var(--md-on-surface);
+      font-weight: 600;
+    }
+
+    .stats-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stats-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: var(--md-shape-full);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .stats-pill.spring { background: var(--spring-bg); color: var(--spring); }
+    .stats-pill.summer { background: var(--summer-bg); color: var(--summer); }
+    .stats-pill.winter { background: var(--winter-bg); color: var(--winter); }
+
+    /* ── Main content ── */
+    .releases-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* Year section */
+    .year-section { margin-bottom: 48px; }
+
+    .year-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .year-heading-text {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--md-outline);
+      white-space: nowrap;
+    }
+
+    .year-heading-line {
+      flex: 1;
+      height: 1px;
+      background: var(--md-outline-variant);
+    }
+
+    /* Release cards grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    /* Release card */
+    .release-card {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-lg);
+      padding: 20px 20px 16px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s var(--md-motion-standard),
+                  box-shadow 0.2s var(--md-motion-standard),
+                  border-color 0.2s var(--md-motion-standard);
+    }
+
+    /* Top accent bar */
+    .release-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .release-card.spring::before  { background: var(--spring-grad); }
+    .release-card.summer::before  { background: var(--summer-grad); }
+    .release-card.winter::before  { background: var(--winter-grad); }
+
+    /* Subtle background icon */
+    .release-card::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      right: -16px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      opacity: 0.05;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .release-card.spring::after { background: var(--spring); }
+    .release-card.summer::after { background: var(--summer); }
+    .release-card.winter::after { background: var(--winter); }
+
+    .release-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--md-elevation-3);
+    }
+
+    .release-card:hover::after { opacity: 0.1; }
+
+    .release-card.spring:hover { border-color: var(--spring-border); }
+    .release-card.summer:hover { border-color: var(--summer-border); }
+    .release-card.winter:hover { border-color: var(--winter-border); }
+
+    /* Season tag inside card */
+    .season-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: var(--md-shape-full);
+      font-family: var(--font-display);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      width: fit-content;
+    }
+
+    .season-tag .tag-icon { font-size: 14px; }
+
+    .season-tag.spring { background: var(--spring-bg); color: var(--spring); }
+    .season-tag.summer { background: var(--summer-bg); color: var(--summer); }
+    .season-tag.winter { background: var(--winter-bg); color: var(--winter); }
+
+    .release-name {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--md-on-surface);
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+
+    .release-sub {
+      font-size: 0.8125rem;
+      color: var(--md-outline);
+      margin-bottom: 20px;
+      flex: 1;
+    }
+
+    .release-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--md-outline-variant);
+    }
+
+    .release-num {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--md-outline);
+      font-weight: 500;
+    }
+
+    .view-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: gap 0.15s;
+    }
+
+    .view-link .material-symbols-rounded { font-size: 16px; }
+
+    .release-card:hover .view-link { gap: 6px; }
+
+    .view-link.spring { color: var(--spring); }
+    .view-link.summer { color: var(--summer); }
+    .view-link.winter { color: var(--winter); }
+
+    /* ── No results ── */
+    .no-results {
+      display: none;
+      text-align: center;
+      padding: 80px 24px;
+    }
+
+    .no-results .material-symbols-rounded {
+      font-size: 48px;
+      color: var(--md-outline-variant);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .no-results h3 {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--md-on-surface);
+      margin-bottom: 8px;
+    }
+
+    .no-results p {
+      font-size: 0.9375rem;
+      color: var(--md-outline);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .controls-bar { top: 0; }
+      .cards-grid { grid-template-columns: 1fr 1fr; }
+      .stats-pills { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .controls-inner { flex-direction: column; align-items: stretch; }
+      .filter-chips { justify-content: flex-start; }
+    }
+  </style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <!-- ── Navbar ── -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tools.html">Tools</a></li>
+        <li><a href="errors.html">Errors</a></li>
+        <li><a href="guides.html">Guides</a></li>
+        <li><a href="tips.html">Tips</a></li>
+        <li><a href="extensions.html">Extensions</a></li>
+        <li><a href="resources.html" class="active">Resources</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0">
+        <span class="material-symbols-rounded">search</span>
+        <span>Search...</span>
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile nav -->
+  <div class="mobile-nav">
+    <a href="index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="resources.html" class="active"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <!-- Search overlay -->
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap">
+        <span class="material-symbols-rounded">search</span>
+        <input type="text" placeholder="Search...">
+      </div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- ── Page Header ── -->
+  <header class="page-header">
+    <div class="container">
+      <div class="overline reveal">
+        <span>Resources</span>
+      </div>
+      <h1 class="display-medium reveal stagger-2">Salesforce Release Notes</h1>
+      <p class="reveal stagger-3">Browse every Salesforce release — Spring, Summer, and Winter — from 2018 to 2026. Click any card to open the official documentation.</p>
+
+      <!-- Quick stat chips -->
+      <div class="flex items-center gap-12 mt-24 reveal stagger-4" style="flex-wrap:wrap">
+        <div class="chip">
+          <span class="material-symbols-rounded" style="font-size:16px;color:var(--md-primary)">history</span>
+          26 Releases
+        </div>
+        <div class="chip">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--spring);display:inline-block;flex-shrink:0"></span>
+          Spring
+        </div>
+        <div class="chip">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--summer);display:inline-block;flex-shrink:0"></span>
+          Summer
+        </div>
+        <div class="chip">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--winter);display:inline-block;flex-shrink:0"></span>
+          Winter
+        </div>
+        <div class="chip">
+          <span class="material-symbols-rounded" style="font-size:16px;color:var(--md-primary)">open_in_new</span>
+          Opens official docs
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Sticky Controls ── -->
+  <div class="controls-bar">
+    <div class="controls-inner">
+      <!-- Search -->
+      <div class="rn-search-wrap">
+        <span class="material-symbols-rounded">search</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search release (e.g. Spring '25, 2024…)"
+          oninput="filterReleases()"
+          autocomplete="off"
+        >
+      </div>
+
+      <!-- Season filters -->
+      <div class="filter-chips">
+        <button class="filter-chip active-all" onclick="setFilter('all', this)">
+          All
+          <span class="chip-count" id="cnt-all">0</span>
+        </button>
+        <button class="filter-chip" onclick="setFilter('spring', this)">
+          <span class="chip-dot" style="background:var(--spring)"></span>
+          Spring
+          <span class="chip-count" id="cnt-spring">0</span>
+        </button>
+        <button class="filter-chip" onclick="setFilter('summer', this)">
+          <span class="chip-dot" style="background:var(--summer)"></span>
+          Summer
+          <span class="chip-count" id="cnt-summer">0</span>
+        </button>
+        <button class="filter-chip" onclick="setFilter('winter', this)">
+          <span class="chip-dot" style="background:var(--winter)"></span>
+          Winter
+          <span class="chip-count" id="cnt-winter">0</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Stats row ── -->
+  <div class="stats-row">
+    <p class="stats-text" id="statsBar"></p>
+    <div class="stats-pills">
+      <span class="stats-pill spring">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--spring);display:inline-block"></span>
+        <span id="stat-spring-count">0</span> Spring
+      </span>
+      <span class="stats-pill summer">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--summer);display:inline-block"></span>
+        <span id="stat-summer-count">0</span> Summer
+      </span>
+      <span class="stats-pill winter">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--winter);display:inline-block"></span>
+        <span id="stat-winter-count">0</span> Winter
+      </span>
+    </div>
+  </div>
+
+  <!-- ── Release cards ── -->
+  <main class="releases-main" id="mainContent"></main>
+
+  <!-- No results -->
+  <div class="no-results" id="noResults">
+    <span class="material-symbols-rounded">search_off</span>
+    <h3>No releases found</h3>
+    <p>Try a different search term or clear the filter.</p>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+          <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="tools.html">Tools</a></li>
+            <li><a href="errors.html">Errors</a></li>
+            <li><a href="guides.html">Guides</a></li>
+            <li><a href="extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="tips.html">Tips</a></li>
+            <li><a href="resources.html">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul><li><a href="about.html">About</a></li></ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top">
+    <span class="material-symbols-rounded">arrow_upward</span>
+  </button>
+
+  <!-- ── Scripts ── -->
+  <script src="js/main.js"></script>
+  <script>
+    const BASE_URL = "https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&type=5&release=";
+
+    const SEASON_META = {
+      spring: { label: "Spring", icon: "local_florist" },
+      summer: { label: "Summer", icon: "wb_sunny" },
+      winter: { label: "Winter", icon: "ac_unit" }
+    };
+
+    const releases = [
+      { name: "Spring '26", season: "spring", year: 2026, release: 260 },
+      { name: "Winter '26", season: "winter", year: 2026, release: 258 },
+      { name: "Summer '25", season: "summer", year: 2025, release: 256 },
+      { name: "Spring '25", season: "spring", year: 2025, release: 254 },
+      { name: "Winter '25", season: "winter", year: 2025, release: 252 },
+      { name: "Summer '24", season: "summer", year: 2024, release: 250 },
+      { name: "Spring '24", season: "spring", year: 2024, release: 248 },
+      { name: "Winter '24", season: "winter", year: 2024, release: 246 },
+      { name: "Summer '23", season: "summer", year: 2023, release: 244 },
+      { name: "Spring '23", season: "spring", year: 2023, release: 242 },
+      { name: "Winter '23", season: "winter", year: 2023, release: 240 },
+      { name: "Summer '22", season: "summer", year: 2022, release: 238 },
+      { name: "Spring '22", season: "spring", year: 2022, release: 236 },
+      { name: "Winter '22", season: "winter", year: 2022, release: 234 },
+      { name: "Summer '21", season: "summer", year: 2021, release: 232 },
+      { name: "Spring '21", season: "spring", year: 2021, release: 230 },
+      { name: "Winter '21", season: "winter", year: 2021, release: 228 },
+      { name: "Summer '20", season: "summer", year: 2020, release: 226 },
+      { name: "Spring '20", season: "spring", year: 2020, release: 224 },
+      { name: "Winter '20", season: "winter", year: 2020, release: 222 },
+      { name: "Summer '19", season: "summer", year: 2019, release: 220 },
+      { name: "Spring '19", season: "spring", year: 2019, release: 218 },
+      { name: "Winter '19", season: "winter", year: 2019, release: 216 },
+      { name: "Summer '18", season: "summer", year: 2018, release: 214 },
+      { name: "Spring '18", season: "spring", year: 2018, release: 212 },
+      { name: "Winter '18", season: "winter", year: 2018, release: 210 },
+    ];
+
+    let activeFilter = 'all';
+
+    function setFilter(filter, btn) {
+      activeFilter = filter;
+      document.querySelectorAll('.filter-chip').forEach(b => {
+        b.className = 'filter-chip';
+      });
+      btn.classList.add('active-' + filter);
+      filterReleases();
+    }
+
+    function filterReleases() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const main  = document.getElementById('mainContent');
+      const noRes = document.getElementById('noResults');
+      const stats = document.getElementById('statsBar');
+
+      const filtered = releases.filter(r => {
+        const matchFilter = activeFilter === 'all' || r.season === activeFilter;
+        const matchSearch = !query
+          || r.name.toLowerCase().includes(query)
+          || String(r.year).includes(query)
+          || r.season.includes(query);
+        return matchFilter && matchSearch;
+      });
+
+      // Group by year
+      const byYear = {};
+      filtered.forEach(r => {
+        if (!byYear[r.year]) byYear[r.year] = [];
+        byYear[r.year].push(r);
+      });
+
+      main.innerHTML = '';
+
+      if (filtered.length === 0) {
+        noRes.style.display  = 'block';
+        main.style.display   = 'none';
+        stats.innerHTML = '';
+        return;
+      }
+
+      noRes.style.display = 'none';
+      main.style.display  = '';
+
+      // Update showing count
+      stats.innerHTML = `Showing <strong>${filtered.length}</strong> release${filtered.length !== 1 ? 's' : ''}`;
+
+      // Update mini stat pills
+      const vis = { spring: 0, summer: 0, winter: 0 };
+      filtered.forEach(r => vis[r.season]++);
+      document.getElementById('stat-spring-count').textContent = vis.spring;
+      document.getElementById('stat-summer-count').textContent = vis.summer;
+      document.getElementById('stat-winter-count').textContent = vis.winter;
+
+      // Render sections
+      Object.keys(byYear).sort((a, b) => b - a).forEach(year => {
+        const section = document.createElement('div');
+        section.className = 'year-section';
+        section.innerHTML = `
+          <div class="year-heading">
+            <span class="year-heading-text">${year}</span>
+            <div class="year-heading-line"></div>
+          </div>
+        `;
+
+        const grid = document.createElement('div');
+        grid.className = 'cards-grid';
+
+        byYear[year].forEach(r => {
+          const meta = SEASON_META[r.season];
+          const a = document.createElement('a');
+          a.href   = BASE_URL + r.release;
+          a.target = '_blank';
+          a.rel    = 'noopener noreferrer';
+          a.className = `release-card ${r.season}`;
+          a.innerHTML = `
+            <div class="season-tag ${r.season}">
+              <span class="material-symbols-rounded tag-icon">${meta.icon}</span>
+              ${meta.label}
+            </div>
+            <div class="release-name">${r.name}</div>
+            <div class="release-sub">Salesforce ${r.name} Release</div>
+            <div class="release-footer">
+              <span class="release-num">Release ${r.release}</span>
+              <span class="view-link ${r.season}">
+                View Notes
+                <span class="material-symbols-rounded">arrow_forward</span>
+              </span>
+            </div>
+          `;
+          grid.appendChild(a);
+        });
+
+        section.appendChild(grid);
+        main.appendChild(section);
+      });
+    }
+
+    function updateCounts() {
+      document.getElementById('cnt-all').textContent    = releases.length;
+      document.getElementById('cnt-spring').textContent = releases.filter(r => r.season === 'spring').length;
+      document.getElementById('cnt-summer').textContent = releases.filter(r => r.season === 'summer').length;
+      document.getElementById('cnt-winter').textContent = releases.filter(r => r.season === 'winter').length;
+
+      document.getElementById('stat-spring-count').textContent = releases.filter(r => r.season === 'spring').length;
+      document.getElementById('stat-summer-count').textContent = releases.filter(r => r.season === 'summer').length;
+      document.getElementById('stat-winter-count').textContent = releases.filter(r => r.season === 'winter').length;
+    }
+
+    updateCounts();
+    filterReleases();
+  </script>
+</body>
+</html>

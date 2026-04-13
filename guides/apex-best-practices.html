@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Best Practices — Complete Guide | Salesforce Decoded</title>
+  <meta name="description" content="Comprehensive guide to Apex best practices: bulkification, trigger patterns, error handling, testing strategies, and governor-limit-safe coding.">
+  <meta name="keywords" content="apex best practices, salesforce apex patterns, apex trigger handler, apex testing, bulkification">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/guides/apex-best-practices.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+          <a href="../index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+    <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html" class="active">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html" class="active"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../guides.html">Guides</a><span class="separator">/</span>
+        <span class="current">Apex Best Practices</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-primary">Comprehensive Guide</span>
+        <span class="body-small text-outline">15 min read</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">Apex Best Practices</h1>
+      <p class="reveal stagger-4">Write clean, scalable, governor-limit-safe Apex code with proven patterns and strategies.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+
+          <p class="body-large reveal">Writing good Apex code means understanding the constraints of the Salesforce platform and designing your solutions around them. This guide covers the essential patterns every Salesforce developer should follow.</p>
+
+          <h2 id="bulkification" class="reveal">Bulkification</h2>
+          <p class="reveal">Bulkification is the single most important Apex best practice. Every piece of Apex code should be designed to handle multiple records in a single transaction, not just one.</p>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <p><strong>Golden Rule:</strong> Never put SOQL queries, DML statements, or callouts inside a loop. Always collect data first, then operate on it in bulk.</p>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Apex — Bulkified Trigger</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre><code><span class="code-keyword">trigger</span> AccountTrigger <span class="code-keyword">on</span> Account (before insert, before update) {
+    <span class="code-comment">// 1. Collect all data needed</span>
+    Set&lt;String&gt; industries = <span class="code-keyword">new</span> Set&lt;String&gt;();
+    <span class="code-keyword">for</span> (Account acc : Trigger.new) {
+        <span class="code-keyword">if</span> (acc.Industry != <span class="code-keyword">null</span>) {
+            industries.add(acc.Industry);
+        }
+    }
+
+    <span class="code-comment">// 2. Single query outside the loop</span>
+    Map&lt;String, Decimal&gt; benchmarks = <span class="code-keyword">new</span> Map&lt;String, Decimal&gt;();
+    <span class="code-keyword">for</span> (Industry_Benchmark__c b : [
+        <span class="code-keyword">SELECT</span> Industry__c, Target_Revenue__c 
+        <span class="code-keyword">FROM</span> Industry_Benchmark__c
+        <span class="code-keyword">WHERE</span> Industry__c <span class="code-keyword">IN</span> :industries
+    ]) {
+        benchmarks.put(b.Industry__c, b.Target_Revenue__c);
+    }
+
+    <span class="code-comment">// 3. Process records using the Map</span>
+    <span class="code-keyword">for</span> (Account acc : Trigger.new) {
+        <span class="code-keyword">if</span> (benchmarks.containsKey(acc.Industry)) {
+            acc.Revenue_Target__c = benchmarks.get(acc.Industry);
+        }
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="trigger-handler" class="reveal">Trigger Handler Pattern</h2>
+          <p class="reveal">Keep your trigger files thin — one trigger per object with all logic delegated to a handler class. This makes your code testable, maintainable, and easy to extend.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Apex — Trigger</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre><code><span class="code-keyword">trigger</span> AccountTrigger <span class="code-keyword">on</span> Account (
+    before insert, before update, 
+    after insert, after update
+) {
+    AccountTriggerHandler handler = <span class="code-keyword">new</span> AccountTriggerHandler();
+    
+    <span class="code-keyword">if</span> (Trigger.isBefore &amp;&amp; Trigger.isInsert) handler.beforeInsert(Trigger.new);
+    <span class="code-keyword">if</span> (Trigger.isBefore &amp;&amp; Trigger.isUpdate) handler.beforeUpdate(Trigger.new, Trigger.oldMap);
+    <span class="code-keyword">if</span> (Trigger.isAfter &amp;&amp; Trigger.isInsert) handler.afterInsert(Trigger.new);
+    <span class="code-keyword">if</span> (Trigger.isAfter &amp;&amp; Trigger.isUpdate) handler.afterUpdate(Trigger.new, Trigger.oldMap);
+}</code></pre>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Apex — Handler Class</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre><code><span class="code-keyword">public class</span> <span class="code-type">AccountTriggerHandler</span> {
+    
+    <span class="code-keyword">public void</span> <span class="code-function">beforeInsert</span>(List&lt;Account&gt; newAccounts) {
+        setDefaults(newAccounts);
+    }
+    
+    <span class="code-keyword">public void</span> <span class="code-function">beforeUpdate</span>(
+        List&lt;Account&gt; newAccounts, 
+        Map&lt;Id, Account&gt; oldMap
+    ) {
+        validateChanges(newAccounts, oldMap);
+    }
+    
+    <span class="code-keyword">private void</span> <span class="code-function">setDefaults</span>(List&lt;Account&gt; accounts) {
+        <span class="code-keyword">for</span> (Account acc : accounts) {
+            <span class="code-keyword">if</span> (acc.Rating == <span class="code-keyword">null</span>) {
+                acc.Rating = <span class="code-string">'Cold'</span>;
+            }
+        }
+    }
+    
+    <span class="code-keyword">private void</span> <span class="code-function">validateChanges</span>(
+        List&lt;Account&gt; newAccounts, 
+        Map&lt;Id, Account&gt; oldMap
+    ) {
+        <span class="code-keyword">for</span> (Account acc : newAccounts) {
+            Account old = oldMap.get(acc.Id);
+            <span class="code-keyword">if</span> (acc.AnnualRevenue != old.AnnualRevenue 
+                &amp;&amp; acc.AnnualRevenue &lt; <span class="code-number">0</span>) {
+                acc.addError(<span class="code-string">'Revenue cannot be negative'</span>);
+            }
+        }
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="error-handling" class="reveal">Error Handling</h2>
+          <p class="reveal">Use structured error handling to make your code resilient and debuggable.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre><code><span class="code-keyword">public class</span> <span class="code-type">AccountService</span> {
+    
+    <span class="code-keyword">public static</span> List&lt;Database.SaveResult&gt; <span class="code-function">safeUpdate</span>(
+        List&lt;Account&gt; accounts
+    ) {
+        List&lt;Database.SaveResult&gt; results = 
+            Database.update(accounts, <span class="code-keyword">false</span>);
+        
+        <span class="code-keyword">for</span> (Integer i = <span class="code-number">0</span>; i &lt; results.size(); i++) {
+            <span class="code-keyword">if</span> (!results[i].isSuccess()) {
+                <span class="code-keyword">for</span> (Database.Error err : results[i].getErrors()) {
+                    System.debug(LoggingLevel.ERROR,
+                        <span class="code-string">'Failed: '</span> + accounts[i].Name + 
+                        <span class="code-string">' - '</span> + err.getMessage()
+                    );
+                }
+            }
+        }
+        <span class="code-keyword">return</span> results;
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="testing" class="reveal">Testing Strategies</h2>
+          <p class="reveal">Good tests are not just about hitting 75% coverage — they validate behavior, edge cases, and bulk scenarios.</p>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">rule</span>
+            <p><strong>Test checklist:</strong> Test positive cases, negative cases, bulk operations (200+ records), user permissions, and boundary conditions.</p>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Apex — Test Class</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre><code><span class="code-keyword">@isTest</span>
+<span class="code-keyword">private class</span> <span class="code-type">AccountTriggerHandlerTest</span> {
+    
+    <span class="code-keyword">@TestSetup</span>
+    <span class="code-keyword">static void</span> <span class="code-function">makeData</span>() {
+        List&lt;Account&gt; accounts = <span class="code-keyword">new</span> List&lt;Account&gt;();
+        <span class="code-keyword">for</span> (Integer i = <span class="code-number">0</span>; i &lt; <span class="code-number">200</span>; i++) {
+            accounts.add(<span class="code-keyword">new</span> Account(
+                Name = <span class="code-string">'Test Account '</span> + i
+            ));
+        }
+        insert accounts;
+    }
+    
+    <span class="code-keyword">@isTest</span>
+    <span class="code-keyword">static void</span> <span class="code-function">testDefaultRating_bulk</span>() {
+        List&lt;Account&gt; accounts = [
+            <span class="code-keyword">SELECT</span> Id, Rating 
+            <span class="code-keyword">FROM</span> Account
+        ];
+        
+        System.assertEquals(<span class="code-number">200</span>, accounts.size(),
+            <span class="code-string">'Should handle 200 records'</span>);
+        
+        <span class="code-keyword">for</span> (Account acc : accounts) {
+            System.assertEquals(<span class="code-string">'Cold'</span>, acc.Rating,
+                <span class="code-string">'Default rating should be Cold'</span>);
+        }
+    }
+    
+    <span class="code-keyword">@isTest</span>
+    <span class="code-keyword">static void</span> <span class="code-function">testNegativeRevenue_showsError</span>() {
+        Account acc = [<span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> Account <span class="code-keyword">LIMIT</span> <span class="code-number">1</span>];
+        acc.AnnualRevenue = <span class="code-number">-500</span>;
+        
+        Test.startTest();
+        Database.SaveResult result = Database.update(acc, <span class="code-keyword">false</span>);
+        Test.stopTest();
+        
+        System.assert(!result.isSuccess(),
+            <span class="code-string">'Negative revenue should fail'</span>);
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="limits" class="reveal">Governor Limit Awareness</h2>
+          <p class="reveal">Always design with limits in mind. Use the <code>Limits</code> class to monitor consumption.</p>
+
+          <div class="grid grid-2 mt-24 mb-32">
+            <div class="card reveal stagger-1" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">100</div>
+              <div class="body-small text-muted">SOQL queries (sync)</div>
+            </div>
+            <div class="card reveal stagger-2" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">150</div>
+              <div class="body-small text-muted">DML statements</div>
+            </div>
+            <div class="card reveal stagger-3" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">6 MB</div>
+              <div class="body-small text-muted">Heap size (sync)</div>
+            </div>
+            <div class="card reveal stagger-4" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">10s</div>
+              <div class="body-small text-muted">CPU time (sync)</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TOC -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#bulkification">Bulkification</a>
+            <a href="#trigger-handler">Trigger Handler Pattern</a>
+            <a href="#error-handling">Error Handling</a>
+            <a href="#testing">Testing Strategies</a>
+            <a href="#limits">Governor Limits</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+         <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+     <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>  
+  </div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

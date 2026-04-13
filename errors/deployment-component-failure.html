@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Deployment Component Failure — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce Deployment Component Failure error. Learn why metadata deployment fails and how to resolve component validation, test coverage, and dependency issues.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/deployment-component-failure.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+  <link rel="manifest" href="../site.webmanifest">
+  <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+  <!-- End Google Tag Manager -->
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+    <ul class="navbar-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html" class="active">Errors</a></li>
+      <li><a href="../guides.html">Guides</a></li>
+      <li><a href="../tips.html">Tips</a></li>
+      <li><a href="../prompts.html">Prompts</a></li>
+      <li><a href="../extensions.html">Extensions</a></li>
+      <li><a href="../resources.html">Resources</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+    <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+    <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+  </div></nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">Deployment Component Failure</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-info">Deployment</span>
+        <span class="tag tag-primary">Metadata</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">Deployment Component Failure</h1>
+      <p class="reveal stagger-4">One or more metadata components failed validation during a Salesforce deployment — the entire deployment is rolled back until every failing component is resolved.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+
+          <div class="callout callout-error reveal">
+            <span class="material-symbols-rounded">error</span>
+            <div><p><strong>Deployment Component Failure</strong> — One or more components failed during deployment validation. Review the component errors in Deployment Status and fix each one individually before redeploying.</p></div>
+          </div>
+
+          <h2 id="what" class="reveal">What does this error mean?</h2>
+          <p class="reveal">When Salesforce deploys a set of metadata changes, every component in the deployment package must pass validation before any change is written to the target org. This is an all-or-nothing transaction — if a single Apex class, trigger, Lightning component, Flow, or custom object fails, the entire deployment is rejected and rolled back.</p>
+          <p class="reveal">The error message itself is a container: the real information is in the per-component error detail, accessible in Setup → Deployment Status or in your CLI output. Always read the component-level errors, not just the top-level failure message.</p>
+
+          <h2 id="causes" class="reveal">Common Causes</h2>
+
+          <h3 class="reveal">1. Apex compilation errors</h3>
+          <p class="reveal">An Apex class or trigger in the deployment contains a syntax error, references a method or field that doesn't exist in the target org, or depends on another class that failed compilation. The target org compiles all Apex fresh on each deployment — a class that compiled fine in sandbox may fail if the target org is on a different API version or is missing a dependency.</p>
+
+          <h3 class="reveal">2. Test class failures or insufficient coverage</h3>
+          <p class="reveal">Production deployments require at least 75% overall Apex code coverage and all test methods must pass. A test that relied on sandbox-specific data or configuration will fail in production. Tests that call external callouts without proper mocking will also fail.</p>
+
+          <h3 class="reveal">3. Missing dependencies in the target org</h3>
+          <p class="reveal">A component references a custom field, object, permission set, named credential, or another metadata type that exists in your source org but hasn't been deployed to the target yet. Salesforce validates all references at deploy time. Deploy dependencies in the correct order, or include them in the same deployment package.</p>
+
+          <h3 class="reveal">4. Managed package API name conflicts</h3>
+          <p class="reveal">If the target org has a managed package installed with a component that shares an API name with something in your package, the deployment will fail with a duplicate or conflict error. Namespace prefixes must be unique.</p>
+
+          <h3 class="reveal">5. Invalid metadata for the target API version</h3>
+          <p class="reveal">Deploying metadata built against a newer API version than the target org supports, or using features (e.g., new Flow element types) not available in the target org's Salesforce release, causes component-level validation failures.</p>
+
+          <h2 id="solution" class="reveal">How to Fix It</h2>
+
+          <h3 class="reveal">Solution 1: Read the component-level error detail</h3>
+          <p class="reveal">The top-level "Deployment Component Failure" message is not the fix — the per-component error is. Navigate to the deployment detail view or read your CLI output carefully.</p>
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Setup</span>
+            </div>
+<pre><code>Setup → Environments → Deploy → Deployment Status
+  → Click "View Details" on the failed deployment
+  → Expand each failing component to see the exact error message</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 2: Validate before you deploy</h3>
+          <p class="reveal">Run a check-only (validation) deployment first. This runs all the same validation steps as a real deployment — including test execution — but writes nothing to the org. Fix all errors, then deploy.</p>
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">SF CLI</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment"># Validate only — no changes written to org</span>
+sf project deploy start --check-only --target-org myOrg
+
+<span class="code-comment"># With specific test level</span>
+sf project deploy start --check-only --target-org myOrg --test-level RunLocalTests
+
+<span class="code-comment"># Deploy for real once validation passes</span>
+sf project deploy start --target-org myOrg --test-level RunLocalTests</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 3: Run tests before deployment</h3>
+          <p class="reveal">Run all local tests in the target org before deploying to surface any test failures caused by existing org state, data configuration, or callout issues.</p>
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">SF CLI</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment"># Run all local tests in the target org</span>
+sf apex run test --target-org myOrg --test-level RunLocalTests --result-format human
+
+<span class="code-comment"># Run a specific test class</span>
+sf apex run test --target-org myOrg --class-names MyApexTest --result-format human</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 4: Fix callout mocking in test classes</h3>
+          <p class="reveal">Tests that make HTTP callouts without a mock will throw a <code>System.CalloutException</code> during deployment test runs. Implement <code>HttpCalloutMock</code> for any test that exercises callout code.</p>
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code>@isTest
+global class MockHttpResponse implements HttpCalloutMock {
+    global HTTPResponse respond(HTTPRequest req) {
+        HttpResponse res = new HttpResponse();
+        res.setStatusCode(200);
+        res.setBody(<span class="code-string">'{"status":"ok"}'</span>);
+        return res;
+    }
+}
+
+@isTest
+private class MyCalloutServiceTest {
+    @isTest
+    static void testCallout() {
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponse());
+        Test.startTest();
+        MyCalloutService.<span class="code-function">callExternalApi</span>();
+        Test.stopTest();
+        <span class="code-comment">// assert expected results</span>
+    }
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 5: Deploy missing dependencies first</h3>
+          <p class="reveal">If the error references a field, object, or metadata component that doesn't exist in the target org, deploy the dependency in a separate package first, then redeploy the original package.</p>
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">SF CLI</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment"># Deploy the dependency package first</span>
+sf project deploy start --source-dir force-app/main/default/objects --target-org myOrg
+
+<span class="code-comment"># Then deploy the full package</span>
+sf project deploy start --target-org myOrg</code></pre>
+          </div>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <div><p><strong>Pro Tip:</strong> In Workbench, go to Migration → Deploy and enable "Check Only" before every production deployment. If validation passes, Workbench stores a validated deployment ID that you can use to do a quick-deploy (skips re-running tests) within 10 days — saving significant deployment time.</p></div>
+          </div>
+
+        </div>
+
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+            <a href="#causes">Common Causes</a>
+            <a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid">
+    <div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul>
+      <li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li>
+      <li><a href="../guides.html">Guides</a></li>
+      <li><a href="../extensions.html">Extensions</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul>
+      <li><a href="../tips.html">Tips</a></li>
+      <li><a href="../resources.html">Resources</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Community</h4><ul>
+      <li><a href="../about.html">About</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

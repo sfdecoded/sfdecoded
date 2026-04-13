@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Invalid Date / Datetime Format in SOQL — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix Salesforce SOQL invalid date format errors. Learn the correct ISO 8601 date and datetime format and how to use SOQL date literals.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/invalid-date-format.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <nav class="navbar"><div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+<ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html" class="active">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+<div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+<div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">Invalid Date / Datetime Format in SOQL</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-warning">Query Syntax</span><span class="tag tag-primary">MALFORMED_QUERY</span></div>
+      <h1 class="display-medium reveal stagger-3">Invalid Date / Datetime Format in SOQL</h1>
+      <p class="reveal stagger-4">MALFORMED_QUERY — A date or datetime value in your SOQL WHERE clause is not in the ISO 8601 format that Salesforce requires.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+          <div class="callout callout-error reveal">
+  <span class="material-symbols-rounded">error</span>
+  <div><p><strong>MALFORMED_QUERY:</strong> Invalid date: 2024-31-01 (or) Invalid datetime: 2024-01-15T25:00:00Z</p></div>
+</div>
+          
+<h2 id="what" class="reveal">What does this error mean?</h2>
+<p class="reveal">SOQL requires date and datetime values to follow <strong>ISO 8601 format</strong> strictly. Salesforce does not accept MM/DD/YYYY, DD-MM-YYYY, or other regional date formats commonly used in applications. When a non-conforming date string appears in a WHERE clause, the query parser rejects it before execution.</p>
+<p class="reveal">SOQL also provides a rich set of <strong>date literals</strong> (like <code>TODAY</code>, <code>LAST_N_DAYS:30</code>, <code>THIS_MONTH</code>) that are often preferable to hardcoded date values because they adapt automatically to the user's locale and time zone.</p>
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+<h3 class="reveal">1. Using regional date format</h3>
+<p class="reveal">Writing <code>WHERE CloseDate = '01/15/2024'</code> or <code>WHERE CloseDate = '15-01-2024'</code> — SOQL only accepts <code>YYYY-MM-DD</code>.</p>
+<h3 class="reveal">2. Invalid datetime timezone offset</h3>
+<p class="reveal">Datetime values must include a valid timezone offset or Z (UTC). <code>2024-01-15T10:00:00</code> without a timezone is invalid; <code>2024-01-15T10:00:00Z</code> or <code>2024-01-15T10:00:00-05:00</code> are correct.</p>
+<h3 class="reveal">3. Out-of-range values</h3>
+<p class="reveal">Month 13, day 32, hour 25 — any out-of-range component produces this error even if the format is otherwise correct.</p>
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+<h3 class="reveal">Solution 1: Use correct ISO 8601 format</h3>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">SOQL</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-comment">-- ❌ Invalid formats</span>
+<span class="code-keyword">WHERE</span> CloseDate = <span class="code-string">'01/15/2024'</span>
+<span class="code-keyword">WHERE</span> CreatedDate &gt; <span class="code-string">'2024-01-15T10:00:00'</span>   <span class="code-comment">-- missing timezone</span>
+
+<span class="code-comment">-- ✅ Correct formats</span>
+<span class="code-keyword">WHERE</span> CloseDate = <span class="code-string">2024-01-15</span>             <span class="code-comment">-- Date: no quotes, no timezone</span>
+<span class="code-keyword">WHERE</span> CreatedDate &gt; <span class="code-string">2024-01-15T10:00:00Z</span>  <span class="code-comment">-- Datetime: Z for UTC</span>
+<span class="code-keyword">WHERE</span> CreatedDate &gt; <span class="code-string">2024-01-15T10:00:00-05:00</span> <span class="code-comment">-- Datetime with offset</span></code></pre>
+</div>
+<h3 class="reveal">Solution 2: Use SOQL date literals</h3>
+<p class="reveal">Date literals are relative to the current date and automatically respect user timezone settings — far more robust than hardcoded values.</p>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">SOQL</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-comment">-- Common date literals</span>
+<span class="code-keyword">WHERE</span> CreatedDate = TODAY
+<span class="code-keyword">WHERE</span> CloseDate = THIS_MONTH
+<span class="code-keyword">WHERE</span> CreatedDate = LAST_N_DAYS:30
+<span class="code-keyword">WHERE</span> CloseDate &gt;= LAST_QUARTER
+<span class="code-keyword">WHERE</span> LastModifiedDate = LAST_N_HOURS:48
+<span class="code-keyword">WHERE</span> CreatedDate = THIS_FISCAL_YEAR</code></pre>
+</div>
+<h3 class="reveal">Solution 3: Format dates correctly in Apex</h3>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-comment">// Format an Apex Date for SOQL string</span>
+Date d = Date.<span class="code-function">today</span>().<span class="code-function">addDays</span>(-30);
+String dateStr = d.<span class="code-function">format</span>(); <span class="code-comment">// 'YYYY-MM-DD' in Apex</span>
+String soql = <span class="code-string">'SELECT Id FROM Opportunity WHERE CloseDate >= '</span> + dateStr;
+
+<span class="code-comment">// Or use a bind variable (preferred — no formatting needed)</span>
+Date cutoff = Date.<span class="code-function">today</span>().<span class="code-function">addDays</span>(-30);
+List&lt;Opportunity&gt; opps = [
+    <span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> Opportunity
+    <span class="code-keyword">WHERE</span> CloseDate &gt;= :cutoff
+];</code></pre>
+</div>
+<div class="callout callout-info reveal">
+  <span class="material-symbols-rounded">lightbulb</span>
+  <div><p><strong>Pro Tip:</strong> In Apex static SOQL, always use bind variables (<code>:myDate</code>) for date values instead of formatting them as strings. Apex handles the type conversion correctly and you avoid format errors entirely.</p></div>
+</div>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+ <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+  <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+<div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+<div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

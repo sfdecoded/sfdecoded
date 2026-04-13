@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Apex Heap Size Too Large — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce 'Apex Heap Size Too Large' governor limit error. Learn causes like over-querying fields and large JSON serialization, with tested solutions.">
+  <meta name="keywords" content="apex heap size too large, salesforce heap limit, apex memory limit, salesforce governor limit, apex transient variable">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/apex-heap-size-too-large.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <style>
+    /* Heap limits panel */
+    .heap-limits-panel {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-lg);
+      padding: 24px;
+      margin: 24px 0;
+    }
+    .heap-limits-panel-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--md-outline);
+      margin-bottom: 16px;
+    }
+    .heap-context-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .heap-context-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .heap-context-label {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--md-on-surface-variant);
+      min-width: 220px;
+    }
+    .heap-context-bar-wrap {
+      flex: 1;
+      height: 8px;
+      background: var(--md-surface-container-high);
+      border-radius: var(--md-shape-full);
+      overflow: hidden;
+    }
+    .heap-context-bar {
+      height: 100%;
+      border-radius: var(--md-shape-full);
+      background: var(--md-primary);
+    }
+    .heap-context-val {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--md-primary);
+      min-width: 52px;
+      text-align: right;
+    }
+    .heap-stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .heap-stat-card {
+      background: var(--md-surface-container);
+      border-radius: var(--md-shape-md);
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .heap-stat-val {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      font-weight: 800;
+      color: var(--md-primary);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .heap-stat-lbl {
+      font-size: 0.75rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.3;
+    }
+
+    /* Reference table */
+    .error-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 0.875rem;
+      border-radius: var(--md-shape-md);
+      overflow: hidden;
+      border: 1px solid var(--md-outline-variant);
+    }
+    .error-table thead {
+      background: var(--md-surface-container);
+    }
+    .error-table th {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--md-on-surface-variant);
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .error-table td {
+      padding: 12px 16px;
+      color: var(--md-on-surface-variant);
+      border-bottom: 1px solid var(--md-outline-variant);
+      line-height: 1.55;
+      vertical-align: top;
+    }
+    .error-table tr:last-child td { border-bottom: none; }
+    .error-table tr:nth-child(even) td { background: var(--md-surface-container-low); }
+    .error-table code {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      padding: 1px 6px;
+      background: var(--md-surface-container-high);
+      border-radius: var(--md-shape-xs);
+      color: var(--md-primary);
+    }
+    .risk-high   { color: var(--md-error);   font-weight: 600; }
+    .risk-medium { color: #92400e; font-weight: 600; }
+    .risk-low    { color: #065f46; font-weight: 600; }
+
+    @media (max-width: 640px) {
+      .heap-stats-row { grid-template-columns: repeat(2, 1fr); }
+      .heap-context-label { min-width: 140px; font-size: 0.8125rem; }
+    }
+  </style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../tools.html">Tools</a></li>
+        <li><a href="../errors.html" class="active">Errors</a></li>
+        <li><a href="../guides.html">Guides</a></li>
+        <li><a href="../tips.html">Tips</a></li>
+        <li><a href="../prompts.html">Prompts</a></li>
+        <li><a href="../extensions.html">Extensions</a></li>
+        <li><a href="../resources.html">Resources</a></li>
+        <li><a href="../about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0">
+        <span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd>
+      </div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap">
+        <span class="material-symbols-rounded">search</span>
+        <input type="text" placeholder="Search errors...">
+      </div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a>
+        <span class="separator">/</span>
+        <a href="../errors.html">Errors</a>
+        <span class="separator">/</span>
+        <span class="current">Apex Heap Size Too Large</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-error">Governor Limit</span>
+        <span class="tag tag-primary">Heap</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">Apex Heap Size Too Large</h1>
+      <p class="reveal stagger-4">System.LimitException — Your Apex transaction exceeded the heap memory limit. Reduce in-memory collections and use <code>transient</code> variables to fix it.</p>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+
+        <!-- Main Content -->
+        <div class="article-content">
+
+          <!-- Error callout -->
+          <div class="callout callout-error reveal">
+            <span class="material-symbols-rounded">error</span>
+            <div>
+              <p style="font-family:var(--font-mono);font-size:0.875rem">
+                <strong>System.LimitException:</strong> Apex heap size too large: 6291457
+              </p>
+            </div>
+          </div>
+
+          <!-- What does it mean -->
+          <h2 id="what" class="reveal">What does this error mean?</h2>
+          <p class="reveal">The Apex heap is the portion of memory allocated to your transaction for storing variables, collections, objects, and strings during execution. When the total memory consumed by all live objects in your transaction exceeds the limit, Salesforce throws this exception and rolls back all work.</p>
+          <p class="reveal">Unlike CPU or SOQL limits, heap consumption is cumulative — every object you instantiate and every string you build stays in memory until it goes out of scope or the transaction ends.</p>
+
+          <!-- Heap limits panel -->
+          <div class="heap-limits-panel reveal">
+            <div class="heap-limits-panel-title">Heap limits by context</div>
+
+            <div class="heap-context-rows">
+              <div class="heap-context-row">
+                <span class="heap-context-label">Synchronous Apex</span>
+                <div class="heap-context-bar-wrap">
+                  <div class="heap-context-bar" style="width:50%"></div>
+                </div>
+                <span class="heap-context-val">6 MB</span>
+              </div>
+              <div class="heap-context-row">
+                <span class="heap-context-label">Asynchronous Apex (Batch, Queueable, Future)</span>
+                <div class="heap-context-bar-wrap">
+                  <div class="heap-context-bar" style="width:100%"></div>
+                </div>
+                <span class="heap-context-val">12 MB</span>
+              </div>
+              <div class="heap-context-row">
+                <span class="heap-context-label">Typical warning threshold</span>
+                <div class="heap-context-bar-wrap">
+                  <div class="heap-context-bar" style="width:42%;background:#f59e0b"></div>
+                </div>
+                <span class="heap-context-val" style="color:#92400e">~5 MB</span>
+              </div>
+            </div>
+
+            <div class="heap-stats-row">
+              <div class="heap-stat-card">
+                <div class="heap-stat-val">6 MB</div>
+                <div class="heap-stat-lbl">Sync limit</div>
+              </div>
+              <div class="heap-stat-card">
+                <div class="heap-stat-val">12 MB</div>
+                <div class="heap-stat-lbl">Async limit</div>
+              </div>
+              <div class="heap-stat-card">
+                <div class="heap-stat-val">~300B</div>
+                <div class="heap-stat-lbl">Avg SObject in memory</div>
+              </div>
+              <div class="heap-stat-card">
+                <div class="heap-stat-val">~20k</div>
+                <div class="heap-stat-lbl">Max SObjects at 6 MB</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Common Causes -->
+          <h2 id="causes" class="reveal">Common Causes</h2>
+
+          <h3 class="reveal">1. Querying Too Many Fields on Too Many Records</h3>
+          <p class="reveal">The single biggest contributor to heap bloat. Every field you select in a SOQL query is loaded into memory for every record returned. A query selecting 50 fields on 5,000 records can easily exhaust 6 MB.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Bad Example</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// ❌ BAD: SELECT * equivalent — loads every field into heap</span>
+List&lt;Account&gt; accounts = [
+    <span class="code-keyword">SELECT</span> Id, Name, Phone, Fax, Website, Industry,
+           AnnualRevenue, NumberOfEmployees, Description,
+           BillingStreet, BillingCity, BillingState,
+           ShippingStreet, ShippingCity, ShippingState
+           <span class="code-comment">/* 40 more fields... */</span>
+    <span class="code-keyword">FROM</span> Account
+    <span class="code-keyword">LIMIT</span> <span class="code-number">5000</span>
+];</code></pre>
+          </div>
+
+          <h3 class="reveal">2. Storing Entire Query Results When Only IDs Are Needed</h3>
+          <p class="reveal">Keeping a full <code>List&lt;SObject&gt;</code> in memory to iterate IDs is wasteful. Storing the full record means all its fields occupy heap space even if you only ever access one or two.</p>
+
+          <h3 class="reveal">3. Large JSON Serialization</h3>
+          <p class="reveal">Calling <code>JSON.serialize()</code> on a large collection creates a new String object in heap that can be just as large as the original collection — effectively doubling the memory cost temporarily.</p>
+
+          <h3 class="reveal">4. Building Large Strings Incrementally</h3>
+          <p class="reveal">Concatenating strings in a loop keeps intermediate String objects alive in the heap. A loop that builds a 4 MB string incrementally may peak at well over 6 MB due to intermediate allocations.</p>
+
+          <h3 class="reveal">5. Retaining References to Large Collections Across Methods</h3>
+          <p class="reveal">Holding static references to large collections (e.g., in a static map cache) means those objects are never garbage-collected during the transaction, even after the method that created them returns.</p>
+
+          <!-- Reference table -->
+          <table class="error-table reveal">
+            <thead>
+              <tr>
+                <th>Object / Operation</th>
+                <th>Approx. Heap Cost</th>
+                <th>Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>SObject with 10 fields selected</td>
+                <td>~300–500 bytes each</td>
+                <td><span class="risk-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>SObject with 50 fields selected</td>
+                <td>~2–4 KB each</td>
+                <td><span class="risk-high">High</span></td>
+              </tr>
+              <tr>
+                <td><code>JSON.serialize()</code> of 1,000 records</td>
+                <td>1–5 MB</td>
+                <td><span class="risk-high">High</span></td>
+              </tr>
+              <tr>
+                <td>String built in a loop (10k iterations)</td>
+                <td>Variable, often 2–8 MB peak</td>
+                <td><span class="risk-high">High</span></td>
+              </tr>
+              <tr>
+                <td><code>Set&lt;Id&gt;</code> with 10,000 entries</td>
+                <td>~400 KB</td>
+                <td><span class="risk-low">Low</span></td>
+              </tr>
+              <tr>
+                <td><code>Map&lt;Id, SObject&gt;</code> with 1,000 entries</td>
+                <td>~300 KB–4 MB (depends on fields)</td>
+                <td><span class="risk-medium">Medium</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Solutions -->
+          <h2 id="solution" class="reveal">How to Fix It</h2>
+
+          <h3 class="reveal">Solution 1: Select Only the Fields You Need</h3>
+          <p class="reveal">This is the highest-impact fix. Audit every SOQL query and remove fields that are not used in the logic that follows. Even saving 5 fields per record across 5,000 records can reclaim megabytes of heap.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Correct</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// ✅ GOOD: Only select what the logic actually uses</span>
+List&lt;Account&gt; accounts = [
+    <span class="code-keyword">SELECT</span> Id, Name, Industry
+    <span class="code-keyword">FROM</span> Account
+    <span class="code-keyword">WHERE</span> IsActive__c = <span class="code-keyword">true</span>
+    <span class="code-keyword">LIMIT</span> <span class="code-number">5000</span>
+];
+
+<span class="code-comment">// If you only need IDs for a Set, don't load full SObjects</span>
+Set&lt;Id&gt; accountIds = <span class="code-keyword">new</span> Map&lt;Id, Account&gt;([
+    <span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> Account <span class="code-keyword">WHERE</span> IsActive__c = <span class="code-keyword">true</span>
+]).keySet();</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 2: Use <code>transient</code> Variables in Visualforce / Aura</h3>
+          <p class="reveal">In Visualforce controllers and Aura components, mark large intermediate variables as <code>transient</code>. Transient variables are excluded from the view state and are not serialized to heap between requests.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Visualforce Controller</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-keyword">public class</span> <span class="code-type">AccountController</span> {
+
+    <span class="code-comment">// ✅ transient — not stored in view state between postbacks</span>
+    <span class="code-keyword">transient public</span> List&lt;Account&gt; largeAccountList { <span class="code-keyword">get</span>; <span class="code-keyword">set</span>; }
+
+    <span class="code-comment">// Persisted in view state — keep this small</span>
+    <span class="code-keyword">public</span> String selectedAccountId { <span class="code-keyword">get</span>; <span class="code-keyword">set</span>; }
+
+    <span class="code-keyword">public void</span> <span class="code-function">loadAccounts</span>() {
+        <span class="code-comment">// Re-queried on every postback — transient handles this</span>
+        largeAccountList = [
+            <span class="code-keyword">SELECT</span> Id, Name, Industry
+            <span class="code-keyword">FROM</span> Account
+            <span class="code-keyword">LIMIT</span> <span class="code-number">1000</span>
+        ];
+    }
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 3: Process Records in Chunks with SOQL <code>for</code> Loops</h3>
+          <p class="reveal">A SOQL <code>for</code> loop retrieves records in internal chunks of 200 and releases each chunk from heap after processing. This prevents you from loading the full result set into memory at once.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — SOQL for() Loop</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// ❌ Loads ALL 50,000 records into heap at once</span>
+List&lt;Contact&gt; all = [<span class="code-keyword">SELECT</span> Id, Email <span class="code-keyword">FROM</span> Contact];
+<span class="code-keyword">for</span> (Contact c : all) { process(c); }
+
+<span class="code-comment">// ✅ Streams 200 records at a time — heap stays flat</span>
+<span class="code-keyword">for</span> (List&lt;Contact&gt; chunk : [<span class="code-keyword">SELECT</span> Id, Email <span class="code-keyword">FROM</span> Contact]) {
+    processChunk(chunk); <span class="code-comment">// chunk released after each iteration</span>
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 4: Null Out Large References When Done</h3>
+          <p class="reveal">Apex's garbage collector runs opportunistically. Setting large collections to <code>null</code> after they are no longer needed makes them eligible for collection sooner, freeing heap for subsequent operations.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code>List&lt;Account&gt; accounts = [<span class="code-keyword">SELECT</span> Id, Name <span class="code-keyword">FROM</span> Account <span class="code-keyword">LIMIT</span> <span class="code-number">5000</span>];
+Set&lt;Id&gt; accountIds = buildIdSet(accounts);
+
+<span class="code-comment">// Done with the full records — release them</span>
+accounts = <span class="code-keyword">null</span>;
+
+<span class="code-comment">// Continue processing using only the lightweight ID set</span>
+List&lt;Contact&gt; contacts = [
+    <span class="code-keyword">SELECT</span> Id, Email
+    <span class="code-keyword">FROM</span> Contact
+    <span class="code-keyword">WHERE</span> AccountId <span class="code-keyword">IN</span> :accountIds
+];</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 5: Monitor Heap Consumption</h3>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Check heap at critical points during development</span>
+System.debug(<span class="code-string">'Heap used : '</span> + Limits.getHeapSize()      + <span class="code-string">' bytes'</span>);
+System.debug(<span class="code-string">'Heap limit: '</span> + Limits.getLimitHeapSize()  + <span class="code-string">' bytes'</span>);
+System.debug(<span class="code-string">'Used %    : '</span>
+    + ((Limits.getHeapSize() * <span class="code-number">100</span>)
+        / Limits.getLimitHeapSize())
+    + <span class="code-string">'%'</span>
+);</code></pre>
+          </div>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <div>
+              <p><strong>Pro Tip:</strong> In debug logs, search for <code>HEAP_ALLOCATE</code> entries to see exactly which lines are allocating the most memory. The Apex Replay Debugger in VS Code can also show live heap values at each checkpoint, making it much easier to pinpoint the allocating culprit.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Table of Contents -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+            <a href="#causes">Common Causes</a>
+            <a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+           <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="../tools.html">Tools</a></li>
+            <li><a href="../errors.html">Errors</a></li>
+            <li><a href="../guides.html">Guides</a></li>
+            <li><a href="../extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="../tips.html">Tips</a></li>
+            <li><a href="../resources.html">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="../about.html">About</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top">
+    <span class="material-symbols-rounded">arrow_upward</span>
+  </button>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fix: Too Many DML Rows 10001 — Salesforce Error Solution | Salesforce Decoded</title>
+<meta name="description" content="Fix the 'Too many DML rows: 10001' governor limit error in Salesforce Apex. Learn how to split work into Batch Apex and reduce DML row consumption."/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',system-ui,sans-serif;background:#f8fafc;color:#0f172a;line-height:1.7;font-size:16px}
+nav{background:#0f172a;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;gap:2rem;height:60px}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.nav-logo-icon{width:30px;height:30px;background:#0070d2;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff}
+.nav-logo-text{font-weight:600;font-size:15px;color:#f1f5f9;letter-spacing:-0.01em}
+.nav-links{display:flex;gap:0;list-style:none;margin-left:auto}
+.nav-links a{color:#94a3b8;text-decoration:none;font-size:13.5px;padding:0 12px;height:60px;display:flex;align-items:center;transition:color .15s;border-bottom:2px solid transparent}
+.nav-links a:hover{color:#e2e8f0}
+.nav-links a.active{color:#fff;border-bottom-color:#0070d2}
+.page-wrap{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+.breadcrumb{padding:1.25rem 0 0;font-size:13px;color:#64748b;display:flex;align-items:center;gap:6px}
+.breadcrumb a{color:#64748b;text-decoration:none}.breadcrumb a:hover{color:#0070d2}
+.breadcrumb span{color:#94a3b8}
+.content-grid{display:grid;grid-template-columns:1fr 220px;gap:3rem;padding:1.5rem 0 4rem;align-items:start}
+@media(max-width:900px){.content-grid{grid-template-columns:1fr}.sidebar{display:none}}
+article{min-width:0}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem}
+.badge{display:inline-flex;align-items:center;font-size:12px;font-weight:500;padding:3px 10px;border-radius:99px;letter-spacing:0.01em}
+.badge-governor{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.badge-code{background:#fef2f2;color:#9f1239;border:1px solid #fecdd3;font-family:'SF Mono','Fira Code',monospace;font-size:11px}
+h1{font-size:2rem;font-weight:700;line-height:1.2;color:#0f172a;margin-bottom:.75rem;letter-spacing:-0.02em}
+.subtitle{font-size:1rem;color:#475569;margin-bottom:1.75rem;line-height:1.6}
+.err-box{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:1rem 1.25rem;margin-bottom:2rem;display:flex;align-items:flex-start;gap:10px}
+.err-icon{color:#f87171;font-size:13px;font-weight:600;background:#3f0f0f;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.err-msg{font-family:'SF Mono','Fira Code','Courier New',monospace;font-size:13.5px;color:#fca5a5;line-height:1.5}
+.err-msg strong{color:#f87171;font-weight:600}
+h2{font-size:1.2rem;font-weight:700;color:#0f172a;margin:2.25rem 0 .9rem;padding-bottom:.6rem;border-bottom:2px solid #e2e8f0;letter-spacing:-0.01em}
+h3{font-size:1rem;font-weight:600;color:#1e293b;margin:1.5rem 0 .6rem}
+p{color:#374151;margin-bottom:1rem;font-size:.9625rem}
+ul,ol{padding-left:1.5rem;margin-bottom:1rem}
+li{color:#374151;font-size:.9625rem;margin-bottom:.35rem}
+code{font-family:'SF Mono','Fira Code','Courier New',monospace;font-size:.835rem;background:#f1f5f9;color:#1e40af;padding:1px 5px;border-radius:4px;border:1px solid #e2e8f0}
+.code-block{margin:1rem 0 1.5rem;border-radius:10px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#1e293b;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.code-lang{font-size:12px;color:#94a3b8;font-weight:500}
+.code-copy{font-size:11px;color:#64748b;background:none;border:1px solid #334155;border-radius:4px;padding:2px 8px;cursor:pointer;font-family:inherit}
+pre{background:#0f172a;padding:1.15rem 1.25rem;overflow-x:auto;margin:0}
+pre code{background:none;border:none;color:#e2e8f0;font-size:13px;padding:0;border-radius:0;line-height:1.65}
+.kw{color:#7dd3fc}.str{color:#86efac}.cm{color:#64748b;font-style:italic}.cls{color:#fde68a}.fn{color:#c4b5fd}.num{color:#fb923c}.ann{color:#fbbf24}
+.tip-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem 1.25rem;margin:1.75rem 0;display:flex;gap:10px}
+.tip-icon{color:#1d4ed8;font-size:16px;flex-shrink:0;margin-top:2px}
+.tip-content{font-size:.9rem;color:#1e3a8a;line-height:1.6}
+.tip-content strong{color:#1e40af}
+.stat-row{display:flex;gap:12px;margin:1.25rem 0 1.75rem;flex-wrap:wrap}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:.85rem 1.25rem;text-align:center;min-width:130px}
+.stat-val{font-size:1.5rem;font-weight:700;color:#0f172a}
+.stat-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.sidebar{position:sticky;top:80px}
+.sidebar-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1.1rem 1.25rem}
+.sidebar-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin-bottom:.85rem}
+.sidebar-nav{list-style:none;padding:0;display:flex;flex-direction:column;gap:2px}
+.sidebar-nav a{display:block;font-size:13.5px;color:#475569;text-decoration:none;padding:5px 8px;border-radius:6px;border-left:2px solid transparent;transition:all .15s}
+.sidebar-nav a:hover{color:#0070d2;background:#eff6ff;border-left-color:#93c5fd}
+footer{background:#0f172a;border-top:1px solid #1e293b;padding:2.5rem 1.5rem}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem}
+.footer-brand p{font-size:13px;color:#64748b;margin-top:.5rem;line-height:1.6;max-width:240px}
+.footer-col h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#475569;margin-bottom:.85rem}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:.4rem}
+.footer-col a{font-size:13px;color:#64748b;text-decoration:none}
+.footer-col a:hover{color:#94a3b8}
+.footer-bottom{border-top:1px solid #1e293b;padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto}
+.footer-bottom span{font-size:13px;color:#475569}
+.footer-links{display:flex;gap:1rem}
+.footer-links a{font-size:13px;color:#475569;text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="https://sfdecoded.netlify.app/" class="nav-logo">
+      <div class="nav-logo-icon">SF</div>
+      <span class="nav-logo-text">SalesforceDecoded</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://sfdecoded.netlify.app/">Home</a></li>
+      <li><a href="https://sfdecoded.netlify.app/tools">Tools</a></li>
+      <li><a href="https://sfdecoded.netlify.app/errors" class="active">Errors</a></li>
+      <li><a href="https://sfdecoded.netlify.app/guides">Guides</a></li>
+      <li><a href="https://sfdecoded.netlify.app/tips">Tips</a></li>
+      <li><a href="https://sfdecoded.netlify.app/prompts">Prompts</a></li>
+      <li><a href="https://sfdecoded.netlify.app/extensions">Extensions</a></li>
+      <li><a href="https://sfdecoded.netlify.app/resources">Resources</a></li>
+      <li><a href="https://sfdecoded.netlify.app/about">About</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="https://sfdecoded.netlify.app/">Home</a>
+    <span>/</span>
+    <a href="https://sfdecoded.netlify.app/errors">Errors</a>
+    <span>/</span>
+    Too Many DML Rows 10001
+  </div>
+
+  <div class="content-grid">
+    <article>
+      <div class="badges">
+        <span class="badge badge-governor">Governor Limit</span>
+        <span class="badge badge-code">DML_ROW_LIMIT_EXCEEDED</span>
+      </div>
+
+      <h1>Too Many DML Rows: 10001</h1>
+      <p class="subtitle">Your Apex transaction attempted to insert, update, delete, or upsert more than 10,000 records in a single synchronous transaction, hitting the DML row governor limit.</p>
+
+      <div class="err-box">
+        <span class="err-icon">error</span>
+        <div class="err-msg"><strong>System.LimitException:</strong> Too many DML rows: 10001</div>
+      </div>
+
+      <h2 id="what">What does this error mean?</h2>
+      <p>Salesforce caps the total number of records that can be written in a single transaction. This limit is shared across <em>all</em> DML operations in the transaction — inserts, updates, deletes, upserts, and undeletes all count against the same pool. Once the cumulative row count reaches 10,001, the platform throws a <code>System.LimitException</code> and rolls back the entire transaction.</p>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-val">10,000</div>
+          <div class="stat-label">Sync row limit</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">10,000</div>
+          <div class="stat-label">Async row limit</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">per execute()</div>
+          <div class="stat-label">Batch Apex scope</div>
+        </div>
+      </div>
+
+      <p>Importantly, Batch Apex <em>does not</em> automatically raise this limit — each <code>execute()</code> call is its own transaction, with its own 10,000 row cap. Batch Apex helps by splitting large datasets into smaller transactions, not by providing a higher per-transaction limit.</p>
+
+      <h2 id="causes">Common Causes</h2>
+
+      <h3>1. Processing large datasets in a single synchronous transaction</h3>
+      <p>A scheduled job, a screen flow's bulk action, or a direct Apex invocation attempts to update tens of thousands of records at once — for example, a mass re-assignment of Account owners when a sales rep leaves.</p>
+
+      <h3>2. Cascade DML: one record triggers updates to many children</h3>
+      <p>A trigger on a parent object updates the parent record and then iterates over all child records to update them too. With a high-volume parent (e.g., an Account with thousands of Contacts or Opportunities), the combined row count of parent + children exceeds 10,000 in a single trigger transaction.</p>
+
+      <h3>3. Multiple DML operations on overlapping datasets</h3>
+      <p>A single transaction performs an insert of 5,000 records, then an update of 3,000 records, then a delete of 2,500 records. Each operation is individually within limits, but the cumulative total of 10,500 rows exceeds the cap.</p>
+
+      <h2 id="solution">How to Fix It</h2>
+
+      <h3>Solution 1: Use Batch Apex to chunk the work</h3>
+      <p>Batch Apex is the primary tool for processing more than 10,000 records. Each <code>execute()</code> call processes a configurable chunk (default 200 rows, max 2,000), with its own fresh transaction and DML row counter.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Apex</span>
+          <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
+        </div>
+        <pre><code><span class="kw">public class</span> <span class="cls">MassReassignBatch</span> <span class="kw">implements</span> <span class="cls">Database</span>.<span class="cls">Batchable</span>&lt;<span class="cls">SObject</span>&gt; {
+
+    <span class="kw">private</span> <span class="cls">Id</span> newOwnerId;
+
+    <span class="kw">public</span> <span class="fn">MassReassignBatch</span>(<span class="cls">Id</span> ownerId) {
+        <span class="kw">this</span>.newOwnerId = ownerId;
+    }
+
+    <span class="kw">public</span> <span class="cls">Database</span>.<span class="cls">QueryLocator</span> <span class="fn">start</span>(<span class="cls">Database</span>.<span class="cls">BatchableContext</span> bc) {
+        <span class="kw">return</span> <span class="cls">Database</span>.<span class="fn">getQueryLocator</span>(
+            <span class="str">'SELECT Id, OwnerId FROM Account WHERE OwnerId = :oldOwner'</span>
+        );
+    }
+
+    <span class="kw">public void</span> <span class="fn">execute</span>(<span class="cls">Database</span>.<span class="cls">BatchableContext</span> bc,
+                         <span class="cls">List</span>&lt;<span class="cls">Account</span>&gt; scope) {
+        <span class="kw">for</span> (<span class="cls">Account</span> acc : scope) {
+            acc.OwnerId = newOwnerId;
+        }
+        <span class="cm">// Processes 200 rows per transaction — well within limits</span>
+        <span class="cls">Database</span>.<span class="fn">update</span>(scope, <span class="kw">false</span>); <span class="cm">// partial success</span>
+    }
+
+    <span class="kw">public void</span> <span class="fn">finish</span>(<span class="cls">Database</span>.<span class="cls">BatchableContext</span> bc) {
+        <span class="cm">// Notify on completion</span>
+    }
+}
+
+<span class="cm">// Kick off the batch — processes all records, 200 at a time</span>
+<span class="cls">Database</span>.<span class="fn">executeBatch</span>(<span class="kw">new</span> <span class="cls">MassReassignBatch</span>(newOwnerId), <span class="num">200</span>);</code></pre>
+      </div>
+
+      <h3>Solution 2: Check limits proactively with Limits class</h3>
+      <p>Use <code>Limits.getDmlRows()</code> and <code>Limits.getLimitDmlRows()</code> to monitor how many DML rows have been consumed at key checkpoints and stop or reroute processing before hitting the ceiling.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Apex</span>
+          <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
+        </div>
+        <pre><code><span class="kw">public static void</span> <span class="fn">processBatch</span>(<span class="cls">List</span>&lt;<span class="cls">Account</span>&gt; accounts) {
+    <span class="cls">Integer</span> remaining = <span class="cls">Limits</span>.<span class="fn">getLimitDmlRows</span>() - <span class="cls">Limits</span>.<span class="fn">getDmlRows</span>();
+    <span class="cls">System</span>.<span class="fn">debug</span>(<span class="str">'DML rows remaining: '</span> + remaining);
+
+    <span class="kw">if</span> (accounts.<span class="fn">size</span>() &gt; remaining) {
+        <span class="cm">// Too many records for this transaction — enqueue overflow</span>
+        <span class="cls">List</span>&lt;<span class="cls">Account</span>&gt; safe = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">Account</span>&gt;(
+            accounts.<span class="fn">subList</span>(<span class="num">0</span>, remaining - <span class="num">1</span>)
+        );
+        update safe;
+        <span class="cm">// Queue the rest asynchronously</span>
+        <span class="cls">System</span>.<span class="fn">enqueueJob</span>(<span class="kw">new</span> <span class="cls">AccountUpdateJob</span>(
+            accounts.<span class="fn">subList</span>(remaining - <span class="num">1</span>, accounts.<span class="fn">size</span>())
+        ));
+    } <span class="kw">else</span> {
+        update accounts;
+    }
+}</code></pre>
+      </div>
+
+      <h3>Solution 3: Reduce unnecessary DML with conditional updates</h3>
+      <p>Before performing DML, compare field values to determine which records actually need updating. Skipping records whose values haven't changed can dramatically reduce your row count.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Apex</span>
+          <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
+        </div>
+        <pre><code><span class="cls">List</span>&lt;<span class="cls">Account</span>&gt; toUpdate = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">Account</span>&gt;();
+<span class="cls">Map</span>&lt;<span class="cls">Id</span>,<span class="cls">Account</span>&gt; oldMap = Trigger.oldMap;
+
+<span class="kw">for</span> (<span class="cls">Account</span> acc : Trigger.new) {
+    <span class="cm">// Only add records where the relevant field actually changed</span>
+    <span class="kw">if</span> (acc.Rating != oldMap.<span class="fn">get</span>(acc.Id).Rating) {
+        toUpdate.<span class="fn">add</span>(acc);
+    }
+}
+
+<span class="kw">if</span> (!toUpdate.isEmpty()) {
+    update toUpdate; <span class="cm">// Only update what changed</span>
+}</code></pre>
+      </div>
+
+      <div class="tip-box">
+        <span class="tip-icon">💡</span>
+        <div class="tip-content">
+          <strong>Pro Tip:</strong> Use <code>Limits.getDmlRows()</code> in debug logs or in a <code>System.debug()</code> statement to measure DML row consumption at critical points in your transaction. Add this check in your trigger handlers to get early warning before you hit the limit in production. For large-scale data operations, always default to Batch Apex with a batch size of 200, which gives you comfortable headroom for any trigger-fired child updates.
+        </div>
+      </div>
+    </article>
+
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">On this page</div>
+        <ul class="sidebar-nav">
+          <li><a href="#what">What does this mean?</a></li>
+          <li><a href="#causes">Common Causes</a></li>
+          <li><a href="#solution">How to Fix It</a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="https://sfdecoded.netlify.app/" class="nav-logo">
+        <div class="nav-logo-icon">SF</div>
+        <span class="nav-logo-text">SalesforceDecoded</span>
+      </a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developers, for developers.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul>
+      <li><a href="https://sfdecoded.netlify.app/tools">Tools</a></li>
+      <li><a href="https://sfdecoded.netlify.app/errors">Errors</a></li>
+      <li><a href="https://sfdecoded.netlify.app/guides">Guides</a></li>
+      <li><a href="https://sfdecoded.netlify.app/extensions">Extensions</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul>
+      <li><a href="https://sfdecoded.netlify.app/tips">Tips</a></li>
+      <li><a href="https://sfdecoded.netlify.app/resources">Resources</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Community</h4><ul>
+      <li><a href="https://sfdecoded.netlify.app/about">About</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Salesforce Decoded.</span>
+    <div class="footer-links">
+      <a href="https://sfdecoded.netlify.app/">code</a>
+      <a href="mailto:sfdecoded@gmail.com">mail</a>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

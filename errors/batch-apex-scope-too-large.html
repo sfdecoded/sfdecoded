@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fix: Batch Apex Scope Too Large — Salesforce Error Solution | Salesforce Decoded</title>
+<meta name="description" content="Fix Database.executeBatch called with a scope greater than 2000. Learn the right batch scope size for each job type."/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',system-ui,sans-serif;background:#f8fafc;color:#0f172a;line-height:1.7;font-size:16px}
+nav{background:#0f172a;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;gap:2rem;height:60px}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.nav-logo-icon{width:30px;height:30px;background:#0070d2;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff}
+.nav-logo-text{font-weight:600;font-size:15px;color:#f1f5f9;letter-spacing:-0.01em}
+.nav-links{display:flex;gap:0;list-style:none;margin-left:auto}
+.nav-links a{color:#94a3b8;text-decoration:none;font-size:13.5px;padding:0 12px;height:60px;display:flex;align-items:center;transition:color .15s;border-bottom:2px solid transparent}
+.nav-links a:hover{color:#e2e8f0}
+.nav-links a.active{color:#fff;border-bottom-color:#0070d2}
+.page-wrap{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+.breadcrumb{padding:1.25rem 0 0;font-size:13px;color:#64748b;display:flex;align-items:center;gap:6px}
+.breadcrumb a{color:#64748b;text-decoration:none}.breadcrumb a:hover{color:#0070d2}
+.breadcrumb span{color:#94a3b8}
+.content-grid{display:grid;grid-template-columns:1fr 220px;gap:3rem;padding:1.5rem 0 4rem;align-items:start}
+@media(max-width:900px){.content-grid{grid-template-columns:1fr}.sidebar{display:none}}
+article{min-width:0}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem}
+.badge{display:inline-flex;align-items:center;font-size:12px;font-weight:500;padding:3px 10px;border-radius:99px;letter-spacing:0.01em}
+.badge-governor{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.badge-dml{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.badge-query{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.badge-runtime{background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe}
+.badge-syntax{background:#fefce8;color:#a16207;border:1px solid #fde68a}
+.badge-deploy{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.badge-lwc{background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7}
+.badge-code{background:#fef2f2;color:#9f1239;border:1px solid #fecdd3;font-family:'SF Mono','Fira Code',monospace;font-size:11px}
+h1{font-size:2rem;font-weight:700;line-height:1.2;color:#0f172a;margin-bottom:.75rem;letter-spacing:-0.02em}
+.subtitle{font-size:1rem;color:#475569;margin-bottom:1.75rem;line-height:1.6}
+.err-box{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:1rem 1.25rem;margin-bottom:2rem;display:flex;align-items:flex-start;gap:10px}
+.err-icon{color:#f87171;font-size:13px;font-weight:600;background:#3f0f0f;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.err-msg{font-family:'SF Mono','Fira Code','Courier New',monospace;font-size:13.5px;color:#fca5a5;line-height:1.5}
+.err-msg strong{color:#f87171;font-weight:600}
+h2{font-size:1.2rem;font-weight:700;color:#0f172a;margin:2.25rem 0 .9rem;padding-bottom:.6rem;border-bottom:2px solid #e2e8f0;letter-spacing:-0.01em}
+h3{font-size:1rem;font-weight:600;color:#1e293b;margin:1.5rem 0 .6rem}
+p{color:#374151;margin-bottom:1rem;font-size:.9625rem}
+ul,ol{padding-left:1.5rem;margin-bottom:1rem}
+li{color:#374151;font-size:.9625rem;margin-bottom:.35rem}
+code{font-family:'SF Mono','Fira Code','Courier New',monospace;font-size:.835rem;background:#f1f5f9;color:#1e40af;padding:1px 5px;border-radius:4px;border:1px solid #e2e8f0}
+.code-block{margin:1rem 0 1.5rem;border-radius:10px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#1e293b;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.code-lang{font-size:12px;color:#94a3b8;font-weight:500}
+.code-copy{font-size:11px;color:#64748b;background:none;border:1px solid #334155;border-radius:4px;padding:2px 8px;cursor:pointer;font-family:inherit}
+.code-copy:hover{color:#94a3b8}
+pre{background:#0f172a;padding:1.15rem 1.25rem;overflow-x:auto;margin:0}
+pre code{background:none;border:none;color:#e2e8f0;font-size:13px;padding:0;border-radius:0;line-height:1.65}
+.kw{color:#7dd3fc}.str{color:#86efac}.cm{color:#64748b;font-style:italic}.cls{color:#fde68a}.fn{color:#c4b5fd}.num{color:#fb923c}.ann{color:#fbbf24}.prop{color:#93c5fd}
+.tip-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem 1.25rem;margin:1.75rem 0;display:flex;gap:10px}
+.tip-icon{font-size:16px;flex-shrink:0;margin-top:2px}
+.tip-content{font-size:.9rem;color:#1e3a8a;line-height:1.6}
+.tip-content strong{color:#1e40af}
+.stat-row{display:flex;gap:12px;margin:1.25rem 0 1.75rem;flex-wrap:wrap}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:.85rem 1.25rem;text-align:center;min-width:120px}
+.stat-val{font-size:1.5rem;font-weight:700;color:#0f172a}
+.stat-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.warn-box{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0 1.75rem;display:flex;gap:10px}
+.warn-content{font-size:.9rem;color:#78350f;line-height:1.6}
+.warn-content strong{color:#92400e}
+.sidebar{position:sticky;top:80px}
+.sidebar-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1.1rem 1.25rem}
+.sidebar-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin-bottom:.85rem}
+.sidebar-nav{list-style:none;padding:0;display:flex;flex-direction:column;gap:2px}
+.sidebar-nav a{display:block;font-size:13.5px;color:#475569;text-decoration:none;padding:5px 8px;border-radius:6px;border-left:2px solid transparent;transition:all .15s}
+.sidebar-nav a:hover{color:#0070d2;background:#eff6ff;border-left-color:#93c5fd}
+footer{background:#0f172a;border-top:1px solid #1e293b;padding:2.5rem 1.5rem}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem}
+.footer-brand p{font-size:13px;color:#64748b;margin-top:.5rem;line-height:1.6;max-width:240px}
+.footer-col h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#475569;margin-bottom:.85rem}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:.4rem}
+.footer-col a{font-size:13px;color:#64748b;text-decoration:none}
+.footer-col a:hover{color:#94a3b8}
+.footer-bottom{border-top:1px solid #1e293b;padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto}
+.footer-bottom span{font-size:13px;color:#475569}
+.footer-links{display:flex;gap:1rem}
+.footer-links a{font-size:13px;color:#475569;text-decoration:none}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="https://sfdecoded.netlify.app/" class="nav-logo">
+      <div class="nav-logo-icon">SF</div>
+      <span class="nav-logo-text">SalesforceDecoded</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://sfdecoded.netlify.app/">Home</a></li>
+      <li><a href="https://sfdecoded.netlify.app/tools">Tools</a></li>
+      <li><a href="https://sfdecoded.netlify.app/errors" class="active">Errors</a></li>
+      <li><a href="https://sfdecoded.netlify.app/guides">Guides</a></li>
+      <li><a href="https://sfdecoded.netlify.app/tips">Tips</a></li>
+      <li><a href="https://sfdecoded.netlify.app/prompts">Prompts</a></li>
+      <li><a href="https://sfdecoded.netlify.app/extensions">Extensions</a></li>
+      <li><a href="https://sfdecoded.netlify.app/resources">Resources</a></li>
+      <li><a href="https://sfdecoded.netlify.app/about">About</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="https://sfdecoded.netlify.app/">Home</a>
+    <span>/</span>
+    <a href="https://sfdecoded.netlify.app/errors">Errors</a>
+    <span>/</span>
+    Batch Apex Scope Too Large
+  </div>
+  <div class="content-grid">
+    <article>
+      <div class="badges"><span class="badge badge-governor">Governor Limit</span><span class="badge badge-code">BATCH_SCOPE_TOO_LARGE</span></div>
+      <h1>Batch Apex Scope Too Large</h1>
+<p class="subtitle">The batch size passed to <code>Database.executeBatch()</code> exceeds the maximum allowed value of 2,000 records per batch execution chunk.</p>
+<div class="err-box"><span class="err-icon">error</span><div class="err-msg"><strong>System.AsyncException:</strong> Database.executeBatch called with a scope greater than 2,000. Specified scope: [N]</div></div>
+<h2 id="what">What does this error mean?</h2>
+<p>The second argument to <code>Database.executeBatch(batchInstance, scope)</code> specifies how many records are passed to each <code>execute()</code> invocation. Salesforce caps this value at <strong>2,000</strong>. Passing any value greater than 2,000 throws a <code>System.AsyncException</code> immediately — the batch job is never submitted to the queue.</p>
+<div class="stat-row"><div class="stat-card"><div class="stat-val">200</div><div class="stat-label">Default scope (no arg)</div></div><div class="stat-card"><div class="stat-val">2,000</div><div class="stat-label">Maximum scope</div></div><div class="stat-card"><div class="stat-val">1</div><div class="stat-label">Minimum scope</div></div><div class="stat-card"><div class="stat-val">5M+</div><div class="stat-label">Records a single batch job can process</div></div></div>
+<p>Note that a larger scope is not always better — each <code>execute()</code> transaction has its own governor limits, and a scope of 2,000 with a complex trigger chain can easily hit the DML row or CPU time limit.</p>
+<h2 id="causes">Common Causes</h2>
+<h3>1. Hard-coded scope value above 2,000</h3>
+<p>A developer configures the scope size via a custom setting or constant with a value of 2,500, 5,000, or higher, not realising the platform hard cap is 2,000.</p>
+<div class="code-block">
+  <div class="code-header"><span class="code-lang">Apex — Bad Example</span><button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button></div>
+  <pre><code><span class="cm">// ❌ BAD: scope of 2001 exceeds the maximum</span>
+<span class="cls">Database</span>.<span class="fn">executeBatch</span>(<span class="kw">new</span> <span class="cls">MyBatch</span>(), <span class="num">2001</span>);
+<span class="cm">// Throws: Database.executeBatch called with a scope</span>
+<span class="cm">// greater than 2000. Specified scope: 2001</span></code></pre>
+</div>
+<h3>2. Scope read from a custom setting that was changed post-deployment</h3>
+<p>A batch job reads its scope size from a custom setting (<code>Batch_Config__c.Scope_Size__c</code>). An admin updates the setting to 2,500 to "improve performance," causing the batch to fail immediately at submission time.</p>
+<h3>3. Dynamic scope calculation producing values over 2,000</h3>
+<p>A formula like <code>totalRecords / numberOfBatches</code> can produce values exceeding 2,000 if the total record count is large and the number of batches is small.</p>
+<h2 id="solution">How to Fix It</h2>
+<h3>Solution 1: Keep scope within the 2,000 limit</h3>
+<p>Set the scope to 2,000 or below. For most DML-heavy jobs, 200 is the safest default, providing ample headroom for trigger-fired child record operations.</p>
+<div class="code-block">
+  <div class="code-header"><span class="code-lang">Apex — Correct</span><button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button></div>
+  <pre><code><span class="cm">// ✅ Use 200 for DML-heavy jobs (safe margin)</span>
+<span class="cls">Database</span>.<span class="fn">executeBatch</span>(<span class="kw">new</span> <span class="cls">MyBatch</span>(), <span class="num">200</span>);
+
+<span class="cm">// ✅ Use up to 2000 only for read-only or callout-heavy jobs</span>
+<span class="cm">//    where DML row count isn't a concern</span>
+<span class="cls">Database</span>.<span class="fn">executeBatch</span>(<span class="kw">new</span> <span class="cls">MyReadOnlyBatch</span>(), <span class="num">2000</span>);</code></pre>
+</div>
+<h3>Solution 2: Right-size scope based on job type</h3>
+<p>Choose scope based on what your <code>execute()</code> method actually does — specifically whether it issues DML, makes callouts, or is read-only. Use the following heuristics as a starting point.</p>
+<div class="code-block">
+  <div class="code-header"><span class="code-lang">Apex — Right-Sizing by Job Type</span><button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button></div>
+  <pre><code><span class="cm">// Choosing the right batch size:</span>
+
+<span class="cm">// DML-heavy (triggers fire on child records)</span>
+<span class="cm">// → Use 50–100 to stay under DML row limit</span>
+<span class="cls">Database</span>.<span class="fn">executeBatch</span>(<span class="kw">new</span> <span class="cls">AccountOwnerBatch</span>(), <span class="num">50</span>);
+
+<span class="cm">// Simple field updates, no complex triggers</span>
+<span class="cm">// → Default 200 is safe and efficient</span>
+<span class="cls">Database</span>.<span class="fn">executeBatch</span>(<span class="kw">new</span> <span class="cls">StatusUpdateBatch</span>(), <span class="num">200</span>);
+
+<span class="cm">// Read-only aggregation, no DML</span>
+<span class="cm">// → Maximise to 2000 for fewer job executions</span>
+<span class="cls">Database</span>.<span class="fn">executeBatch</span>(<span class="kw">new</span> <span class="cls">ReportingBatch</span>(), <span class="num">2000</span>);
+
+<span class="cm">// External callouts (one per record)</span>
+<span class="cm">// → Use 1–10; callout limit is 100 per transaction</span>
+<span class="cls">Database</span>.<span class="fn">executeBatch</span>(<span class="kw">new</span> <span class="cls">IntegrationBatch</span>(), <span class="num">10</span>);</code></pre>
+</div>
+<div class="tip-box"><span class="tip-icon">💡</span><div class="tip-content"><strong>Pro Tip:</strong> Expose batch scope as a <code>Batch_Settings__mdt</code> custom metadata record rather than a hard-coded value or a regular custom setting. Custom metadata is included in deployments and change sets, making scope configuration a code-reviewed, version-controlled decision rather than an admin-editable runtime value that can silently break batch jobs.</div></div>
+    </article>
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">On this page</div>
+        <ul class="sidebar-nav">
+          <li><a href="#what">What does this mean?</a></li>
+          <li><a href="#causes">Common Causes</a></li>
+          <li><a href="#solution">How to Fix It</a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="https://sfdecoded.netlify.app/" class="nav-logo">
+        <div class="nav-logo-icon">SF</div>
+        <span class="nav-logo-text">SalesforceDecoded</span>
+      </a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developers, for developers.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul>
+      <li><a href="https://sfdecoded.netlify.app/tools">Tools</a></li>
+      <li><a href="https://sfdecoded.netlify.app/errors">Errors</a></li>
+      <li><a href="https://sfdecoded.netlify.app/guides">Guides</a></li>
+      <li><a href="https://sfdecoded.netlify.app/extensions">Extensions</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul>
+      <li><a href="https://sfdecoded.netlify.app/tips">Tips</a></li>
+      <li><a href="https://sfdecoded.netlify.app/resources">Resources</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Community</h4><ul>
+      <li><a href="https://sfdecoded.netlify.app/about">About</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Salesforce Decoded.</span>
+    <div class="footer-links">
+      <a href="https://sfdecoded.netlify.app/">code</a>
+      <a href="mailto:sfdecoded@gmail.com">mail</a>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

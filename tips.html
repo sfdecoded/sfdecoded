@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Developer Tips — Salesforce Decoded</title>
+  <meta name="description" content="Quick productivity tips for Salesforce developers: keyboard shortcuts, VS Code tips, debugging techniques, and deployment best practices.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tips.html">
+  <link rel="stylesheet" href="css/style.css">
+   <link rel="icon" href="favicons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="favicons/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <style>
+    .tip-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--md-primary-container); color: var(--md-on-primary-container);
+      font-family: var(--font-display); font-size: 0.75rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .tip-row { display: flex; gap: 14px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid var(--md-outline-variant); }
+    .tip-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .tip-row:first-child { padding-top: 0; }
+  </style>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+</head>
+<body>
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+    <ul class="navbar-links">
+      <li><a href="index.html">Home</a></li><li><a href="tools.html">Tools</a></li>
+      <li><a href="errors.html">Errors</a></li><li><a href="guides.html">Guides</a></li>
+      <li><a href="tips.html" class="active">Tips</a></li><li><a href="prompts.html">Prompts</a></li><li><a href="extensions.html">Extensions</a></li>
+      <li><a href="resources.html">Resources</a></li><li><a href="about.html">About</a></li>
+    </ul>
+    <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+    <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+  </div></nav>
+
+  <div class="mobile-nav">
+    <a href="index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="tips.html" class="active"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="overline reveal"><span>Developer Tips</span></div>
+      <h1 class="display-medium reveal stagger-2">Productivity Tips</h1>
+      <p class="reveal stagger-3">Bite-sized tips to speed up your Salesforce development workflow every day.</p>
+    </div>
+  </header>
+
+  <!-- ── Keyboard Shortcuts ──────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline"><span>Shortcuts</span></div>
+        <h2 class="display-small">Salesforce Keyboard Shortcuts</h2>
+        <p>Navigate faster with these essential shortcuts.</p>
+      </div>
+
+      <div class="grid grid-2" style="gap:16px">
+        <div class="card reveal stagger-1" style="display:flex;align-items:center;gap:16px">
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">Ctrl</kbd>
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">/</kbd>
+          </div>
+          <div><h3 style="font-size:0.9375rem;margin:0">Global Search</h3><p style="font-size:0.8125rem;margin:0;color:var(--md-outline)">Open Salesforce global search from anywhere</p></div>
+        </div>
+
+        <div class="card reveal stagger-2" style="display:flex;align-items:center;gap:16px">
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">Ctrl</kbd>
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">E</kbd>
+          </div>
+          <div><h3 style="font-size:0.9375rem;margin:0">Execute Anonymous</h3><p style="font-size:0.8125rem;margin:0;color:var(--md-outline)">Run Apex in Developer Console</p></div>
+        </div>
+
+        <div class="card reveal stagger-3" style="display:flex;align-items:center;gap:16px">
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">Ctrl</kbd>
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">Shift</kbd>
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">C</kbd>
+          </div>
+          <div><h3 style="font-size:0.9375rem;margin:0">Open Console</h3><p style="font-size:0.8125rem;margin:0;color:var(--md-outline)">Launch Developer Console quickly</p></div>
+        </div>
+
+        <div class="card reveal stagger-4" style="display:flex;align-items:center;gap:16px">
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">Ctrl</kbd>
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">G</kbd>
+          </div>
+          <div><h3 style="font-size:0.9375rem;margin:0">Go to Line</h3><p style="font-size:0.8125rem;margin:0;color:var(--md-outline)">Jump to specific line in code editor</p></div>
+        </div>
+
+        <div class="card reveal stagger-5" style="display:flex;align-items:center;gap:16px">
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">Ctrl</kbd>
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">S</kbd>
+          </div>
+          <div><h3 style="font-size:0.9375rem;margin:0">Save & Compile</h3><p style="font-size:0.8125rem;margin:0;color:var(--md-outline)">Save file and compile Apex in Developer Console</p></div>
+        </div>
+
+        <div class="card reveal stagger-6" style="display:flex;align-items:center;gap:16px">
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">Ctrl</kbd>
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">F</kbd>
+          </div>
+          <div><h3 style="font-size:0.9375rem;margin:0">Find in File</h3><p style="font-size:0.8125rem;margin:0;color:var(--md-outline)">Search within the current file in Developer Console</p></div>
+        </div>
+
+        <div class="card reveal stagger-1" style="display:flex;align-items:center;gap:16px">
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">Alt</kbd>
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">←</kbd>
+          </div>
+          <div><h3 style="font-size:0.9375rem;margin:0">Navigate Back</h3><p style="font-size:0.8125rem;margin:0;color:var(--md-outline)">Go back to previous cursor location in VS Code</p></div>
+        </div>
+
+        <div class="card reveal stagger-2" style="display:flex;align-items:center;gap:16px">
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">Ctrl</kbd>
+            <kbd style="padding:6px 12px;background:var(--md-surface-container-high);border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;border:1px solid var(--md-outline-variant)">P</kbd>
+          </div>
+          <div><h3 style="font-size:0.9375rem;margin:0">Quick Open File</h3><p style="font-size:0.8125rem;margin:0;color:var(--md-outline)">Fuzzy-search and open any file in VS Code instantly</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VS Code Tips ────────────────────────────────────────────────────── -->
+  <section class="section" style="background:var(--md-surface-container-low)">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline"><span>VS Code</span></div>
+        <h2 class="display-small">VS Code Tips for Salesforce</h2>
+        <p>Essential extensions and configurations for Salesforce DX development.</p>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="card reveal stagger-1">
+          <div class="card-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">extension</span></div>
+          <h3>Salesforce Extension Pack</h3>
+          <p>Install the official extension pack for Apex language support, SOQL highlighting, Lightning Web Components, and org management.</p>
+        </div>
+        <div class="card reveal stagger-2">
+          <div class="card-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">auto_fix</span></div>
+          <h3>Apex PMD Linting</h3>
+          <p>Install Apex PMD for static code analysis. Catch governor limit issues, unused variables, and code smells before deployment.</p>
+        </div>
+        <div class="card reveal stagger-3">
+          <div class="card-icon" style="background:#fef3c7;color:#92400e"><span class="material-symbols-rounded">snippet_folder</span></div>
+          <h3>Custom Snippets</h3>
+          <p>Create Apex snippets for common patterns: trigger handlers, test methods, SOQL templates, and batch class boilerplate.</p>
+        </div>
+        <div class="card reveal stagger-4">
+          <div class="card-icon" style="background:#ede9fe;color:#5b21b6"><span class="material-symbols-rounded">palette</span></div>
+          <h3>Theme: One Dark Pro</h3>
+          <p>Recommended dark theme with excellent Apex syntax highlighting for long coding sessions with reduced eye strain.</p>
+        </div>
+        <div class="card reveal stagger-5">
+          <div class="card-icon" style="background:#fce7f3;color:#9d174d"><span class="material-symbols-rounded">sync</span></div>
+          <h3>Settings Sync</h3>
+          <p>Use VS Code's built-in settings sync to keep your Salesforce development environment consistent across machines.</p>
+        </div>
+        <div class="card reveal stagger-6">
+          <div class="card-icon"><span class="material-symbols-rounded">bug_report</span></div>
+          <h3>Replay Debugger</h3>
+          <p>Use the Apex Replay Debugger to step through code execution from debug logs — set breakpoints and inspect variables.</p>
+        </div>
+        <div class="card reveal stagger-1">
+          <div class="card-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">terminal</span></div>
+          <h3>Integrated Terminal</h3>
+          <p>Use the built-in terminal for SFDX commands without switching windows. Split terminals to run deploys and watch logs simultaneously.</p>
+        </div>
+        <div class="card reveal stagger-2">
+          <div class="card-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">manage_search</span></div>
+          <h3>Multi-Cursor Editing</h3>
+          <p>Hold <kbd style="font-family:var(--font-mono);font-size:0.75rem;padding:1px 6px;background:var(--md-surface-container-high);border-radius:4px;border:1px solid var(--md-outline-variant)">Alt</kbd> and click to place multiple cursors and edit several lines at once — great for bulk field renaming.</p>
+        </div>
+        <div class="card reveal stagger-3">
+          <div class="card-icon" style="background:#fef3c7;color:#92400e"><span class="material-symbols-rounded">format_align_left</span></div>
+          <h3>Prettier for LWC</h3>
+          <p>Add Prettier with the Salesforce plugin to auto-format HTML, JS, and CSS files on save. Keeps LWC files consistent across your team.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Debugging Tips ─────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline"><span>Debugging</span></div>
+        <h2 class="display-small">Debugging Techniques</h2>
+        <p>Master Salesforce debugging to resolve issues faster.</p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card reveal stagger-1" style="padding:28px">
+          <h3>Use Trace Flags Effectively</h3>
+          <p>Set trace flags on specific users with appropriate log levels. Use FINEST for Apex but INFO for system events to reduce log noise and stay within the 20 active log limit.</p>
+          <div class="code-block mt-16" style="font-size:0.8125rem">
+<pre style="margin:0"><code><span class="code-comment">// Recommended log levels</span>
+Apex Code: FINEST
+System: INFO
+Validation: INFO
+Database: FINE
+Workflow: INFO</code></pre>
+          </div>
+        </div>
+
+        <div class="card reveal stagger-2" style="padding:28px">
+          <h3>Strategic System.debug()</h3>
+          <p>Don't scatter debug statements randomly. Use labels and JSON serialization for complex objects so logs stay readable.</p>
+          <div class="code-block mt-16" style="font-size:0.8125rem">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre style="margin:0"><code>System.debug(<span class="code-string">'=== AccountTrigger ==='</span>);
+System.debug(<span class="code-string">'Records: '</span> + 
+    JSON.serializePretty(newAccounts));
+System.debug(<span class="code-string">'SOQL used: '</span> + 
+    Limits.getQueries() + <span class="code-string">'/'</span> + 
+    Limits.getLimitQueries());</code></pre>
+          </div>
+        </div>
+
+        <div class="card reveal stagger-3" style="padding:28px">
+          <h3>Checkpoint Inspector</h3>
+          <p>Use checkpoints in the Developer Console to capture the heap state at specific lines. This shows variable values and object references without adding debug statements to your code.</p>
+        </div>
+
+        <div class="card reveal stagger-4" style="padding:28px">
+          <h3>Debug with Limits Monitoring</h3>
+          <p>Always check governor limit consumption in your logs. Look for the <code>LIMIT_USAGE_FOR_NS</code> line at the end of every transaction to identify issues before they hit production.</p>
+        </div>
+
+        <div class="card reveal stagger-5" style="padding:28px">
+          <h3>Filter Logs with Keywords</h3>
+          <p>In the Developer Console log viewer, filter by <code>USER_DEBUG</code> to see only your debug statements, or by <code>SOQL_EXECUTE_BEGIN</code> to audit all queries in a transaction.</p>
+        </div>
+
+        <div class="card reveal stagger-6" style="padding:28px">
+          <h3>Anonymous Apex for Quick Tests</h3>
+          <p>Use Execute Anonymous to test logic in isolation before adding it to a class. Great for verifying SOQL output, testing callouts in sandbox, or quickly checking a governor limit.</p>
+          <div class="code-block mt-16" style="font-size:0.8125rem">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre style="margin:0"><code><span class="code-comment">// Quick limit check</span>
+System.debug(Limits.getCpuTime());
+System.debug(Limits.getHeapSize());
+System.debug(Limits.getQueries());</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SOQL Tips ──────────────────────────────────────────────────────── -->
+  <section class="section" style="background:var(--md-surface-container-low)">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline"><span>SOQL</span></div>
+        <h2 class="display-small">SOQL Best Practices</h2>
+        <p>Write queries that are fast, selective, and governor-limit safe.</p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card reveal stagger-1" style="padding:28px">
+          <h3>Never Query Inside Loops</h3>
+          <p>This is the #1 governor limit mistake. Move all queries outside of loops and use collections to process results in bulk.</p>
+          <div class="code-block mt-16" style="font-size:0.8125rem">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre style="margin:0"><code><span class="code-comment">// ❌ Wrong — hits limit fast</span>
+<span class="code-keyword">for</span> (Account a : accounts) {
+    List&lt;Contact&gt; c = [SELECT Id FROM 
+        Contact WHERE AccountId = :a.Id];
+}
+
+<span class="code-comment">// ✅ Right — one query for all</span>
+Map&lt;Id, List&lt;Contact&gt;&gt; cMap = <span class="code-keyword">new</span> Map&lt;&gt;();
+<span class="code-keyword">for</span> (Contact c : [SELECT Id, AccountId 
+    FROM Contact WHERE AccountId IN :accounts]) {
+    <span class="code-keyword">if</span> (!cMap.containsKey(c.AccountId))
+        cMap.put(c.AccountId, <span class="code-keyword">new</span> List&lt;Contact&gt;());
+    cMap.get(c.AccountId).add(c);
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="card reveal stagger-2" style="padding:28px">
+          <h3>Use Bind Variables</h3>
+          <p>Always use Apex bind variables (:<code>varName</code>) instead of string concatenation. They prevent SOQL injection and are automatically optimized by the query engine.</p>
+          <div class="code-block mt-16" style="font-size:0.8125rem">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre style="margin:0"><code><span class="code-comment">// ❌ Injection risk</span>
+String q = <span class="code-string">'SELECT Id FROM Account WHERE Name = \''</span>
+    + userInput + <span class="code-string">'\''</span>;
+
+<span class="code-comment">// ✅ Safe bind variable</span>
+String name = userInput;
+List&lt;Account&gt; accs = [SELECT Id FROM Account
+    WHERE Name = :name];</code></pre>
+          </div>
+        </div>
+
+        <div class="card reveal stagger-3" style="padding:28px">
+          <h3>Query Only What You Need</h3>
+          <p>Avoid <code>SELECT *</code> patterns. Only include fields you actually use — this reduces heap consumption and makes your query more selective on indexed fields.</p>
+        </div>
+
+        <div class="card reveal stagger-4" style="padding:28px">
+          <h3>Use Relationship Queries</h3>
+          <p>Fetch parent and child data in one query instead of separate round trips. Child relationships use a subquery; parent fields use dot notation.</p>
+          <div class="code-block mt-16" style="font-size:0.8125rem">
+            <div class="code-block-header"><span class="code-block-lang">SOQL</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre style="margin:0"><code><span class="code-keyword">SELECT</span> Id, Name, Account.Name,
+    (<span class="code-keyword">SELECT</span> Id, Subject
+     <span class="code-keyword">FROM</span> Cases)
+<span class="code-keyword">FROM</span> Contact
+<span class="code-keyword">WHERE</span> Account.Industry = <span class="code-string">'Technology'</span></code></pre>
+          </div>
+        </div>
+
+        <div class="card reveal stagger-5" style="padding:28px">
+          <h3>Count Without Fetching Records</h3>
+          <p>Use <code>SELECT COUNT()</code> when you only need a number — it returns an integer immediately without transferring any records and doesn't count against your 50,000 row query limit.</p>
+          <div class="code-block mt-16" style="font-size:0.8125rem">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre style="margin:0"><code>Integer total = [SELECT COUNT() 
+    FROM Opportunity 
+    WHERE StageName = <span class="code-string">'Closed Won'</span> 
+    AND CloseDate = THIS_YEAR];</code></pre>
+          </div>
+        </div>
+
+        <div class="card reveal stagger-6" style="padding:28px">
+          <h3>Index-Friendly WHERE Clauses</h3>
+          <p>Fields like <code>Id</code>, <code>Name</code>, <code>OwnerId</code>, and custom fields marked as External ID or Unique are indexed. Leading wildcards like <code>LIKE '%value'</code> bypass indexes completely — use trailing wildcards instead: <code>LIKE 'value%'</code>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Apex Patterns ──────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline"><span>Apex</span></div>
+        <h2 class="display-small">Apex Coding Patterns</h2>
+        <p>Write cleaner, more maintainable Apex with these proven patterns.</p>
+      </div>
+
+      <div class="card card-elevated reveal-scale" style="padding:32px">
+        <div class="tip-row">
+          <span class="tip-number">1</span>
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:4px">One Trigger Per Object</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem">Never have multiple triggers on the same object — execution order is non-deterministic. Use a single trigger that delegates to a handler class. This gives you full control over execution order.</p>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">2</span>
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:4px">Bulkify Everything</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem">Always write code assuming 200 records will be processed at once. If your method takes a single <code>SObject</code>, change it to take a <code>List&lt;SObject&gt;</code>. Triggers always fire in bulk.</p>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">3</span>
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:4px">Use Custom Metadata for Config</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem">Store threshold values, feature flags, and org-specific settings in Custom Metadata Types (CMDT) instead of hardcoding them. CMDTs are deployable, queryable, and don't count against your SOQL limits.</p>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">4</span>
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:4px">Avoid Hardcoded IDs</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem">Record IDs change between orgs — sandbox to production, scratch org to scratch org. Use SOQL to look up records by unique names, record types by <code>DeveloperName</code>, or store them in CMDT.</p>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">5</span>
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:4px">Use Database Methods for Partial Success</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem">Use <code>Database.insert(records, false)</code> instead of <code>insert records</code> when you want partial success. Check <code>SaveResult</code> for errors per record instead of rolling back the whole transaction.</p>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">6</span>
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:4px">Leverage Static Variables for Recursion Control</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem">Use a static Boolean flag in your handler class to prevent trigger recursion. Set it to <code>true</code> after the first execution — subsequent DML operations in the same transaction will skip re-processing.</p>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">7</span>
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:4px">Prefer Maps Over Nested Loops</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem">Nested loops are O(n²) — fine for 5 records, a disaster for 200. Build a <code>Map&lt;Id, SObject&gt;</code> first, then do single lookups inside the loop to keep it O(n).</p>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">8</span>
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:4px">Always Write Test Setup with @TestSetup</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem">Use <code>@TestSetup</code> to create shared test data once per test class. It runs before each test method with a rollback, which is faster than recreating data in every individual test.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Governor Limits ────────────────────────────────────────────────── -->
+  <section class="section" style="background:var(--md-surface-container-low)">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline"><span>Governor Limits</span></div>
+        <h2 class="display-small">Staying Within Governor Limits</h2>
+        <p>Know the limits, respect the limits, stay out of production incidents.</p>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="card reveal stagger-1">
+          <div class="card-icon"><span class="material-symbols-rounded">database</span></div>
+          <h3>100 SOQL Queries</h3>
+          <p>The synchronous limit. Use relationship queries, aggregate results, and bulkification to stay under. Check <code>Limits.getQueries()</code> in debug logs.</p>
+          <div class="mt-16"><span class="tag tag-error">Hard Limit</span></div>
+        </div>
+        <div class="card reveal stagger-2">
+          <div class="card-icon" style="background:#fef3c7;color:#92400e"><span class="material-symbols-rounded">speed</span></div>
+          <h3>10s CPU Time</h3>
+          <p>Synchronous Apex gets 10,000ms. Move heavy computation to async (Queueable/Batch). Avoid string manipulation inside large loops — it's expensive.</p>
+          <div class="mt-16"><span class="tag tag-error">Hard Limit</span></div>
+        </div>
+        <div class="card reveal stagger-3">
+          <div class="card-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">memory</span></div>
+          <h3>6MB Heap Size</h3>
+          <p>Avoid storing large collections in memory. Process records in batches, clear variables when done, and never serialize entire objects unless necessary.</p>
+          <div class="mt-16"><span class="tag tag-error">Hard Limit</span></div>
+        </div>
+        <div class="card reveal stagger-4">
+          <div class="card-icon" style="background:#ede9fe;color:#5b21b6"><span class="material-symbols-rounded">table_rows</span></div>
+          <h3>50,000 Rows Returned</h3>
+          <p>A single transaction can't hold more than 50k records in memory. Use <code>Database.QueryLocator</code> in Batch Apex to bypass this for large data volumes.</p>
+          <div class="mt-16"><span class="tag" style="background:#fef3c7;color:#92400e">Workaround Available</span></div>
+        </div>
+        <div class="card reveal stagger-5">
+          <div class="card-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">cloud_upload</span></div>
+          <h3>150 DML Statements</h3>
+          <p>Batch all inserts, updates, and deletes into lists. Never call DML inside a loop. One <code>update myList</code> counts as one DML regardless of list size.</p>
+          <div class="mt-16"><span class="tag tag-error">Hard Limit</span></div>
+        </div>
+        <div class="card reveal stagger-6">
+          <div class="card-icon" style="background:#fce7f3;color:#9d174d"><span class="material-symbols-rounded">http</span></div>
+          <h3>100 Callouts</h3>
+          <p>Callouts can't be made after DML in the same transaction. Use <code>@future(callout=true)</code>, Queueable with <code>Database.AllowsCallouts</code>, or Platform Events to decouple them.</p>
+          <div class="mt-16"><span class="tag tag-error">Hard Limit</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Security Tips ──────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline"><span>Security</span></div>
+        <h2 class="display-small">Apex Security Best Practices</h2>
+        <p>Write secure code that respects Salesforce's sharing and access model.</p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card reveal stagger-1" style="padding:28px">
+          <h3>with sharing vs. without sharing</h3>
+          <p>Always declare <code>with sharing</code> on service and controller classes unless you explicitly need to bypass sharing rules. When you do bypass, isolate it in a dedicated inner class to minimise scope.</p>
+          <div class="code-block mt-16" style="font-size:0.8125rem">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre style="margin:0"><code><span class="code-keyword">public with sharing class</span> AccountService {
+    <span class="code-comment">// Respects sharing rules ✅</span>
+    <span class="code-keyword">public static</span> List&lt;Account&gt; getAccounts() {
+        <span class="code-keyword">return</span> [SELECT Id FROM Account];
+    }
+
+    <span class="code-comment">// Isolated bypass for internal use only</span>
+    <span class="code-keyword">private without sharing class</span> Admin {
+        List&lt;Account&gt; getAllAccounts() {
+            <span class="code-keyword">return</span> [SELECT Id FROM Account];
+        }
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="card reveal stagger-2" style="padding:28px">
+          <h3>Strip Inaccessible Fields</h3>
+          <p>Use <code>Security.stripInaccessible()</code> before DML to automatically remove fields the running user can't read or write — far safer than manually checking FLS on every field.</p>
+          <div class="code-block mt-16" style="font-size:0.8125rem">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre style="margin:0"><code>SObjectAccessDecision decision = 
+    Security.stripInaccessible(
+        AccessType.CREATABLE, records);
+
+insert decision.getRecords();</code></pre>
+          </div>
+        </div>
+
+        <div class="card reveal stagger-3" style="padding:28px">
+          <h3>Validate All User Input</h3>
+          <p>Any value arriving from an LWC, Aura component, or API can be tampered with. Never trust <code>@AuraEnabled</code> method parameters — validate type, length, and format on the server side before processing.</p>
+        </div>
+
+        <div class="card reveal stagger-4" style="padding:28px">
+          <h3>Avoid SOQL Injection</h3>
+          <p>Dynamic SOQL with user input is a critical vulnerability. Use <code>String.escapeSingleQuotes()</code> when dynamic SOQL is unavoidable, and prefer static SOQL with bind variables wherever possible.</p>
+          <div class="code-block mt-16" style="font-size:0.8125rem">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre style="margin:0"><code><span class="code-comment">// Last resort — always escape</span>
+String safe = String.escapeSingleQuotes(input);
+String q = <span class="code-string">'SELECT Id FROM Account WHERE Name = \''</span>
+    + safe + <span class="code-string">'\''</span>;</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SFDX & CLI Tips ────────────────────────────────────────────────── -->
+  <section class="section" style="background:var(--md-surface-container-low)">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline"><span>CLI</span></div>
+        <h2 class="display-small">SFDX CLI Productivity</h2>
+        <p>Speed up your local development workflow with these CLI commands and habits.</p>
+      </div>
+
+      <div class="card card-elevated reveal-scale" style="padding:32px">
+        <div class="tip-row">
+          <span class="tip-number">1</span>
+          <div style="flex:1">
+            <h3 style="font-size:1rem;margin-bottom:8px">Alias Your Orgs</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem;margin-bottom:12px">Always set an alias when authorising an org. It saves you from copying 18-character usernames into every command.</p>
+            <div class="code-block" style="font-size:0.8125rem">
+<pre style="margin:0"><code>sf org login web --alias mydev --set-default</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">2</span>
+          <div style="flex:1">
+            <h3 style="font-size:1rem;margin-bottom:8px">Deploy Only Changed Metadata</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem;margin-bottom:12px">Use <code>--source-dir</code> to deploy a specific folder instead of the entire project. Much faster for iterative development.</p>
+            <div class="code-block" style="font-size:0.8125rem">
+<pre style="margin:0"><code>sf project deploy start \
+  --source-dir force-app/main/default/classes/AccountService.cls \
+  --target-org mydev</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">3</span>
+          <div style="flex:1">
+            <h3 style="font-size:1rem;margin-bottom:8px">Run Specific Tests Only</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem;margin-bottom:12px">Don't run your entire test suite every deploy during development. Target the test class that covers your changes.</p>
+            <div class="code-block" style="font-size:0.8125rem">
+<pre style="margin:0"><code>sf project deploy start \
+  --source-dir force-app/main/default/classes \
+  --test-level RunSpecifiedTests \
+  --tests AccountServiceTest \
+  --target-org mydev</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">4</span>
+          <div style="flex:1">
+            <h3 style="font-size:1rem;margin-bottom:8px">Tail Logs in Real Time</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem;margin-bottom:12px">Stream debug logs directly to your terminal without opening Developer Console. Pipe through <code>grep</code> to filter noise.</p>
+            <div class="code-block" style="font-size:0.8125rem">
+<pre style="margin:0"><code>sf apex tail log --target-org mydev | grep USER_DEBUG</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">5</span>
+          <div style="flex:1">
+            <h3 style="font-size:1rem;margin-bottom:8px">Pull Metadata from Org</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem;margin-bottom:12px">Retrieve any metadata type from an org back to your local project. Useful when changes are made declaratively in Setup.</p>
+            <div class="code-block" style="font-size:0.8125rem">
+<pre style="margin:0"><code>sf project retrieve start \
+  --metadata ApexClass:AccountService \
+  --target-org mydev</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="tip-row">
+          <span class="tip-number">6</span>
+          <div style="flex:1">
+            <h3 style="font-size:1rem;margin-bottom:8px">Run Anonymous Apex from CLI</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9375rem;margin-bottom:12px">Execute a local script file against any org directly from the terminal — great for data fixes, seeding records, and quick tests.</p>
+            <div class="code-block" style="font-size:0.8125rem">
+<pre style="margin:0"><code>sf apex run --file scripts/fix-accounts.apex \
+  --target-org mydev</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Deployment Tips ────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="overline"><span>Deployment</span></div>
+        <h2 class="display-small">Deployment Best Practices</h2>
+        <p>Ship with confidence using these deployment habits.</p>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="feature-item reveal stagger-1"><div class="feature-item-icon"><span class="material-symbols-rounded">check_circle</span></div><div><h3>Validate Before Deploying</h3><p>Always run a validation-only deployment first to catch errors without impacting the org.</p></div></div>
+        <div class="feature-item reveal stagger-2"><div class="feature-item-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">schedule</span></div><div><h3>Deploy During Off-Hours</h3><p>Schedule deployments during low-usage windows to minimise user impact and reduce lock conflicts.</p></div></div>
+        <div class="feature-item reveal stagger-3"><div class="feature-item-icon" style="background:#fef3c7;color:#92400e"><span class="material-symbols-rounded">inventory</span></div><div><h3>Use Packages Wisely</h3><p>Organise related metadata into unlocked packages for modular, repeatable deployments across sandboxes.</p></div></div>
+        <div class="feature-item reveal stagger-4"><div class="feature-item-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">history</span></div><div><h3>Maintain a Rollback Plan</h3><p>Always have a documented rollback strategy with previous metadata snapshots ready to restore.</p></div></div>
+        <div class="feature-item reveal stagger-5"><div class="feature-item-icon" style="background:#ede9fe;color:#5b21b6"><span class="material-symbols-rounded">science</span></div><div><h3>Test in Full-Copy Sandbox</h3><p>Run full regression tests in a full-copy sandbox before any production deployment, not just Developer sandboxes.</p></div></div>
+        <div class="feature-item reveal stagger-6"><div class="feature-item-icon" style="background:#fce7f3;color:#9d174d"><span class="material-symbols-rounded">build_circle</span></div><div><h3>CI/CD Pipeline</h3><p>Set up GitHub Actions with SFDX for automated test runs and deployment on every pull request merge.</p></div></div>
+        <div class="feature-item reveal stagger-1"><div class="feature-item-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">rule</span></div><div><h3>Quick Deploy After Validation</h3><p>A successful validation within 10 days unlocks Quick Deploy — skip re-running all tests and deploy in seconds.</p></div></div>
+        <div class="feature-item reveal stagger-2"><div class="feature-item-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">checklist</span></div><div><h3>Component-Level Deployment</h3><p>Deploy only the components that changed. Deploying everything every time slows you down and increases rollback risk.</p></div></div>
+        <div class="feature-item reveal stagger-3"><div class="feature-item-icon" style="background:#fef3c7;color:#92400e"><span class="material-symbols-rounded">lock</span></div><div><h3>Lock the Org During Deployment</h3><p>For critical production deployments, use the "Prevent Backups" option and communicate a change window to users beforehand.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="nav-logo">
+            <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+          <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4><ul>
+          <li><a href="tools.html">Tools</a></li><li><a href="errors.html">Errors</a></li>
+          <li><a href="guides.html">Guides</a></li><li><a href="prompts.html">Prompts</a></li><li><a href="extensions.html">Extensions</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Resources</h4><ul>
+          <li><a href="tips.html">Tips</a></li><li><a href="resources.html">Resources</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Community</h4><ul>
+          <li><a href="about.html">About</a></li>
+        </ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="https://sfdecoded.netlify.app/"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="js/main.js"></script>
+</body>
+</html>

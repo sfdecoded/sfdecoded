@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Code Coverage Below 75% — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce 'Code Coverage Below 75%' deployment error. Learn why it blocks production deploys and how to write proper test classes with working examples.">
+  <meta name="keywords" content="salesforce code coverage below 75, apex test coverage, deployment failed coverage, salesforce apex tests fix">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/code-coverage-below-75.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+        <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+  <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html" class="active">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <!-- Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">Code Coverage Below 75%</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-error">Deployment</span>
+        <span class="tag tag-primary">Metadata</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">Code Coverage Below 75%</h1>
+      <p class="reveal stagger-4">Deployment failure — Salesforce requires at least 75% overall Apex code coverage across all classes to deploy to production.</p>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <!-- Main Content -->
+        <div class="article-content">
+
+          <!-- Error Message -->
+          <div class="callout callout-error reveal">
+            <span class="material-symbols-rounded">error</span>
+            <div>
+              <p style="font-family:var(--font-mono);font-size:0.875rem"><strong>Deployment failed:</strong> Average test coverage across all Apex Classes and Triggers is 62%, at least 75% test coverage is required.</p>
+            </div>
+          </div>
+
+          <h2 id="what" class="reveal">What does this error mean?</h2>
+          <p class="reveal">Before any Apex code can be deployed to a Salesforce production org, Salesforce runs all local test classes and calculates the percentage of Apex code lines that are executed by those tests. If the overall coverage falls below 75%, the deployment is blocked entirely.</p>
+          <p class="reveal">Coverage is calculated across <em>all</em> Apex classes and triggers in the org — not just the classes being deployed. A new class with 0% coverage can pull the org-wide average below the threshold even if the rest of the org is well-covered.</p>
+
+          <h4 class="reveal">Coverage thresholds at a glance</h4>
+          <div class="table-wrap reveal" style="margin-bottom:1.5rem">
+            <table style="width:100%;border-collapse:collapse;font-size:0.9rem">
+              <thead>
+                <tr>
+                  <th style="text-align:left;padding:10px 14px;background:var(--color-surface-2,#f4f4f5);border-bottom:2px solid var(--color-border,#e4e4e7);white-space:nowrap">Status</th>
+                  <th style="text-align:left;padding:10px 14px;background:var(--color-surface-2,#f4f4f5);border-bottom:2px solid var(--color-border,#e4e4e7)">Coverage</th>
+                  <th style="text-align:left;padding:10px 14px;background:var(--color-surface-2,#f4f4f5);border-bottom:2px solid var(--color-border,#e4e4e7)">Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background:#fff5f5">
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7);font-weight:500;white-space:nowrap">❌ Below threshold</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7);font-family:var(--font-mono);font-size:0.85rem">&lt; 75%</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7);color:#b91c1c">Deployment will fail</td>
+                </tr>
+                <tr style="background:#fffbeb">
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7);font-weight:500;white-space:nowrap">⚠️ Minimum</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7);font-family:var(--font-mono);font-size:0.85rem">= 75%</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7);color:#92400e">Passes but leaves no margin</td>
+                </tr>
+                <tr style="background:#f0fdf4">
+                  <td style="padding:10px 14px;font-weight:500;white-space:nowrap">✅ Healthy</td>
+                  <td style="padding:10px 14px;font-family:var(--font-mono);font-size:0.85rem">85%+</td>
+                  <td style="padding:10px 14px;color:#166534">Safe to deploy with buffer</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-wrap reveal">
+            <table style="width:100%;border-collapse:collapse;font-size:0.9rem">
+              <thead>
+                <tr>
+                  <th style="text-align:left;padding:10px 14px;background:var(--color-surface-2,#f4f4f5);border-bottom:2px solid var(--color-border,#e4e4e7)">Rule</th>
+                  <th style="text-align:left;padding:10px 14px;background:var(--color-surface-2,#f4f4f5);border-bottom:2px solid var(--color-border,#e4e4e7)">Detail</th>
+                  <th style="text-align:left;padding:10px 14px;background:var(--color-surface-2,#f4f4f5);border-bottom:2px solid var(--color-border,#e4e4e7);white-space:nowrap">Required?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7);font-weight:500;white-space:nowrap">Org-wide coverage ≥ 75%</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7)">Average across all classes and triggers in the target org</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7)"><span class="tag tag-error">Required</span></td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7);font-weight:500;white-space:nowrap">Each trigger ≥ 1%</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7)">Every trigger must be covered by at least one test line</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7)"><span class="tag tag-error">Required</span></td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7);font-weight:500;white-space:nowrap">Test classes excluded</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7)">Classes annotated <code>@isTest</code> don't count toward coverage</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7)"><span class="tag tag-primary">Info</span></td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7);font-weight:500;white-space:nowrap">System.assert()</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7)">Not required for coverage, but strongly recommended for quality</td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--color-border,#e4e4e7)"><span class="tag tag-primary">Info</span></td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 14px;font-weight:500;white-space:nowrap">Sandbox deploys</td>
+                  <td style="padding:10px 14px">Coverage not enforced — tests run but threshold not required</td>
+                  <td style="padding:10px 14px"><span class="tag tag-primary">Info</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="causes" class="reveal">Common Causes</h2>
+
+          <h3 class="reveal">1. New Class Deployed with No Test Coverage</h3>
+          <p class="reveal">The most common scenario. A developer writes a new Apex class but skips the test class. In sandbox this isn't enforced, so it goes unnoticed — until production deployment, where the class brings the org-wide average down.</p>
+
+          <h3 class="reveal">2. Test Classes That Don't Call the Actual Code</h3>
+          <p class="reveal">Tests that insert records without triggering automation, or test classes that only test trivial getter/setter methods, don't cover the real logic inside handler classes, service classes, or utilities.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Bad Test (No Real Coverage)</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code>@isTest
+<span class="code-keyword">private class</span> <span class="code-type">AccountServiceTest</span> {
+    @isTest
+    <span class="code-keyword">static void</span> <span class="code-function">testNothing</span>() {
+        <span class="code-comment">// ❌ BAD: Creates record but never calls AccountService</span>
+        <span class="code-comment">// AccountService methods have 0% coverage</span>
+        <span class="code-type">Account</span> acc = <span class="code-keyword">new</span> <span class="code-type">Account</span>(Name = <span class="code-string">'Test'</span>);
+        <span class="code-keyword">insert</span> acc;
+        System.<span class="code-function">assertNotEquals</span>(<span class="code-keyword">null</span>, acc.Id);
+    }
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">3. Missed Branch Coverage — <code>if/else</code> and Exception Paths</h3>
+          <p class="reveal">A single test covering the "happy path" leaves the <code>else</code> branch, catch blocks, and edge cases uncovered. Each uncovered branch is an uncovered line that reduces your percentage.</p>
+
+          <h3 class="reveal">4. Dead Code That Can't Be Tested</h3>
+          <p class="reveal">Commented-out code that was accidentally left in a class counts as uncovered lines — even though it will never execute. Commented Apex lines that aren't removed still reduce your coverage percentage.</p>
+
+          <h3 class="reveal">5. Deleted Test Classes Leaving Orphaned Production Code</h3>
+          <p class="reveal">Removing a test class while the production code it covered remains in the org instantly drops that code's coverage to 0%, potentially pulling the org-wide total below 75%.</p>
+
+          <h2 id="find" class="reveal">How to Find Uncovered Lines</h2>
+
+          <h3 class="reveal">Method 1: VS Code — Apex Test Runner</h3>
+          <p class="reveal">Run tests from the VS Code sidebar using the Salesforce Extension Pack. After tests complete, click <strong>View Coverage</strong> — uncovered lines are highlighted in red directly in your editor. This is the fastest way to spot gaps.</p>
+
+          <h3 class="reveal">Method 2: Developer Console</h3>
+          <p class="reveal">Open the Developer Console → <strong>Test → Run All Tests</strong>. After execution, go to the <strong>Tests</strong> tab → select a class → click the <strong>Coverage</strong> percentage link to see a colour-coded line-by-line view of covered (blue) vs. uncovered (red) lines.</p>
+
+          <h3 class="reveal">Method 3: SFDX CLI</h3>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Terminal — SFDX</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment"># Run all tests and output coverage report</span>
+sf apex run test \
+  --test-level RunAllTestsInOrg \
+  --code-coverage \
+  --result-format human \
+  --output-dir ./coverage-report
+
+<span class="code-comment"># Run tests for a specific class only</span>
+sf apex run test \
+  --class-names AccountServiceTest \
+  --code-coverage \
+  --result-format json</code></pre>
+          </div>
+
+          <h2 id="solution" class="reveal">How to Fix It</h2>
+
+          <h3 class="reveal">Solution 1: Write a Proper Test Class That Calls Your Code</h3>
+          <p class="reveal">Every service class, handler, and utility must be called directly from a test method. Use <code>Test.startTest()</code> and <code>Test.stopTest()</code> to isolate governor limits and call the actual methods — not just insert records and hope the trigger fires.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Good Test Class</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code>@isTest
+<span class="code-keyword">private class</span> <span class="code-type">AccountServiceTest</span> {
+
+    @TestSetup
+    <span class="code-keyword">static void</span> <span class="code-function">makeData</span>() {
+        <span class="code-keyword">insert new</span> <span class="code-type">Account</span>(Name = <span class="code-string">'Test Corp'</span>, Phone = <span class="code-string">'415-555-0100'</span>);
+    }
+
+    @isTest
+    <span class="code-keyword">static void</span> <span class="code-function">testGetActiveAccounts_returnsResults</span>() {
+        Test.<span class="code-function">startTest</span>();
+        <span class="code-comment">// ✅ GOOD: Directly calls the method being tested</span>
+        List&lt;Account&gt; results =
+            AccountService.<span class="code-function">getActiveAccounts</span>();
+        Test.<span class="code-function">stopTest</span>();
+
+        System.<span class="code-function">assertNotEquals</span>(0, results.size(),
+            <span class="code-string">'Should return at least one active account'</span>);
+    }
+
+    @isTest
+    <span class="code-keyword">static void</span> <span class="code-function">testGetActiveAccounts_emptyOrg</span>() {
+        <span class="code-comment">// ✅ Test the edge case — no active accounts</span>
+        <span class="code-keyword">delete</span> [<span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> Account];
+
+        Test.<span class="code-function">startTest</span>();
+        List&lt;Account&gt; results =
+            AccountService.<span class="code-function">getActiveAccounts</span>();
+        Test.<span class="code-function">stopTest</span>();
+
+        System.<span class="code-function">assertEquals</span>(0, results.size(),
+            <span class="code-string">'Should return empty list when no active accounts'</span>);
+    }
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 2: Cover Both Branches of Every <code>if</code> Statement</h3>
+          <p class="reveal">For every conditional in your code, write at least two tests — one that exercises the <code>if</code> branch and one that exercises the <code>else</code> branch. Don't forget catch blocks and null-check paths.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Branch Coverage Pattern</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Method under test</span>
+<span class="code-keyword">public static</span> String <span class="code-function">classify</span>(<span class="code-type">Account</span> acc) {
+    <span class="code-keyword">if</span> (acc.AnnualRevenue &gt; 1000000) {
+        <span class="code-keyword">return</span> <span class="code-string">'Enterprise'</span>;       <span class="code-comment">// Branch A</span>
+    } <span class="code-keyword">else if</span> (acc.AnnualRevenue &gt; 100000) {
+        <span class="code-keyword">return</span> <span class="code-string">'Mid-Market'</span>;        <span class="code-comment">// Branch B</span>
+    } <span class="code-keyword">else</span> {
+        <span class="code-keyword">return</span> <span class="code-string">'SMB'</span>;               <span class="code-comment">// Branch C</span>
+    }
+}
+
+<span class="code-comment">// Test covering all three branches</span>
+@isTest
+<span class="code-keyword">static void</span> <span class="code-function">testClassify_allBranches</span>() {
+    System.<span class="code-function">assertEquals</span>(<span class="code-string">'Enterprise'</span>,
+        AccountService.<span class="code-function">classify</span>(
+            <span class="code-keyword">new</span> <span class="code-type">Account</span>(AnnualRevenue = 5000000)));
+
+    System.<span class="code-function">assertEquals</span>(<span class="code-string">'Mid-Market'</span>,
+        AccountService.<span class="code-function">classify</span>(
+            <span class="code-keyword">new</span> <span class="code-type">Account</span>(AnnualRevenue = 500000)));
+
+    System.<span class="code-function">assertEquals</span>(<span class="code-string">'SMB'</span>,
+        AccountService.<span class="code-function">classify</span>(
+            <span class="code-keyword">new</span> <span class="code-type">Account</span>(AnnualRevenue = 50000)));
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 3: Validate Before Deploying — Run Tests in Sandbox First</h3>
+          <p class="reveal">Always run the full test suite in a sandbox that mirrors production before attempting a production deployment. Use the SFDX CLI to validate without actually deploying:</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Terminal — Validate-Only Deployment</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment"># Validate without deploying — checks coverage against production rules</span>
+sf project deploy validate \
+  --source-dir force-app \
+  --test-level RunLocalTests \
+  --target-org production \
+  --code-coverage
+
+<span class="code-comment"># Quick deploy if validation already passed (within 10 days)</span>
+sf project deploy quick \
+  --job-id &lt;validation-job-id&gt; \
+  --target-org production</code></pre>
+          </div>
+
+          <h3 class="reveal">Deployment Testing Checklist</h3>
+          <div class="checklist reveal">
+            <div class="checklist-item checklist-item--unchecked">
+              <span class="material-symbols-rounded">radio_button_unchecked</span>
+              <span>Org-wide coverage is ≥ 75% in a full-copy sandbox before deploying</span>
+            </div>
+            <div class="checklist-item checklist-item--unchecked">
+              <span class="material-symbols-rounded">radio_button_unchecked</span>
+              <span>Every trigger has at least one test covering it (≥ 1 line executed)</span>
+            </div>
+            <div class="checklist-item checklist-item--checked">
+              <span class="material-symbols-rounded">check_circle</span>
+              <span>Every new class has a corresponding test class calling it directly</span>
+            </div>
+            <div class="checklist-item checklist-item--checked">
+              <span class="material-symbols-rounded">check_circle</span>
+              <span>Both branches of every <code>if/else</code> are covered by separate test methods</span>
+            </div>
+            <div class="checklist-item checklist-item--checked">
+              <span class="material-symbols-rounded">check_circle</span>
+              <span>Catch blocks and exception paths are tested with deliberate error scenarios</span>
+            </div>
+            <div class="checklist-item checklist-item--tip">
+              <span class="material-symbols-rounded">lightbulb</span>
+              <span>Aim for 85%+ to give yourself a buffer against future additions lowering the average</span>
+            </div>
+            <div class="checklist-item checklist-item--tip">
+              <span class="material-symbols-rounded">lightbulb</span>
+              <span>Use <code>@TestSetup</code> to share data across all test methods in a class — faster and DRY</span>
+            </div>
+          </div>
+
+          <div class="callout callout-warning reveal">
+            <span class="material-symbols-rounded">warning</span>
+            <div>
+              <p><strong>Coverage ≠ Quality.</strong> Lines executed during a test count as "covered" even with no assertions. A test that calls every method but asserts nothing gives you 100% coverage and zero confidence. Always add meaningful <code>System.assertEquals()</code> assertions to validate actual behaviour.</p>
+            </div>
+          </div>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <div>
+              <p><strong>Pro Tip:</strong> Use the <strong>Apex Test Execution</strong> page in Setup → Apex Test Execution → <em>View Test History</em> to see a class-by-class breakdown of coverage percentages without leaving the browser. Clicking any class name shows uncovered lines inline — no VS Code or CLI required.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Table of Contents -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+            <a href="#causes">Common Causes</a>
+            <a href="#find">Find Uncovered Lines</a>
+            <a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+        <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+   <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+    <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+  <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+  <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Salesforce Decoded.</p>
+      <div class="footer-social">
+        <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+        <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+      </div>
+    </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

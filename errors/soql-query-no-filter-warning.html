@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: SOQL Query With No Filter Returns All Rows — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Understand and fix Salesforce SOQL queries with no WHERE clause. Learn why filterless queries are dangerous at scale and how to add appropriate constraints.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/soql-query-no-filter-warning.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <nav class="navbar"><div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+<ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html" class="active">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+<div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+<div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">SOQL Query With No Filter Returns All Rows</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-error">Performance</span><span class="tag tag-warning">Best Practice</span></div>
+      <h1 class="display-medium reveal stagger-3">SOQL Query With No Filter Returns All Rows</h1>
+      <p class="reveal stagger-4">Debug log warning — A SOQL query executed without a WHERE clause, retrieving all rows from the object. This is dangerous in production orgs with large data volumes.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+          <div class="callout callout-error reveal">
+  <span class="material-symbols-rounded">error</span>
+  <div><p><strong>Warning (Debug Log):</strong> SOQL query with no filter returns all rows — this may return more records than expected</p></div>
+</div>
+          
+<h2 id="what" class="reveal">What does this error mean?</h2>
+<p class="reveal">A SOQL query without a <code>WHERE</code> clause retrieves every record on the queried object. In development with small data sets this seems harmless, but in production orgs with hundreds of thousands of records, it will breach the 50,000-row governor limit, slow down the transaction significantly, or trigger the non-selective query error on large objects. This warning appears in debug logs and is surfaced by code review tools and Salesforce's Best Practice Analyzer.</p>
+<p class="reveal">Even with a <code>LIMIT</code> clause, a filterless query performs a full table scan internally — retrieving and discarding rows until it reaches the limit. The query overhead is the same regardless of how small the <code>LIMIT</code> is.</p>
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+<h3 class="reveal">1. Development queries promoted to production</h3>
+<p class="reveal">Quick queries written during development or debugging (<code>SELECT Id FROM Account LIMIT 10</code>) accidentally left in production code.</p>
+<h3 class="reveal">2. Utility methods that retrieve all records of a type</h3>
+<p class="reveal">Helper methods like <code>getAllAccounts()</code> that were designed for small orgs and never had filters — fine in sandbox, dangerous in production at scale.</p>
+<h3 class="reveal">3. Admin scripts run via Execute Anonymous</h3>
+<p class="reveal">One-off data operations that use broad queries to get all records of a type, then process them — workable for small objects, will fail for large ones.</p>
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+<h3 class="reveal">Solution 1: Always add a contextual WHERE clause</h3>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-comment">// ❌ BAD — retrieves all accounts</span>
+List&lt;Account&gt; allAccounts = [<span class="code-keyword">SELECT</span> Id, Name <span class="code-keyword">FROM</span> Account];
+
+<span class="code-comment">// ✅ GOOD — scoped to relevant context</span>
+List&lt;Account&gt; activeAccounts = [
+    <span class="code-keyword">SELECT</span> Id, Name
+    <span class="code-keyword">FROM</span> Account
+    <span class="code-keyword">WHERE</span> IsActive__c = <span class="code-keyword">true</span>
+      <span class="code-keyword">AND</span> OwnerId = :UserInfo.<span class="code-function">getUserId</span>()
+    <span class="code-keyword">LIMIT</span> 1000
+];</code></pre>
+</div>
+<h3 class="reveal">Solution 2: For large-data processing, use Batch Apex</h3>
+<p class="reveal">If you genuinely need to process all records of an object, use Batch Apex with <code>Database.getQueryLocator()</code>. It handles pagination safely and doesn't hit the 50,000-row limit per chunk.</p>
+<div class="callout callout-warning reveal">
+  <span class="material-symbols-rounded">warning</span>
+  <div><p><strong>Code review rule:</strong> Treat any SOQL query without a WHERE clause as a bug in production code, not just a warning. Add a WHERE clause or a <code>// intentionally no filter: [reason]</code> comment so future reviewers don't question it. Static analysis tools like PMD ApexRules flag these automatically.</p></div>
+</div>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+ <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+  <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+<div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+<div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

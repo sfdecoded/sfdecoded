@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Too Many Aggregate Queries: 301 — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce 'Too many aggregate queries: 301' error. Learn how to consolidate GROUP BY queries and avoid hitting this governor limit.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/too-many-aggregate-queries-301.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <nav class="navbar"><div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+<ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html" class="active">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+<div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+<div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">Too Many Aggregate Queries: 301</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-error">Governor Limit</span><span class="tag tag-primary">Runtime Error</span></div>
+      <h1 class="display-medium reveal stagger-3">Too Many Aggregate Queries: 301</h1>
+      <p class="reveal stagger-4">System.LimitException — Your transaction executed more than 300 SOQL aggregate queries (queries using GROUP BY or aggregate functions), exceeding the per-transaction limit.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+          <div class="callout callout-error reveal">
+  <span class="material-symbols-rounded">error</span>
+  <div><p><strong>System.LimitException:</strong> Too many aggregate queries: 301</p></div>
+</div>
+          
+<h2 id="what" class="reveal">What does this error mean?</h2>
+<p class="reveal">Salesforce tracks aggregate SOQL queries — those using <code>GROUP BY</code>, <code>COUNT()</code>, <code>SUM()</code>, <code>AVG()</code>, <code>MIN()</code>, <code>MAX()</code> — separately from standard queries. The limit is <strong>300 aggregate queries</strong> per transaction (synchronous and asynchronous alike). Aggregate queries also count toward the standard 100 SOQL query limit, so hitting this limit means you've likely already hit or are near the 100 SOQL limit too.</p>
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+<h3 class="reveal">1. Aggregate queries inside loops</h3>
+<p class="reveal">Running a <code>COUNT()</code> or <code>SUM()</code> query per record in a loop is the classic cause. With 200 records in a trigger, that's 200 aggregate queries — already well past the limit in asynchronous contexts and over it in synchronous.</p>
+<h3 class="reveal">2. Complex reporting logic in Apex</h3>
+<p class="reveal">Analytics or rollup logic that runs multiple <code>GROUP BY</code> queries across different field combinations — for example, grouping by region, then by owner, then by stage — quickly accumulates aggregate query count.</p>
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+<h3 class="reveal">Solution 1: Combine aggregate queries with IN clauses</h3>
+<p class="reveal">Instead of one aggregate query per record, write a single aggregate query that covers all records and use a <code>Map</code> to distribute results.</p>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-comment">// ❌ BAD — aggregate query per account</span>
+<span class="code-keyword">for</span> (<span class="code-type">Account</span> acc : Trigger.new) {{
+    AggregateResult ar = [
+        <span class="code-keyword">SELECT SUM</span>(Amount) total
+        <span class="code-keyword">FROM</span> Opportunity
+        <span class="code-keyword">WHERE</span> AccountId = :acc.Id
+    ][0];
+}}
+
+<span class="code-comment">// ✅ GOOD — single aggregate for all accounts</span>
+Map&lt;Id, Decimal&gt; totals = <span class="code-keyword">new</span> Map&lt;Id, Decimal&gt;();
+<span class="code-keyword">for</span> (AggregateResult ar : [
+    <span class="code-keyword">SELECT</span> AccountId, <span class="code-keyword">SUM</span>(Amount) total
+    <span class="code-keyword">FROM</span> Opportunity
+    <span class="code-keyword">WHERE</span> AccountId <span class="code-keyword">IN</span> :Trigger.newMap.keySet()
+    <span class="code-keyword">GROUP BY</span> AccountId
+]) {{
+    totals.put((Id)ar.get(<span class="code-string">'AccountId'</span>), (Decimal)ar.get(<span class="code-string">'total'</span>));
+}}</code></pre>
+</div>
+<h3 class="reveal">Solution 2: Use roll-up summary fields for simple totals</h3>
+<p class="reveal">If you're aggregating child records to a parent, consider using a Salesforce <strong>Roll-Up Summary Field</strong> instead of Apex. These update automatically via the platform without consuming governor limits.</p>
+<div class="callout callout-info reveal">
+  <span class="material-symbols-rounded">lightbulb</span>
+  <div><p><strong>Pro Tip:</strong> Aggregate queries also count toward the standard 100 SOQL limit. Use <code>Limits.getAggregateQueries()</code> to track aggregate query usage and <code>Limits.getQueries()</code> to monitor total query count simultaneously.</p></div>
+</div>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+ <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+  <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+<div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+<div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

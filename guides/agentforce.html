@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentforce Guide — Complete Guide | Salesforce Decoded</title>
+  <meta name="description" content="Master Agentforce — Salesforce's AI agent platform. Build autonomous agents, custom actions, topics, and integrate with Apex and Flow.">
+  <meta name="keywords" content="agentforce, salesforce ai agents, agentforce topics, agentforce actions, einstein copilot, agentforce apex">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/guides/agentforce.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+  <style>
+    /* Agentforce accent overrides */
+    .af-gradient-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px 6px 10px;
+      background: linear-gradient(135deg, #0d6efd15, #7c3aed15);
+      border: 1px solid #7c3aed30;
+      border-radius: var(--md-shape-full);
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #7c3aed;
+      margin-bottom: 8px;
+    }
+    .af-gradient-badge .material-symbols-rounded {
+      font-size: 18px;
+      color: #7c3aed;
+    }
+
+    /* Architecture diagram */
+    .arch-diagram {
+      background: var(--md-surface-container-lowest);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-xl);
+      padding: 32px 24px;
+      margin: 24px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .arch-diagram::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, #7c3aed10 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .arch-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .arch-row:last-child { margin-bottom: 0; }
+    .arch-node {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--md-shape-md);
+      font-family: var(--font-display);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
+    .arch-node .material-symbols-rounded { font-size: 18px; }
+    .arch-node-primary {
+      background: linear-gradient(135deg, #ede9fe, #dbeafe);
+      color: #4c1d95;
+      border: 1px solid #c4b5fd;
+    }
+    .arch-node-action {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+    .arch-node-data {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+    }
+    .arch-node-neutral {
+      background: var(--md-surface-container);
+      color: var(--md-on-surface-variant);
+      border: 1px solid var(--md-outline-variant);
+    }
+    .arch-arrow {
+      color: var(--md-outline);
+      font-size: 1.2rem;
+      font-weight: 300;
+      flex-shrink: 0;
+    }
+    .arch-label {
+      font-family: var(--font-display);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--md-outline);
+      margin-bottom: 10px;
+    }
+    .arch-section {
+      padding: 16px;
+      border-radius: var(--md-shape-md);
+      border: 1px dashed var(--md-outline-variant);
+      margin-bottom: 16px;
+    }
+    .arch-section:last-child { margin-bottom: 0; }
+    .arch-section-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--md-outline);
+      margin-bottom: 12px;
+    }
+
+    /* Comparison table */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 24px 0;
+      table-layout: fixed;
+    }
+    .compare-table th {
+      padding: 14px 18px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--md-on-surface);
+      text-align: left;
+      background: var(--md-surface-container);
+      border-bottom: 2px solid var(--md-outline-variant);
+      word-break: break-word;
+    }
+    .compare-table td {
+      padding: 12px 18px;
+      color: var(--md-on-surface-variant);
+      border-bottom: 1px solid var(--md-outline-variant);
+      vertical-align: top;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tr:nth-child(even) td { background: var(--md-surface-container-low); }
+
+    .tag-purple {
+      background: #ede9fe;
+      color: #4c1d95;
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: var(--md-shape-full);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .tag-green {
+      background: #d1fae5;
+      color: #065f46;
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: var(--md-shape-full);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Fix grid layout overflow */
+    .article-content {
+      min-width: 0;
+      overflow-x: hidden;
+    }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+    <ul class="navbar-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li>
+      <li><a href="../guides.html" class="active">Guides</a></li>
+      <li><a href="../tips.html">Tips</a></li>
+      <li><a href="../prompts.html">Prompts</a></li>
+      <li><a href="../extensions.html">Extensions</a></li>
+      <li><a href="../resources.html">Resources</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+    <div class="navbar-search" role="button" tabindex="0">
+      <span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd>
+    </div>
+    <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+  </div></nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html" class="active"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../guides.html">Guides</a><span class="separator">/</span>
+        <span class="current">Agentforce Guide</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-primary">AI Agent Guide</span>
+        <span class="body-small text-outline">22 min read</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">Agentforce Guide</h1>
+      <p class="reveal stagger-4">Build autonomous AI agents on the Salesforce platform — from topics and actions to Apex integration and deployment best practices.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+
+          <p class="body-large reveal">Agentforce is Salesforce's platform for building and deploying autonomous AI agents that can reason, plan, and take actions inside your org — without a human in the loop for every step. Unlike a chatbot that only answers questions, an Agentforce agent can retrieve data, update records, call external APIs, and trigger flows, all driven by natural language instructions.</p>
+
+          <!-- ─── What is Agentforce ─── -->
+          <h2 id="what-is-agentforce" class="reveal">What Is Agentforce?</h2>
+          <p class="reveal">Agentforce sits on top of the <strong>Einstein 1 Platform</strong> and uses a large language model (the <em>Einstein Reasoning Engine</em>) as its brain. You define the agent's role, the topics it can handle, and the actions it can take. At runtime, the LLM decides which topic and action to invoke based on the user's message, executes it, and returns a grounded response.</p>
+
+          <div class="arch-diagram reveal">
+            <div class="arch-section-title">Agentforce Runtime Architecture</div>
+
+            <div class="arch-section">
+              <div class="arch-label">User Layer</div>
+              <div class="arch-row">
+                <div class="arch-node arch-node-neutral"><span class="material-symbols-rounded">person</span> End User</div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node arch-node-neutral"><span class="material-symbols-rounded">chat</span> Messaging Channel</div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node arch-node-primary"><span class="material-symbols-rounded">smart_toy</span> Agentforce Agent</div>
+              </div>
+            </div>
+
+            <div class="arch-section">
+              <div class="arch-label">Reasoning Layer</div>
+              <div class="arch-row">
+                <div class="arch-node arch-node-primary"><span class="material-symbols-rounded">psychology</span> Einstein Reasoning Engine (LLM)</div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node arch-node-primary"><span class="material-symbols-rounded">category</span> Topic Classification</div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node arch-node-primary"><span class="material-symbols-rounded">bolt</span> Action Selection</div>
+              </div>
+            </div>
+
+            <div class="arch-section">
+              <div class="arch-label">Action Layer</div>
+              <div class="arch-row">
+                <div class="arch-node arch-node-action"><span class="material-symbols-rounded">code</span> Apex Action</div>
+                <div class="arch-node arch-node-action"><span class="material-symbols-rounded">account_tree</span> Flow Action</div>
+                <div class="arch-node arch-node-action"><span class="material-symbols-rounded">integration_instructions</span> API Action</div>
+                <div class="arch-node arch-node-action"><span class="material-symbols-rounded">search</span> Data Cloud Query</div>
+              </div>
+            </div>
+
+            <div class="arch-section">
+              <div class="arch-label">Data Layer</div>
+              <div class="arch-row">
+                <div class="arch-node arch-node-data"><span class="material-symbols-rounded">database</span> Salesforce CRM</div>
+                <div class="arch-node arch-node-data"><span class="material-symbols-rounded">hub</span> Data Cloud</div>
+                <div class="arch-node arch-node-data"><span class="material-symbols-rounded">article</span> Knowledge Base</div>
+                <div class="arch-node arch-node-data"><span class="material-symbols-rounded">cloud</span> External Systems</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <p><strong>Key mental model:</strong> You don't code the agent's decision-making — you configure <em>what</em> the agent can do (Topics + Actions) and the LLM decides <em>when</em> and <em>how</em> to use those tools based on the conversation context.</p>
+          </div>
+
+          <!-- ─── Core Concepts ─── -->
+          <h2 id="core-concepts" class="reveal">Core Concepts</h2>
+          <p class="reveal">Agentforce has four building blocks. Understanding how they compose is the foundation of everything else.</p>
+
+          <div class="grid grid-2 mt-24 mb-32">
+            <div class="card reveal stagger-1" style="padding:24px;border-left:4px solid #7c3aed">
+              <div class="card-icon" style="background:#ede9fe;color:#4c1d95;margin-bottom:16px">
+                <span class="material-symbols-rounded">smart_toy</span>
+              </div>
+              <h3 style="margin-bottom:8px">Agent</h3>
+              <p>The top-level entity. Defines the agent's name, persona, role description, and which topics it has access to. An agent can serve one channel (e.g., a service portal) or multiple.</p>
+            </div>
+            <div class="card reveal stagger-2" style="padding:24px;border-left:4px solid #0d6efd">
+              <div class="card-icon" style="background:#dbeafe;color:#1e40af;margin-bottom:16px">
+                <span class="material-symbols-rounded">category</span>
+              </div>
+              <h3 style="margin-bottom:8px">Topic</h3>
+              <p>A domain of responsibility. Each topic has a natural language description that the LLM uses to classify incoming requests. A topic contains one or more actions. Example: <em>"Order Management"</em>.</p>
+            </div>
+            <div class="card reveal stagger-3" style="padding:24px;border-left:4px solid #059669">
+              <div class="card-icon" style="background:#d1fae5;color:#065f46;margin-bottom:16px">
+                <span class="material-symbols-rounded">bolt</span>
+              </div>
+              <h3 style="margin-bottom:8px">Action</h3>
+              <p>A specific capability the agent can invoke — an Apex method, a Flow, a prompt template, or an external API call. Each action has inputs/outputs the LLM maps to and from the conversation.</p>
+            </div>
+            <div class="card reveal stagger-4" style="padding:24px;border-left:4px solid #d97706">
+              <div class="card-icon" style="background:#fef3c7;color:#92400e;margin-bottom:16px">
+                <span class="material-symbols-rounded">psychology</span>
+              </div>
+              <h3 style="margin-bottom:8px">Reasoning Engine</h3>
+              <p>The LLM layer that reads the conversation, selects the right topic and action, maps user intent to action inputs, executes it, and generates a natural language response from the output.</p>
+            </div>
+          </div>
+
+          <!-- ─── Topics ─── -->
+          <h2 id="topics" class="reveal">Configuring Topics</h2>
+          <p class="reveal">Topics are configured in <strong>Setup → Agents → [Your Agent] → Topics</strong>. The topic description is critical — it's the text the LLM reads to decide whether an incoming user message belongs to this topic. Write it like a job description for the topic.</p>
+
+          <div class="callout callout-warning reveal">
+            <span class="material-symbols-rounded">edit_note</span>
+            <p><strong>Write better topic descriptions:</strong> Be specific about what the topic handles AND what it doesn't. Overlapping descriptions cause the LLM to pick the wrong topic. Include example triggers like <em>"Use this topic when the user asks about order status, cancellations, or shipment tracking."</em></p>
+          </div>
+
+          <div class="card card-elevated reveal" style="padding:28px;margin:24px 0">
+            <div class="arch-section-title" style="margin-bottom:16px">Example: Well-Written Topic</div>
+            <div style="display:grid;gap:16px">
+              <div>
+                <div class="arch-label">Topic Name</div>
+                <div style="font-family:var(--font-mono);font-size:0.9rem;color:var(--md-on-surface);padding:10px 14px;background:var(--md-surface-container);border-radius:8px">Order Management</div>
+              </div>
+              <div>
+                <div class="arch-label">Scope / Description</div>
+                <div style="font-size:0.9rem;color:var(--md-on-surface-variant);padding:12px 16px;background:var(--md-surface-container);border-radius:8px;line-height:1.7">
+                  Handle all customer requests related to orders. Use this topic when the user asks about: checking order status or delivery dates, cancelling or modifying an existing order, reporting a missing or damaged item, requesting a return label, or tracking a shipment. Do <strong>not</strong> use this topic for product recommendations, account billing questions, or technical support issues.
+                </div>
+              </div>
+              <div>
+                <div class="arch-label">Actions in this Topic</div>
+                <div class="chip-group">
+                  <span class="chip">Get Order Status</span>
+                  <span class="chip">Cancel Order</span>
+                  <span class="chip">Create Return Case</span>
+                  <span class="chip">Send Tracking Link</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── Apex Actions ─── -->
+          <h2 id="apex-actions" class="reveal">Building Apex Actions</h2>
+          <p class="reveal">Apex actions are the most powerful and flexible way to extend Agentforce. An invocable Apex method becomes an action the agent can call with inputs drawn from the conversation and CRM context.</p>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">info</span>
+            <p><strong>Requirements:</strong> The Apex class must be <code>global</code>, the method must be <code>@InvocableMethod</code>, and all parameters must use an inner <code>@InvocableVariable</code> wrapper class. The method must be bulkified (accept and return <code>List</code>).</p>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Invocable Action for Agentforce</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-keyword">global class</span> <span class="code-type">GetOrderStatusAction</span> {
+
+    <span class="code-comment">// Input wrapper — each @InvocableVariable is a field the LLM can populate</span>
+    <span class="code-keyword">global class</span> <span class="code-type">ActionInput</span> {
+        <span class="code-keyword">@InvocableVariable</span>(
+            label=<span class="code-string">'Order Number'</span>
+            description=<span class="code-string">'The customer-facing order number, e.g. ORD-12345'</span>
+            required=<span class="code-keyword">true</span>
+        )
+        <span class="code-keyword">global</span> String orderNumber;
+
+        <span class="code-keyword">@InvocableVariable</span>(
+            label=<span class="code-string">'Customer Account ID'</span>
+            description=<span class="code-string">'Salesforce Account ID of the requesting customer'</span>
+            required=<span class="code-keyword">false</span>
+        )
+        <span class="code-keyword">global</span> String accountId;
+    }
+
+    <span class="code-comment">// Output wrapper — the LLM reads these to formulate its response</span>
+    <span class="code-keyword">global class</span> <span class="code-type">ActionOutput</span> {
+        <span class="code-keyword">@InvocableVariable</span>(label=<span class="code-string">'Order Status'</span>)
+        <span class="code-keyword">global</span> String status;
+
+        <span class="code-keyword">@InvocableVariable</span>(label=<span class="code-string">'Estimated Delivery Date'</span>)
+        <span class="code-keyword">global</span> String estimatedDelivery;
+
+        <span class="code-keyword">@InvocableVariable</span>(label=<span class="code-string">'Tracking URL'</span>)
+        <span class="code-keyword">global</span> String trackingUrl;
+
+        <span class="code-keyword">@InvocableVariable</span>(label=<span class="code-string">'Error Message'</span>)
+        <span class="code-keyword">global</span> String errorMessage;
+    }
+
+    <span class="code-keyword">@InvocableMethod</span>(
+        label=<span class="code-string">'Get Order Status'</span>
+        description=<span class="code-string">'Retrieves the current status and delivery information for a given order number. Use when the customer asks where their order is or when it will arrive.'</span>
+        category=<span class="code-string">'Order Management'</span>
+    )
+    <span class="code-keyword">global static</span> List&lt;ActionOutput&gt; <span class="code-function">execute</span>(List&lt;ActionInput&gt; inputs) {
+        List&lt;ActionOutput&gt; outputs = <span class="code-keyword">new</span> List&lt;ActionOutput&gt;();
+
+        <span class="code-keyword">for</span> (ActionInput inp : inputs) {
+            ActionOutput out = <span class="code-keyword">new</span> ActionOutput();
+
+            <span class="code-keyword">try</span> {
+                List&lt;Order__c&gt; orders = [
+                    <span class="code-keyword">SELECT</span> Id, Status__c, Estimated_Delivery__c, Tracking_URL__c
+                    <span class="code-keyword">FROM</span> Order__c
+                    <span class="code-keyword">WHERE</span> Order_Number__c = :inp.orderNumber
+                    <span class="code-keyword">LIMIT</span> <span class="code-number">1</span>
+                ];
+
+                <span class="code-keyword">if</span> (orders.isEmpty()) {
+                    out.errorMessage = <span class="code-string">'No order found with number '</span> + inp.orderNumber;
+                } <span class="code-keyword">else</span> {
+                    Order__c order = orders[<span class="code-number">0</span>];
+                    out.status = order.Status__c;
+                    out.estimatedDelivery = order.Estimated_Delivery__c != <span class="code-keyword">null</span>
+                        ? order.Estimated_Delivery__c.format()
+                        : <span class="code-string">'Not yet available'</span>;
+                    out.trackingUrl = order.Tracking_URL__c;
+                }
+
+            } <span class="code-keyword">catch</span> (Exception e) {
+                out.errorMessage = <span class="code-string">'Unable to retrieve order: '</span> + e.getMessage();
+                System.debug(LoggingLevel.ERROR, <span class="code-string">'GetOrderStatus error: '</span> + e.getMessage());
+            }
+
+            outputs.add(out);
+        }
+
+        <span class="code-keyword">return</span> outputs;
+    }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-warning reveal">
+            <span class="material-symbols-rounded">warning</span>
+            <p><strong>Write great descriptions:</strong> The <code>description</code> on <code>@InvocableMethod</code> and each <code>@InvocableVariable</code> is read by the LLM to understand when and how to call your action. Treat them like API documentation — be precise about what each field means and when the action should be used.</p>
+          </div>
+
+          <!-- ─── Flow Actions ─── -->
+          <h2 id="flow-actions" class="reveal">Flow Actions</h2>
+          <p class="reveal">Auto-launched Flows can also be surfaced as Agentforce actions — no Apex required. This is ideal for admins or when the logic already exists in Flow. Mark the Flow's input/output variables as <strong>Available for Input</strong> and <strong>Available for Output</strong> to expose them to the agent.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Flow Variable Configuration Checklist</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// In Flow Builder, for each variable you want the agent to use:</span>
+
+<span class="code-comment">// INPUT variables (agent provides values TO the flow):</span>
+<span class="code-comment">// ✅ Data Type: Text, Number, Boolean, Record, etc.</span>
+<span class="code-comment">// ✅ "Available for Input" = true</span>
+<span class="code-comment">// ✅ Description filled in (the LLM reads this)</span>
+
+<span class="code-comment">// OUTPUT variables (flow returns values TO the agent):</span>
+<span class="code-comment">// ✅ "Available for Output" = true</span>
+<span class="code-comment">// ✅ Description filled in</span>
+
+<span class="code-comment">// Flow-level settings:</span>
+<span class="code-comment">// ✅ Flow Type: Auto-launched Flow (No Trigger)</span>
+<span class="code-comment">// ✅ API Name is meaningful (shown in Agent Builder)</span>
+<span class="code-comment">// ✅ Description explains when to use this flow</span>
+
+<span class="code-comment">// In Agent Builder:
+// Setup → Agents → [Agent] → Topics → [Topic] → Actions → Add Action
+// Filter by "Flow" → select your Auto-launched Flow
+// The LLM will map conversation context to flow variables automatically</span></code></pre>
+          </div>
+
+          <!-- ─── Prompt Templates ─── -->
+          <h2 id="prompt-templates" class="reveal">Prompt Templates</h2>
+          <p class="reveal">Prompt Templates let you define reusable, data-merged prompts that the agent (or your own Apex/Flow) can invoke. They support merge fields from any Salesforce object and can be versioned and shared across agents.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Invoking a Prompt Template</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-keyword">import</span> ConnectApi.EinsteinLLM;
+<span class="code-keyword">import</span> ConnectApi.EinsteinPromptTemplateGenerationsInput;
+<span class="code-keyword">import</span> ConnectApi.EinsteinPromptTemplateGenerationsRepresentation;
+
+<span class="code-keyword">public class</span> <span class="code-type">PromptTemplateService</span> {
+
+    <span class="code-keyword">public static</span> String <span class="code-function">generateCaseEmail</span>(Id caseId) {
+        ConnectApi.EinsteinPromptTemplateGenerationsInput input =
+            <span class="code-keyword">new</span> ConnectApi.EinsteinPromptTemplateGenerationsInput();
+
+        <span class="code-comment">// Reference the template by its API name</span>
+        input.promptTemplateName = <span class="code-string">'Case_Resolution_Email'</span>;
+
+        <span class="code-comment">// Provide the record context for merge fields</span>
+        input.inputParams = <span class="code-keyword">new</span> Map&lt;String, ConnectApi.WrappedValue&gt;{
+            <span class="code-string">'Input:CaseId'</span> =&gt; ConnectApi.EinsteinLLM.wrap(caseId)
+        };
+
+        input.isPreview = <span class="code-keyword">false</span>;
+
+        ConnectApi.EinsteinPromptTemplateGenerationsRepresentation result =
+            ConnectApi.EinsteinLLM.generateMessagesForPromptTemplate(input);
+
+        <span class="code-keyword">return</span> result.generations[<span class="code-number">0</span>].text;
+    }
+}</code></pre>
+          </div>
+
+          <!-- ─── Agent Builder Setup ─── -->
+          <h2 id="agent-builder" class="reveal">Agent Builder: Step-by-Step</h2>
+          <p class="reveal">Agentforce agents are created and configured in <strong>Setup → Agents</strong>. Here's the end-to-end process for standing up a new agent.</p>
+
+          <div class="card card-elevated reveal" style="padding:28px;margin:24px 0">
+            <div style="display:grid;gap:0">
+
+              <div style="display:flex;gap:20px;padding-bottom:24px;border-bottom:1px solid var(--md-outline-variant)">
+                <div style="width:36px;height:36px;min-width:36px;background:var(--md-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:var(--font-display);font-weight:700;font-size:0.875rem">1</div>
+                <div>
+                  <div style="font-family:var(--font-display);font-weight:600;margin-bottom:4px">Create the Agent</div>
+                  <p style="margin:0;font-size:0.9rem;color:var(--md-on-surface-variant)">Setup → Agents → New Agent. Choose a type (Service, Sales, Custom), give it a Name and a Role Description. The role description sets the agent's personality and overall scope — e.g., <em>"You are a helpful service agent for Acme Corp. You help customers with orders, returns, and account questions."</em></p>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:20px;padding:24px 0;border-bottom:1px solid var(--md-outline-variant)">
+                <div style="width:36px;height:36px;min-width:36px;background:var(--md-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:var(--font-display);font-weight:700;font-size:0.875rem">2</div>
+                <div>
+                  <div style="font-family:var(--font-display);font-weight:600;margin-bottom:4px">Add Topics</div>
+                  <p style="margin:0;font-size:0.9rem;color:var(--md-on-surface-variant)">Inside the agent, go to Topics tab → New Topic. Write a descriptive Scope field — this is the most important configuration you'll do. Add actions to each topic. Start with 3–5 focused topics rather than one massive topic.</p>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:20px;padding:24px 0;border-bottom:1px solid var(--md-outline-variant)">
+                <div style="width:36px;height:36px;min-width:36px;background:var(--md-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:var(--font-display);font-weight:700;font-size:0.875rem">3</div>
+                <div>
+                  <div style="font-family:var(--font-display);font-weight:600;margin-bottom:4px">Configure Actions</div>
+                  <p style="margin:0;font-size:0.9rem;color:var(--md-on-surface-variant)">Actions → Add Action → select Apex, Flow, or API. Fill in the Action Description (used by LLM), map input/output variables, and set confirmation behavior — some actions should ask the user before executing (e.g., canceling an order).</p>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:20px;padding:24px 0;border-bottom:1px solid var(--md-outline-variant)">
+                <div style="width:36px;height:36px;min-width:36px;background:var(--md-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:var(--font-display);font-weight:700;font-size:0.875rem">4</div>
+                <div>
+                  <div style="font-family:var(--font-display);font-weight:600;margin-bottom:4px">Test in Agent Builder</div>
+                  <p style="margin:0;font-size:0.9rem;color:var(--md-on-surface-variant)">Use the built-in conversation simulator in Agent Builder. Type test messages that match each topic's expected triggers. Check which topic and action the agent selected — use the <strong>Reasoning Trace</strong> to debug unexpected behavior.</p>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:20px;padding-top:24px">
+                <div style="width:36px;height:36px;min-width:36px;background:var(--md-success,#1B6B3A);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:var(--font-display);font-weight:700;font-size:0.875rem">5</div>
+                <div>
+                  <div style="font-family:var(--font-display);font-weight:600;margin-bottom:4px">Activate & Deploy</div>
+                  <p style="margin:0;font-size:0.9rem;color:var(--md-on-surface-variant)">Activate the agent and assign it to a channel — Service Cloud Messaging, a website bot widget, Slack, or a custom channel via API. Set guardrails (out-of-scope message handling) before going live.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ─── Testing & Debugging ─── -->
+          <h2 id="testing-debugging" class="reveal">Testing & Debugging Agents</h2>
+          <p class="reveal">Agent behavior depends on LLM reasoning, which means deterministic unit tests alone aren't sufficient. Use a layered testing strategy.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Testing Invocable Action Logic</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Unit test the Apex action independently of the agent runtime</span>
+<span class="code-keyword">@isTest</span>
+<span class="code-keyword">private class</span> <span class="code-type">GetOrderStatusActionTest</span> {
+
+    <span class="code-keyword">@TestSetup</span>
+    <span class="code-keyword">static void</span> <span class="code-function">makeData</span>() {
+        Order__c order = <span class="code-keyword">new</span> Order__c(
+            Order_Number__c = <span class="code-string">'ORD-99999'</span>,
+            Status__c = <span class="code-string">'Shipped'</span>,
+            Estimated_Delivery__c = Date.today().addDays(<span class="code-number">3</span>),
+            Tracking_URL__c = <span class="code-string">'https://track.example.com/ORD-99999'</span>
+        );
+        insert order;
+    }
+
+    <span class="code-keyword">@isTest</span>
+    <span class="code-keyword">static void</span> <span class="code-function">validOrder_returnsStatusAndTracking</span>() {
+        GetOrderStatusAction.ActionInput inp = <span class="code-keyword">new</span> GetOrderStatusAction.ActionInput();
+        inp.orderNumber = <span class="code-string">'ORD-99999'</span>;
+
+        Test.startTest();
+        List&lt;GetOrderStatusAction.ActionOutput&gt; results =
+            GetOrderStatusAction.execute(<span class="code-keyword">new</span> List&lt;GetOrderStatusAction.ActionInput&gt;{ inp });
+        Test.stopTest();
+
+        System.assertEquals(<span class="code-number">1</span>, results.size(), <span class="code-string">'Should return one result'</span>);
+        System.assertEquals(<span class="code-string">'Shipped'</span>, results[<span class="code-number">0</span>].status, <span class="code-string">'Status should be Shipped'</span>);
+        System.assertNotEquals(<span class="code-keyword">null</span>, results[<span class="code-number">0</span>].trackingUrl, <span class="code-string">'Tracking URL should be present'</span>);
+        System.assertEquals(<span class="code-keyword">null</span>, results[<span class="code-number">0</span>].errorMessage, <span class="code-string">'No error expected'</span>);
+    }
+
+    <span class="code-keyword">@isTest</span>
+    <span class="code-keyword">static void</span> <span class="code-function">invalidOrder_returnsErrorMessage</span>() {
+        GetOrderStatusAction.ActionInput inp = <span class="code-keyword">new</span> GetOrderStatusAction.ActionInput();
+        inp.orderNumber = <span class="code-string">'ORD-DOESNOTEXIST'</span>;
+
+        Test.startTest();
+        List&lt;GetOrderStatusAction.ActionOutput&gt; results =
+            GetOrderStatusAction.execute(<span class="code-keyword">new</span> List&lt;GetOrderStatusAction.ActionInput&gt;{ inp });
+        Test.stopTest();
+
+        System.assertNotEquals(<span class="code-keyword">null</span>, results[<span class="code-number">0</span>].errorMessage, <span class="code-string">'Should return an error message'</span>);
+        System.assertEquals(<span class="code-keyword">null</span>, results[<span class="code-number">0</span>].status, <span class="code-string">'Status should be null on error'</span>);
+    }
+}</code></pre>
+          </div>
+
+          <div class="card card-elevated reveal" style="padding:24px;margin:24px 0">
+            <h3 style="margin-bottom:16px;font-size:1.1rem">Debugging with Reasoning Trace</h3>
+            <p style="color:var(--md-on-surface-variant);font-size:0.9rem;margin-bottom:16px">Every agent conversation in the simulator exposes a Reasoning Trace — a step-by-step log of what the LLM decided. Use it to diagnose:</p>
+            <div style="display:grid;gap:10px">
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <span class="material-symbols-rounded" style="color:#7c3aed;font-size:20px;margin-top:2px">search</span>
+                <div style="font-size:0.9rem;color:var(--md-on-surface-variant)"><strong style="color:var(--md-on-surface)">Wrong topic selected</strong> — Your topic descriptions are too similar or ambiguous. Make them more distinct and add "Do NOT use for..." clauses.</div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <span class="material-symbols-rounded" style="color:#7c3aed;font-size:20px;margin-top:2px">bolt</span>
+                <div style="font-size:0.9rem;color:var(--md-on-surface-variant)"><strong style="color:var(--md-on-surface)">Wrong action selected</strong> — Improve the <code>description</code> field on your <code>@InvocableMethod</code>. Be explicit about the trigger condition.</div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <span class="material-symbols-rounded" style="color:#7c3aed;font-size:20px;margin-top:2px">input</span>
+                <div style="font-size:0.9rem;color:var(--md-on-surface-variant)"><strong style="color:var(--md-on-surface)">Incorrect input mapping</strong> — Improve the <code>description</code> on your <code>@InvocableVariable</code> fields. Include format hints like <em>"Order number in format ORD-XXXXX"</em>.</div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <span class="material-symbols-rounded" style="color:#d97706;font-size:20px;margin-top:2px">error</span>
+                <div style="font-size:0.9rem;color:var(--md-on-surface-variant)"><strong style="color:var(--md-on-surface)">Action fails at runtime</strong> — The trace shows the exception. Check your Apex error handling — always return a graceful errorMessage instead of throwing exceptions the agent can't handle.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── Agentforce vs Einstein Bots ─── -->
+          <h2 id="vs-bots" class="reveal">Agentforce vs Einstein Bots</h2>
+          <p class="reveal">If you've used Einstein Bots before, here's how Agentforce differs — and when to use each.</p>
+
+          <div class="card card-elevated reveal" style="padding:0;overflow:hidden;margin:24px 0">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>Feature</th>
+                  <th><span class="tag-purple">Agentforce</span></th>
+                  <th><span class="tag-green">Einstein Bots</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Decision Logic</strong></td>
+                  <td>LLM-driven (natural language intent classification)</td>
+                  <td>Rule/dialog-tree driven (explicit if/then flows)</td>
+                </tr>
+                <tr>
+                  <td><strong>Configuration</strong></td>
+                  <td>Topics + Actions + natural language descriptions</td>
+                  <td>Dialog nodes, intents, entities, buttons</td>
+                </tr>
+                <tr>
+                  <td><strong>Flexibility</strong></td>
+                  <td>High — handles open-ended, varied phrasing naturally</td>
+                  <td>Lower — requires explicit intent training or buttons</td>
+                </tr>
+                <tr>
+                  <td><strong>Predictability</strong></td>
+                  <td>Lower — LLM decisions vary; needs prompt tuning</td>
+                  <td>Higher — deterministic dialog flows</td>
+                </tr>
+                <tr>
+                  <td><strong>Best For</strong></td>
+                  <td>Open-ended conversations, complex multi-step tasks</td>
+                  <td>Highly structured workflows with known paths</td>
+                </tr>
+                <tr>
+                  <td><strong>Grounding</strong></td>
+                  <td>Data Cloud, Knowledge, CRM context, retrieval</td>
+                  <td>CRM data via Apex/Flow actions</td>
+                </tr>
+                <tr>
+                  <td><strong>Required Skill</strong></td>
+                  <td>Prompt engineering + Apex/Flow</td>
+                  <td>Dialog design + Apex/Flow</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ─── Best Practices ─── -->
+          <h2 id="best-practices" class="reveal">Best Practices</h2>
+
+          <div class="callout callout-success reveal">
+            <span class="material-symbols-rounded">verified</span>
+            <div>
+              <p><strong>Design checklist for production-ready Agentforce agents:</strong></p>
+              <p>✅ Keep topics narrow and non-overlapping — one clear job per topic</p>
+              <p>✅ Write action descriptions like API docs — who uses it, when, and what each field means</p>
+              <p>✅ Always return a graceful errorMessage from Apex actions — never let unhandled exceptions bubble to the LLM</p>
+              <p>✅ Use confirmation prompts for destructive actions (cancel, delete, update)</p>
+              <p>✅ Unit test every Apex action independently before wiring to the agent</p>
+              <p>✅ Add an "Out of Scope" system message telling the agent how to handle irrelevant requests</p>
+              <p>✅ Use Named Credentials for any external API calls within actions</p>
+              <p>✅ Monitor conversations with Einstein Conversation Insights after launch</p>
+            </div>
+          </div>
+
+          <!-- ─── Stats ─── -->
+          <div class="grid grid-2 mt-24 mb-32">
+            <div class="card reveal stagger-1" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem;color:#7c3aed">∞</div>
+              <div class="body-small text-muted">Topics per agent (no hard limit)</div>
+            </div>
+            <div class="card reveal stagger-2" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem;color:#7c3aed">20</div>
+              <div class="body-small text-muted">Max actions per topic (recommended)</div>
+            </div>
+            <div class="card reveal stagger-3" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem;color:#7c3aed">5</div>
+              <div class="body-small text-muted">Max reasoning hops per turn</div>
+            </div>
+            <div class="card reveal stagger-4" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem;color:#7c3aed">100</div>
+              <div class="body-small text-muted">SOQL / DML limits (standard Apex)</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TOC -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what-is-agentforce">What Is Agentforce?</a>
+            <a href="#core-concepts">Core Concepts</a>
+            <a href="#topics">Configuring Topics</a>
+            <a href="#apex-actions">Apex Actions</a>
+            <a href="#flow-actions">Flow Actions</a>
+            <a href="#prompt-templates">Prompt Templates</a>
+            <a href="#agent-builder">Agent Builder Setup</a>
+            <a href="#testing-debugging">Testing &amp; Debugging</a>
+            <a href="#vs-bots">Agentforce vs Bots</a>
+            <a href="#best-practices">Best Practices</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid">
+    <div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

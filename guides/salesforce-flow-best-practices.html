@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Flow Best Practices (2026) | Salesforce Decoded</title>
+  <meta name="description" content="Salesforce Flow best practices — bulkification, fault paths, before-save vs after-save, subflows, when to use Flow vs Apex. Build flows that survive production.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/guides/salesforce-flow-best-practices.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+  <link rel="manifest" href="../site.webmanifest">
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="../index.html" class="nav-logo"><div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="navbar-brand-text">Salesforce<span>Decoded</span></div></a>
+    <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html" class="active">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul>
+    <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+    <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+  </div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../guides.html" class="active"><span class="material-symbols-rounded">menu_book</span> Guides</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal"><a href="../index.html">Home</a><span class="separator">/</span><a href="../guides.html">Guides</a><span class="separator">/</span><span class="current">Flow Best Practices</span></div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-primary">Flow</span><span class="tag tag-warning">Best Practices</span></div>
+      <h1 class="display-medium reveal stagger-3">Salesforce Flow Best Practices</h1>
+      <p class="reveal stagger-4">Flows that work in a sandbox often fail in production with real data volumes. These practices keep flows performant, maintainable, and fault-tolerant.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">info</span>
+            <div><p><strong>2026 context:</strong> Workflow Rules and Process Builder are fully deprecated. Record-Triggered Flows are now the primary automation tool. These best practices apply to all Flow types but focus on Record-Triggered Flows.</p></div>
+          </div>
+
+          <h2 id="before-vs-after" class="reveal">1. Before-Save vs After-Save</h2>
+          <p class="reveal">This is the single most impactful decision in Record-Triggered Flow design.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Decision Guide</span></div>
+<pre><code>USE BEFORE-SAVE WHEN:
+  ✓ Updating fields on the triggering record
+  ✓ You want the update in the same transaction without extra DML
+  ✓ Field validation or defaulting logic
+
+USE AFTER-SAVE WHEN:
+  ✓ Creating or updating related records
+  ✓ Sending emails or notifications
+  ✓ Making callouts (via Apex action)
+  ✓ Querying the saved record's Id (new inserts)
+  ✓ Publishing platform events</code></pre>
+          </div>
+
+          <p class="reveal">Before-save flows are significantly more efficient — they don't consume a DML statement for the field update because the record hasn't been written yet. Use before-save whenever you're only modifying the triggering record.</p>
+
+          <h2 id="bulkification" class="reveal">2. Build Bulk-Safe Flows</h2>
+          <p class="reveal">Flows process records one at a time by default in record-triggered context, but they share the same transaction governor limits as all Apex. A flow with a Get Records inside a loop will hit the 100 SOQL limit on the first data load over 100 records.</p>
+
+          <div class="callout callout-error reveal">
+            <span class="material-symbols-rounded">error</span>
+            <div><p><strong>Anti-pattern:</strong> A Loop element that contains a Get Records or Create Records element. Every iteration burns a SOQL query or DML statement.</p></div>
+          </div>
+
+          <p class="reveal">Bulk-safe patterns to use instead:</p>
+          <ul class="reveal" style="margin-left:1.5rem;line-height:2.2">
+            <li>Use <strong>Get Records</strong> outside loops to query all related records at once into a collection variable.</li>
+            <li>Use <strong>Assignment</strong> elements inside loops to build up a record collection variable.</li>
+            <li>Use a single <strong>Create Records</strong> or <strong>Update Records</strong> element after the loop to perform DML once on the whole collection.</li>
+            <li>Never put DML actions (Create/Update/Delete Records) or Get Records inside a Loop element.</li>
+          </ul>
+
+          <h2 id="fault-paths" class="reveal">3. Always Configure Fault Paths</h2>
+          <p class="reveal">Every element that can fail — Create Records, Update Records, Delete Records, Apex Actions, Send Email — should have a fault path configured. Without one, an unhandled fault rolls back the entire transaction and shows a generic error to the user.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Fault Path Pattern</span></div>
+<pre><code>Action Element (Create Records / Apex Action / etc.)
+  │
+  ├─ SUCCESS path → continue flow
+  │
+  └─ FAULT path →
+       ├─ Assignment: capture {!$Flow.FaultMessage}
+       └─ Choice:
+            ├─ Screen Flow: Display error screen to user
+            └─ Auto-launched Flow: Send email to admin / log to object</code></pre>
+          </div>
+
+          <h2 id="one-flow" class="reveal">4. One Flow Per Object Per Trigger Type</h2>
+          <p class="reveal">Just like triggers, multiple record-triggered flows on the same object fire in an indeterminate order. Consolidate logic into one flow and use Decision elements to branch for different scenarios. This avoids hard-to-debug ordering issues and keeps your automation inventory manageable.</p>
+
+          <h2 id="subflows" class="reveal">5. Use Subflows for Reusability</h2>
+          <p class="reveal">If the same logic appears in multiple flows, extract it into an autolaunched flow and invoke it as a Subflow. Common candidates: validation logic, notification patterns, record creation templates.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Subflow pattern</span></div>
+<pre><code>Main Flow (Record-Triggered)
+  └─ Decision: Which type of change?
+       ├─ New High-Value Opportunity → Subflow: NotifyTeam
+       ├─ Stage Changed to Closed Won → Subflow: CreateOnboardingTask
+       └─ Account Changed → Subflow: SyncRelatedContacts
+
+Subflow: NotifyTeam (Autolaunched)
+  └─ Input: {recordId}, {opportunityName}, {ownerEmail}
+  └─ Send Email action
+  └─ Create Task action</code></pre>
+          </div>
+
+          <h2 id="avoid-hardcoding" class="reveal">6. Avoid Hard-Coding IDs and Values</h2>
+          <p class="reveal">Record IDs are org-specific. A flow with a hard-coded Profile ID, Record Type ID, or User ID will break in every sandbox and every production org it's deployed to. Use alternatives:</p>
+          <ul class="reveal" style="margin-left:1.5rem;line-height:2.2">
+            <li>Use <strong>Get Records</strong> to look up the ID by Name or DeveloperName at runtime.</li>
+            <li>Use <strong>Custom Labels</strong> for configurable string values.</li>
+            <li>Use <strong>Custom Metadata</strong> for multi-value configuration tables that can be deployed without code.</li>
+          </ul>
+
+          <h2 id="flow-vs-apex" class="reveal">7. Flow vs Apex — When to Use Which</h2>
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Decision Matrix</span></div>
+<pre><code>USE FLOW WHEN:
+  ✓ Field updates on triggering record or immediate children
+  ✓ Sending standard email alerts
+  ✓ Creating tasks, chatter posts, or simple child records
+  ✓ Simple conditional branching
+  ✓ Screen flows for guided user input
+
+USE APEX WHEN:
+  ✗ Complex multi-object DML with conditional relationships
+  ✗ Callouts to external APIs with custom auth/headers
+  ✗ Batch processing of 50,000+ records (use Batch Apex)
+  ✗ Complex string/data manipulation beyond Flow formulas
+  ✗ Recursion control that Flow can't handle
+  ✗ Custom exception handling with try/catch/finally</code></pre>
+          </div>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <div><p><strong>Debug tip:</strong> Use Flow Builder's built-in debug run tool (the bug icon) to step through your flow with custom input values and see exactly which path each element took and what values were set.</p></div>
+          </div>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#before-vs-after">Before-Save vs After-Save</a>
+            <a href="#bulkification">Build Bulk-Safe Flows</a>
+            <a href="#fault-paths">Fault Paths</a>
+            <a href="#one-flow">One Flow Per Object</a>
+            <a href="#subflows">Subflows</a>
+            <a href="#avoid-hardcoding">Avoid Hard-Coding</a>
+            <a href="#flow-vs-apex">Flow vs Apex</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid">
+    <div class="footer-brand"><a href="../index.html" class="nav-logo"><div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="navbar-brand-text">Salesforce<span>Decoded</span></div></a><p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div>
+    <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+  </div><div class="footer-bottom"><p>&copy; 2026 Salesforce Decoded.</p><div class="footer-social"><a href="../index.html"><span class="material-symbols-rounded">code</span></a><a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a></div></div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

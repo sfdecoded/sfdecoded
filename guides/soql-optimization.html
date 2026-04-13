@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOQL Optimization Guide — Complete Guide | Salesforce Decoded</title>
+  <meta name="description" content="Master SOQL query performance with selective queries, proper indexing, relationship queries, aggregate functions, and large data volume strategies.">
+  <meta name="keywords" content="soql optimization, salesforce soql performance, soql indexing, large data volumes, selective queries">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/guides/soql-optimization.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+    <ul class="navbar-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li>
+      <li><a href="../guides.html" class="active">Guides</a></li>
+      <li><a href="../tips.html">Tips</a></li>
+      <li><a href="../prompts.html">Prompts</a></li>
+      <li><a href="../extensions.html">Extensions</a></li>
+      <li><a href="../resources.html">Resources</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+    <div class="navbar-search" role="button" tabindex="0">
+      <span class="material-symbols-rounded">search</span>
+      <span>Search...</span>
+      <kbd>⌘K</kbd>
+    </div>
+    <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+  </div></nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html" class="active"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../guides.html">Guides</a><span class="separator">/</span>
+        <span class="current">SOQL Optimization Guide</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-primary">Performance Guide</span>
+        <span class="body-small text-outline">12 min read</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">SOQL Optimization Guide</h1>
+      <p class="reveal stagger-4">Master query performance with selective queries, proper indexing, relationship queries, and strategies for large data volumes.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+
+          <p class="body-large reveal">SOQL is the backbone of data access in Salesforce, but poorly written queries can quickly exhaust your governor limits and degrade performance at scale. Understanding how Salesforce processes queries and optimizes storage is essential for building production-ready applications.</p>
+
+          <h2 id="selective-queries" class="reveal">Selective Queries</h2>
+          <p class="reveal">A query is considered <strong>selective</strong> when it uses indexed fields in the WHERE clause and returns a small percentage of total records. Non-selective queries perform full table scans and will fail on large orgs (typically 200,000+ records).</p>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <p><strong>Selectivity Rule:</strong> A query is selective if it returns fewer than 10% of total records (up to 333,333) OR fewer than 200,000 records from a non-standard object. Always filter on indexed fields.</p>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">SOQL — Non-Selective vs Selective</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// ❌ Non-selective — scans every row</span>
+<span class="code-keyword">SELECT</span> Id, Name, Email
+<span class="code-keyword">FROM</span> Contact
+<span class="code-keyword">WHERE</span> Description = <span class="code-string">'VIP Customer'</span>
+
+<span class="code-comment">// ✅ Selective — filters on standard indexed field</span>
+<span class="code-keyword">SELECT</span> Id, Name, Email
+<span class="code-keyword">FROM</span> Contact
+<span class="code-keyword">WHERE</span> AccountId = <span class="code-string">'001XXXXXXXXXXXXXXX'</span>
+<span class="code-keyword">AND</span> IsDeleted = <span class="code-keyword">false</span>
+
+<span class="code-comment">// ✅ Selective — using external ID custom index</span>
+<span class="code-keyword">SELECT</span> Id, Name
+<span class="code-keyword">FROM</span> Account
+<span class="code-keyword">WHERE</span> External_Id__c = <span class="code-string">'EXT-12345'</span></code></pre>
+          </div>
+
+          <h2 id="indexing" class="reveal">Indexing Strategy</h2>
+          <p class="reveal">Salesforce automatically indexes certain fields. For custom fields, you can request custom indexes through Salesforce Support, or mark them as <strong>External ID</strong> or <strong>Unique</strong> to gain index benefits.</p>
+
+          <div class="grid grid-2 mt-24 mb-32">
+            <div class="card reveal stagger-1" style="padding:24px">
+              <div class="card-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">auto_awesome</span></div>
+              <h3>Auto-Indexed Fields</h3>
+              <p style="font-size:0.875rem">Id, Name, OwnerId, CreatedDate, SystemModstamp, RecordTypeId, and all master-detail/lookup foreign keys are indexed by default.</p>
+            </div>
+            <div class="card reveal stagger-2" style="padding:24px">
+              <div class="card-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">settings</span></div>
+              <h3>Custom Index Fields</h3>
+              <p style="font-size:0.875rem">Fields marked as External ID or Unique automatically get an index. For other critical filter fields, request a custom index from Salesforce Support.</p>
+            </div>
+          </div>
+
+          <div class="callout callout-warning reveal">
+            <span class="material-symbols-rounded">warning</span>
+            <p><strong>Index Exclusions:</strong> Indexes are NOT used when filtering on NULL values (<code>field = null</code>), when using negative operators (<code>!=</code>, <code>NOT IN</code>, <code>NOT LIKE</code>), or when a formula field references a non-indexed field.</p>
+          </div>
+
+          <h2 id="relationship-queries" class="reveal">Relationship Queries</h2>
+          <p class="reveal">SOQL supports two types of relationship queries. Use them to reduce the number of total queries and avoid hitting the 100 SOQL limit.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">SOQL — Parent-to-Child (Inner Query)</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Fetch Accounts with their related Contacts in one query</span>
+<span class="code-keyword">SELECT</span> 
+    Id, 
+    Name,
+    AnnualRevenue,
+    (<span class="code-keyword">SELECT</span> Id, FirstName, LastName, Email 
+     <span class="code-keyword">FROM</span> Contacts 
+     <span class="code-keyword">WHERE</span> IsDeleted = <span class="code-keyword">false</span>
+     <span class="code-keyword">ORDER BY</span> LastName <span class="code-keyword">ASC</span>
+     <span class="code-keyword">LIMIT</span> <span class="code-number">200</span>)
+<span class="code-keyword">FROM</span> Account
+<span class="code-keyword">WHERE</span> Industry = <span class="code-string">'Technology'</span>
+<span class="code-keyword">AND</span> AnnualRevenue > <span class="code-number">1000000</span></code></pre>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">SOQL — Child-to-Parent (Dot Notation)</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Traverse up to 5 levels of parent relationships</span>
+<span class="code-keyword">SELECT</span> 
+    Id,
+    Subject,
+    Account.Name,
+    Account.Owner.Name,
+    Account.Owner.Profile.Name
+<span class="code-keyword">FROM</span> Case
+<span class="code-keyword">WHERE</span> Status = <span class="code-string">'Open'</span>
+<span class="code-keyword">AND</span> Account.Industry = <span class="code-string">'Healthcare'</span>
+
+<span class="code-comment">// Access sub-query results in Apex</span>
+<span class="code-keyword">for</span> (Account acc : [<span class="code-keyword">SELECT</span> Id, Name, (<span class="code-keyword">SELECT</span> Id, Email <span class="code-keyword">FROM</span> Contacts) <span class="code-keyword">FROM</span> Account]) {
+    List&lt;Contact&gt; contacts = acc.Contacts;
+    System.debug(acc.Name + <span class="code-string">' has '</span> + contacts.size() + <span class="code-string">' contacts'</span>);
+}</code></pre>
+          </div>
+
+          <h2 id="aggregate-functions" class="reveal">Aggregate Functions</h2>
+          <p class="reveal">Use aggregate SOQL to perform calculations database-side instead of pulling thousands of records into Apex heap memory.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">SOQL — Aggregate Queries</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// ❌ Inefficient — loads all records into heap</span>
+Decimal total = <span class="code-number">0</span>;
+<span class="code-keyword">for</span> (Opportunity opp : [<span class="code-keyword">SELECT</span> Amount <span class="code-keyword">FROM</span> Opportunity <span class="code-keyword">WHERE</span> StageName = <span class="code-string">'Closed Won'</span>]) {
+    total += opp.Amount;
+}
+
+<span class="code-comment">// ✅ Efficient — calculates at the database level</span>
+AggregateResult[] results = [
+    <span class="code-keyword">SELECT</span> 
+        StageName, 
+        <span class="code-function">SUM</span>(Amount) totalAmount,
+        <span class="code-function">COUNT</span>(Id) dealCount,
+        <span class="code-function">AVG</span>(Amount) avgDeal,
+        <span class="code-function">MAX</span>(Amount) biggestDeal
+    <span class="code-keyword">FROM</span> Opportunity
+    <span class="code-keyword">WHERE</span> CloseDate = <span class="code-keyword">THIS_YEAR</span>
+    <span class="code-keyword">GROUP BY</span> StageName
+    <span class="code-keyword">HAVING</span> <span class="code-function">SUM</span>(Amount) > <span class="code-number">50000</span>
+    <span class="code-keyword">ORDER BY</span> <span class="code-function">SUM</span>(Amount) <span class="code-keyword">DESC</span>
+];
+
+<span class="code-keyword">for</span> (AggregateResult ar : results) {
+    System.debug(ar.get(<span class="code-string">'StageName'</span>) + <span class="code-string">': $'</span> + ar.get(<span class="code-string">'totalAmount'</span>));
+}</code></pre>
+          </div>
+
+          <h2 id="large-data-volumes" class="reveal">Large Data Volumes</h2>
+          <p class="reveal">When working with millions of records, standard queries fail. Use <code>LIMIT</code>/<code>OFFSET</code>, last-modified-date filters, or SOQL for loops to process records in batches.</p>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">info</span>
+            <p><strong>SOQL For Loop:</strong> Automatically chunks results into 200-record batches, keeping heap usage low. Always prefer this over storing all query results in a List when processing large datasets.</p>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — SOQL For Loop (LDV Safe)</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// ❌ Loads entire result set into memory — dangerous at scale</span>
+List&lt;Contact&gt; allContacts = [
+    <span class="code-keyword">SELECT</span> Id, Email <span class="code-keyword">FROM</span> Contact <span class="code-keyword">WHERE</span> AccountId != <span class="code-keyword">null</span>
+];
+
+<span class="code-comment">// ✅ SOQL for loop — processes 200 records at a time</span>
+<span class="code-keyword">for</span> (List&lt;Contact&gt; batch : [
+    <span class="code-keyword">SELECT</span> Id, Email, AccountId 
+    <span class="code-keyword">FROM</span> Contact 
+    <span class="code-keyword">WHERE</span> AccountId != <span class="code-keyword">null</span>
+    <span class="code-keyword">ORDER BY</span> SystemModstamp <span class="code-keyword">ASC</span>
+]) {
+    <span class="code-comment">// Each 'batch' is a List&lt;Contact&gt; of up to 200 records</span>
+    List&lt;Contact&gt; toUpdate = <span class="code-keyword">new</span> List&lt;Contact&gt;();
+    <span class="code-keyword">for</span> (Contact c : batch) {
+        <span class="code-keyword">if</span> (c.Email == <span class="code-keyword">null</span>) {
+            c.Email = c.AccountId + <span class="code-string">'@placeholder.com'</span>;
+            toUpdate.add(c);
+        }
+    }
+    <span class="code-keyword">if</span> (!toUpdate.isEmpty()) {
+        update toUpdate;
+    }
+}</code></pre>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">SOQL — Date Literals for Incremental Processing</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Sync only recently modified records instead of everything</span>
+<span class="code-keyword">SELECT</span> Id, Name, Phone, BillingCity
+<span class="code-keyword">FROM</span> Account
+<span class="code-keyword">WHERE</span> SystemModstamp > <span class="code-keyword">LAST_N_HOURS</span>:<span class="code-number">24</span>
+<span class="code-keyword">ORDER BY</span> SystemModstamp <span class="code-keyword">ASC</span>
+<span class="code-keyword">LIMIT</span> <span class="code-number">2000</span>
+
+<span class="code-comment">// Common date literals</span>
+<span class="code-comment">// TODAY, YESTERDAY, THIS_WEEK, LAST_WEEK</span>
+<span class="code-comment">// THIS_MONTH, LAST_MONTH, THIS_YEAR, LAST_YEAR</span>
+<span class="code-comment">// LAST_N_DAYS:n, NEXT_N_DAYS:n</span>
+<span class="code-comment">// LAST_N_WEEKS:n, LAST_N_HOURS:n</span></code></pre>
+          </div>
+
+          <h2 id="query-plan" class="reveal">Using the Query Plan Tool</h2>
+          <p class="reveal">The Query Plan tool in the Developer Console helps you understand how Salesforce will execute your query before running it in production. Enable it via <strong>Help &gt; Preferences &gt; Enable Query Plan</strong>.</p>
+
+          <div class="grid grid-2 mt-24 mb-32">
+            <div class="card reveal stagger-1" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">&lt; 0.25</div>
+              <div class="body-small text-muted">Good selectivity score</div>
+            </div>
+            <div class="card reveal stagger-2" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">50,000</div>
+              <div class="body-small text-muted">Max SOQL query rows returned</div>
+            </div>
+            <div class="card reveal stagger-3" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">100</div>
+              <div class="body-small text-muted">SOQL queries per transaction</div>
+            </div>
+            <div class="card reveal stagger-4" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">5</div>
+              <div class="body-small text-muted">Max relationship traversal levels</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TOC -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#selective-queries">Selective Queries</a>
+            <a href="#indexing">Indexing Strategy</a>
+            <a href="#relationship-queries">Relationship Queries</a>
+            <a href="#aggregate-functions">Aggregate Functions</a>
+            <a href="#large-data-volumes">Large Data Volumes</a>
+            <a href="#query-plan">Query Plan Tool</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid">
+    <div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

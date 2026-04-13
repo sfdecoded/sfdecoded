@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: FIELD_CUSTOM_VALIDATION_EXCEPTION — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce FIELD_CUSTOM_VALIDATION_EXCEPTION error. Learn why validation rules block DML, common causes, and tested solutions with code examples.">
+  <meta name="keywords" content="FIELD_CUSTOM_VALIDATION_EXCEPTION, salesforce validation rule error, dml exception salesforce, salesforce apex dml error fix">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/field-custom-validation-exception.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+        <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+  <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html" class="active">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <!-- Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">FIELD_CUSTOM_VALIDATION_EXCEPTION</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-warning">Validation</span>
+        <span class="tag tag-primary">DML</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">FIELD_CUSTOM_VALIDATION_EXCEPTION</h1>
+      <p class="reveal stagger-4">System.DmlException — A validation rule is blocking a DML operation. The record's field values don't satisfy the rule's error condition.</p>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <!-- Main Content -->
+        <div class="article-content">
+
+          <!-- Error Message -->
+          <div class="callout callout-error reveal">
+            <span class="material-symbols-rounded">error</span>
+            <div>
+              <p style="font-family:var(--font-mono);font-size:0.875rem"><strong>System.DmlException:</strong> Insert failed. First exception on row 0; first error: FIELD_CUSTOM_VALIDATION_EXCEPTION, Revenue must be greater than zero: [AnnualRevenue]</p>
+            </div>
+          </div>
+
+          <h2 id="what" class="reveal">What does this error mean?</h2>
+          <p class="reveal">Salesforce validation rules evaluate field values on a record whenever a DML operation (insert, update, upsert) is attempted. If the rule's error condition formula evaluates to <code>true</code>, Salesforce blocks the DML and throws this exception. The error message and field name in brackets both come directly from the validation rule configuration.</p>
+          <p class="reveal">This error appears in both the UI (as a page-level message) and in Apex (as a <code>System.DmlException</code> with status code <code>FIELD_CUSTOM_VALIDATION_EXCEPTION</code>). In Apex, the <code>getFields()</code> method on the error object returns the API name of the field the rule is attached to.</p>
+
+          <h4 class="reveal">Anatomy of the exception message</h4>
+          <div class="info-grid reveal">
+            <div class="info-grid-row">
+              <span class="info-grid-label">Status Code</span>
+              <span class="info-grid-value"><code>FIELD_CUSTOM_VALIDATION_EXCEPTION</code></span>
+            </div>
+            <div class="info-grid-row">
+              <span class="info-grid-label">Error Message</span>
+              <span class="info-grid-value">&lt;Your validation rule's Error Message&gt;</span>
+            </div>
+            <div class="info-grid-row">
+              <span class="info-grid-label">Field</span>
+              <span class="info-grid-value"><code>[AnnualRevenue]</code> — API name of field the rule targets</span>
+            </div>
+            <div class="info-grid-row">
+              <span class="info-grid-label">Row Index</span>
+              <span class="info-grid-value">First exception on row 0 — first failing record in the list</span>
+            </div>
+          </div>
+
+          <div class="callout callout-warning reveal">
+            <span class="material-symbols-rounded">warning</span>
+            <div>
+              <p><strong>Not always a bug:</strong> This error is often <em>correct behaviour</em> — a validation rule is doing exactly what it was designed to do. The fix may be updating your Apex code to set the right field values, not removing the validation rule.</p>
+            </div>
+          </div>
+
+          <h2 id="causes" class="reveal">Common Causes</h2>
+
+          <h3 class="reveal">1. Apex Code Setting Incorrect Field Values</h3>
+          <p class="reveal">Automations, triggers, or integrations that create or update records programmatically often skip populating required fields that a validation rule checks. A rule that says "Phone is required when Status is Active" will block any Apex that sets Status to Active without also setting Phone.</p>
+
+          <h3 class="reveal">2. Validation Rule Added After Existing Automation</h3>
+          <p class="reveal">A new validation rule is deployed to an org where existing Apex automations were never updated to account for it. The automation had previously set a field value that now violates the new rule.</p>
+
+          <h3 class="reveal">3. Integration Payloads Missing Required Fields</h3>
+          <p class="reveal">An external system pushing records via the REST or SOAP API does not include all fields that validation rules require. The partial payload passes schema validation but fails business logic validation.</p>
+
+          <h3 class="reveal">4. Test Data Not Matching Validation Criteria</h3>
+          <p class="reveal">Test classes that create minimal records (just enough to satisfy required fields) fail because a validation rule's criteria require additional fields to be populated with specific values.</p>
+
+          <h3 class="reveal">5. <code>allOrNone = true</code> Rolling Back Valid Records</h3>
+          <p class="reveal">With the default <code>allOrNone = true</code> DML behaviour, a single record in a list failing validation causes the entire operation to roll back — including records that would have passed. This surfaces the error even when most records are perfectly valid.</p>
+
+          <h2 id="debug" class="reveal">How to Debug It</h2>
+          <p class="reveal">Before writing any fix, you need to identify exactly <em>which</em> validation rule is firing and <em>which</em> field value is the problem. Follow this sequence:</p>
+
+          <div class="steps reveal">
+            <div class="step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h4>Read the full error message</h4>
+                <p>The text in the exception is your validation rule's exact error message. Search for it in Setup → Validation Rules to find the culprit rule instantly.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h4>Check the field name in brackets</h4>
+                <p>The API field name inside <code>[]</code> tells you exactly which field the rule evaluates. That's the field your code likely has a wrong value on.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h4>Log the failing record's field values</h4>
+                <p>Use <code>JSON.serializePretty(record)</code> in a debug log to inspect every field value on the record right before the DML call.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h4>Read the validation rule formula</h4>
+                <p>Go to Setup → Object Manager → [Object] → Validation Rules → [Rule Name]. Read the Error Condition Formula to understand exactly what values will trigger it.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">5</div>
+              <div class="step-content">
+                <h4>Compare record values against the formula</h4>
+                <p>Manually evaluate the formula with your record's field values. If it evaluates to <code>true</code>, the rule fires. Adjust your Apex to produce values that make the formula <code>false</code>.</p>
+              </div>
+            </div>
+          </div>
+
+          <h2 id="solution" class="reveal">How to Fix It</h2>
+
+          <h3 class="reveal">Solution 1: Inspect and Fix the Record's Field Values</h3>
+          <p class="reveal">The most direct fix — make sure your Apex sets the field values the validation rule requires. Log the record before DML to see exactly what you're sending.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Debug Before DML</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-type">Account</span> acc = <span class="code-keyword">new</span> <span class="code-type">Account</span>(
+    Name      = <span class="code-string">'Acme Corp'</span>,
+    Status__c = <span class="code-string">'Active'</span>
+    <span class="code-comment">// ❌ Missing Phone — validation rule requires it when Active</span>
+);
+
+<span class="code-comment">// Log before DML to see exactly what you're inserting</span>
+System.<span class="code-function">debug</span>(JSON.<span class="code-function">serializePretty</span>(acc));
+
+<span class="code-comment">// ✅ Fix: populate the field the rule requires</span>
+acc.Phone = <span class="code-string">'415-555-0100'</span>;
+<span class="code-keyword">insert</span> acc;</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 2: Handle Validation Errors Gracefully with Partial DML</h3>
+          <p class="reveal">Use <code>Database.insert(allOrNone:false)</code> to process valid records and collect failures separately, so one bad record doesn't block the whole batch. Log or surface validation errors clearly for each failing record.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Partial DML with Error Handling</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code>List&lt;Database.SaveResult&gt; results =
+    Database.<span class="code-function">insert</span>(accountList, <span class="code-keyword">false</span>); <span class="code-comment">// allOrNone = false</span>
+
+List&lt;String&gt; errors = <span class="code-keyword">new</span> List&lt;String&gt;();
+
+<span class="code-keyword">for</span> (Integer i = 0; i &lt; results.size(); i++) {
+    <span class="code-keyword">if</span> (!results[i].<span class="code-function">isSuccess</span>()) {
+        <span class="code-keyword">for</span> (Database.Error err : results[i].<span class="code-function">getErrors</span>()) {
+
+            <span class="code-comment">// Detect validation rule failures specifically</span>
+            <span class="code-keyword">if</span> (err.<span class="code-function">getStatusCode</span>() ==
+                StatusCode.FIELD_CUSTOM_VALIDATION_EXCEPTION) {
+
+                errors.<span class="code-function">add</span>(
+                    <span class="code-string">'Row '</span> + i + <span class="code-string">': Validation failed — '</span>
+                    + err.<span class="code-function">getMessage</span>()
+                    + <span class="code-string">' Field(s): '</span> + err.<span class="code-function">getFields</span>()
+                );
+            }
+        }
+    }
+}
+
+<span class="code-keyword">if</span> (!errors.<span class="code-function">isEmpty</span>()) {
+    System.<span class="code-function">debug</span>(LoggingLevel.WARN,
+        <span class="code-string">'Validation errors:\n'</span> + String.<span class="code-function">join</span>(errors, <span class="code-string">'\n'</span>));
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 3: Bypass Validation in Test Setup Using <code>@TestSetup</code></h3>
+          <p class="reveal">If validation rules are blocking your test's setup data, create records that satisfy the rule's conditions — don't disable the rule. Your tests should mirror real-world data scenarios.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Test Class</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code>@isTest
+<span class="code-keyword">private class</span> <span class="code-type">AccountServiceTest</span> {
+
+    @TestSetup
+    <span class="code-keyword">static void</span> <span class="code-function">makeData</span>() {
+        <span class="code-comment">// ✅ Include all fields validation rules require</span>
+        <span class="code-type">Account</span> acc = <span class="code-keyword">new</span> <span class="code-type">Account</span>(
+            Name          = <span class="code-string">'Test Corp'</span>,
+            Phone         = <span class="code-string">'415-555-0100'</span>, <span class="code-comment">// Required by VR when Active</span>
+            Status__c     = <span class="code-string">'Active'</span>,
+            AnnualRevenue = 100000       <span class="code-comment">// Must be &gt; 0 per another VR</span>
+        );
+        <span class="code-keyword">insert</span> acc;
+    }
+
+    @isTest
+    <span class="code-keyword">static void</span> <span class="code-function">testUpdateAccount</span>() {
+        <span class="code-type">Account</span> acc = [<span class="code-keyword">SELECT</span> Id, Name <span class="code-keyword">FROM</span> Account <span class="code-keyword">LIMIT</span> 1];
+        Test.<span class="code-function">startTest</span>();
+        acc.Name = <span class="code-string">'Updated Corp'</span>;
+        <span class="code-keyword">update</span> acc;
+        Test.<span class="code-function">stopTest</span>();
+        System.<span class="code-function">assertEquals</span>(<span class="code-string">'Updated Corp'</span>,
+            [<span class="code-keyword">SELECT</span> Name <span class="code-keyword">FROM</span> Account <span class="code-keyword">WHERE</span> Id = :acc.Id].Name);
+    }
+}</code></pre>
+          </div>
+
+          <h3 class="reveal">Solution 4: Use a Bypass Flag for System Automation</h3>
+          <p class="reveal">When a legitimate system automation (like a data migration or integration) must bypass a validation rule, the cleanest approach is to add a bypass checkbox field to the object and update the rule's formula to skip when the flag is set.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Validation Rule Formula — With Bypass</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">/* Original rule: fires when AnnualRevenue is blank or zero */</span>
+AND(
+  ISBLANK(AnnualRevenue),
+  NOT(Bypass_Validation__c)  <span class="code-comment">/* Skip rule when bypass flag is true */</span>
+)</code></pre>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Set Bypass Flag for Data Migration</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-keyword">for</span> (<span class="code-type">Account</span> acc : accountsToMigrate) {
+    acc.Bypass_Validation__c = <span class="code-keyword">true</span>; <span class="code-comment">// Signals rule to skip</span>
+}
+<span class="code-keyword">update</span> accountsToMigrate;
+
+<span class="code-comment">// Re-enable after migration</span>
+<span class="code-keyword">for</span> (<span class="code-type">Account</span> acc : accountsToMigrate) {
+    acc.Bypass_Validation__c = <span class="code-keyword">false</span>;
+}
+<span class="code-keyword">update</span> accountsToMigrate;</code></pre>
+          </div>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">lightbulb</span>
+            <div>
+              <p><strong>Pro Tip:</strong> In Setup, go to <strong>Object Manager → [Object] → Validation Rules</strong> and use the <em>Active</em> checkbox filter to see all active rules at a glance. You can also temporarily deactivate a specific rule in a sandbox to confirm it's the culprit before writing any fix code — much faster than log hunting.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Table of Contents -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+            <a href="#causes">Common Causes</a>
+            <a href="#debug">How to Debug It</a>
+            <a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+        <a href="../index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+   <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+    <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+  <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+  <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Salesforce Decoded.</p>
+      <div class="footer-social">
+        <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+        <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+      </div>
+    </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

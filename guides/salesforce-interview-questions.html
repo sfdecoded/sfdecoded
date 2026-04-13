@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Developer Interview Questions (2026) — Answers Included | Salesforce Decoded</title>
+  <meta name="description" content="Top Salesforce developer interview questions with detailed answers. Covers Apex, SOQL, LWC, Flow, triggers, governor limits, and integration — everything that actually comes up in interviews.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/guides/salesforce-interview-questions.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+  <link rel="manifest" href="../site.webmanifest">
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="../index.html" class="nav-logo"><div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="navbar-brand-text">Salesforce<span>Decoded</span></div></a>
+    <ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html" class="active">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul>
+    <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+    <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+  </div></nav>
+  <div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../guides.html" class="active"><span class="material-symbols-rounded">menu_book</span> Guides</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal"><a href="../index.html">Home</a><span class="separator">/</span><a href="../guides.html">Guides</a><span class="separator">/</span><span class="current">Interview Questions</span></div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-primary">Career</span><span class="tag tag-warning">Interview Prep</span></div>
+      <h1 class="display-medium reveal stagger-3">Salesforce Developer Interview Questions</h1>
+      <p class="reveal stagger-4">The questions that actually come up — Apex, SOQL, LWC, Flow, triggers, governor limits — with answers that demonstrate real understanding, not memorized definitions.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+
+          <h2 id="apex" class="reveal">Apex Fundamentals</h2>
+
+          <h3 class="reveal">Q: What is bulkification and why does it matter?</h3>
+          <p class="reveal"><strong>A:</strong> Bulkification means writing Apex that handles multiple records at once efficiently — moving SOQL and DML out of loops. Salesforce governor limits apply per transaction, not per record. A trigger processing 200 records with SOQL inside a loop burns 200 queries out of the 100 allowed, causing an immediate failure. Bulkified code queries all records once into a collection, processes in memory, then writes once.</p>
+
+          <h3 class="reveal">Q: What is the difference between Trigger.new and Trigger.newMap?</h3>
+          <p class="reveal"><strong>A:</strong> <code>Trigger.new</code> is a <code>List&lt;SObject&gt;</code> of the new record values in the order they were processed. <code>Trigger.newMap</code> is a <code>Map&lt;Id, SObject&gt;</code> keyed by record Id — only available in update, delete, and undelete contexts where records already have Ids. Use <code>Trigger.newMap</code> when you need to look up records by Id or when building a Map for related-record queries.</p>
+
+          <h3 class="reveal">Q: When would you use @future vs Queueable vs Batch Apex?</h3>
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Answer</span></div>
+<pre><code>@future          → Simple async fire-and-forget. Can make callouts.
+                   Cannot chain, cannot accept sObjects as parameters.
+
+Queueable        → Chainable async jobs. Supports sObject parameters.
+                   Can make callouts (implements Database.AllowsCallouts).
+                   Better than @future for most modern async patterns.
+
+Batch Apex       → Processing millions of records in chunks.
+                   Implements Database.Batchable. Has start/execute/finish.
+                   Use when data volume exceeds what a single transaction can handle.</code></pre>
+          </div>
+
+          <h3 class="reveal">Q: What is the order of execution when a record is saved?</h3>
+          <p class="reveal"><strong>A:</strong> System validation → Before-save Record-Triggered Flows → Before Apex Triggers → Custom Validation Rules → Duplicate Rules → Save to DB (uncommitted) → After Apex Triggers → Assignment/Auto-response/Workflow/Escalation Rules → After-save Record-Triggered Flows → Roll-up summaries → Sharing rules → Commit → Post-commit (email, async Apex, platform events).</p>
+
+          <h2 id="soql" class="reveal">SOQL</h2>
+
+          <h3 class="reveal">Q: What is SOQL injection and how do you prevent it?</h3>
+          <p class="reveal"><strong>A:</strong> SOQL injection occurs when user-supplied input is concatenated directly into a SOQL string, allowing an attacker to modify the query. Prevent it by always using bind variables (<code>:variableName</code> syntax) instead of string concatenation. For dynamic SOQL that must use strings, use <code>String.escapeSingleQuotes()</code> on any user input.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Apex</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre><code><span class="code-comment">// Vulnerable — never do this</span>
+String query = 'SELECT Id FROM Account WHERE Name = \'' + userInput + '\'';
+
+<span class="code-comment">// Safe — bind variable</span>
+List&lt;Account&gt; accs = [SELECT Id FROM Account WHERE Name = :userInput];
+
+<span class="code-comment">// Safe — dynamic SOQL with escaping</span>
+String safeInput = String.escapeSingleQuotes(userInput);
+String query = 'SELECT Id FROM Account WHERE Name = \'' + safeInput + '\'';</code></pre>
+          </div>
+
+          <h3 class="reveal">Q: What is the difference between SOQL and SOSL?</h3>
+          <p class="reveal"><strong>A:</strong> SOQL queries a single object (or its relationships) with structured field-level filters — like SQL SELECT. SOSL is a full-text search across multiple objects and fields simultaneously, returning results grouped by object. Use SOQL when you know exactly which object and fields to filter on. Use SOSL when searching across multiple objects for a keyword — like a global search.</p>
+
+          <h2 id="lwc" class="reveal">Lightning Web Components</h2>
+
+          <h3 class="reveal">Q: What is the difference between @api, @track, and @wire?</h3>
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">Answer</span></div>
+<pre><code>@api     → Makes a property or method PUBLIC. Parent can pass values in.
+           Also used to expose methods callable by parent via querySelector.
+
+@track   → Historically made properties reactive. Since Summer '19,
+           all properties are reactive by default. @track is now only
+           needed to detect deep changes in objects and arrays (nested
+           property changes on objects, or changes to array elements).
+
+@wire    → Connects a property or function to a Salesforce data service —
+           either an Apex method annotated @AuraEnabled(cacheable=true)
+           or a wire adapter (like getRecord, getPicklistValues).
+           Data is read-only and automatically refreshes when reactive
+           properties change.</code></pre>
+          </div>
+
+          <h3 class="reveal">Q: How do you call Apex from LWC? Wire vs imperative — when to use each?</h3>
+          <p class="reveal"><strong>A:</strong> Wire calls the Apex method automatically when the component loads and when reactive properties change. The result is read-only and cached. Use wire for read-only data that should refresh automatically.</p>
+          <p class="reveal">Imperative calls the Apex method explicitly (usually inside an event handler or <code>connectedCallback</code>). The result is mutable, so you can manipulate it. Required for DML operations and when you need to control exactly when the call fires.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header"><span class="code-block-lang">JavaScript</span><button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button></div>
+<pre><code>import { LightningElement, wire } from 'lwc';
+import getAccount from '@salesforce/apex/AccountService.getAccount';
+import updateAccount from '@salesforce/apex/AccountService.updateAccount';
+
+export default class Example extends LightningElement {
+    accountId = '001XXXX';
+
+    // Wire — auto-fetches when accountId changes
+    @wire(getAccount, { recordId: '$accountId' })
+    account;
+
+    // Imperative — called on button click
+    async handleSave() {
+        try {
+            await updateAccount({ recordId: this.accountId, name: 'New Name' });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="flow" class="reveal">Flow</h2>
+
+          <h3 class="reveal">Q: When should you use a before-save Flow vs after-save Flow?</h3>
+          <p class="reveal"><strong>A:</strong> Before-save flows run before the record is written to the database and can modify fields on the triggering record without an extra DML statement — far more efficient. Use before-save for field updates on the triggering record. After-save flows run after the record is committed, making the record's Id available, and can perform DML on related records or send notifications. Use after-save for everything else.</p>
+
+          <h3 class="reveal">Q: What replaced Process Builder and Workflow Rules?</h3>
+          <p class="reveal"><strong>A:</strong> Both are deprecated as of December 31, 2025. Record-Triggered Flows replace both. They have equivalent and expanded functionality — before/after save options, complex branching, subflows, Apex actions, and better bulk support — and are the only supported declarative automation path going forward.</p>
+
+          <h2 id="governance" class="reveal">Governor Limits</h2>
+
+          <h3 class="reveal">Q: How do you avoid Too Many SOQL Queries (101)?</h3>
+          <p class="reveal"><strong>A:</strong> Move all SOQL outside of loops. Use <code>Map&lt;Id, SObject&gt;</code> patterns to look up related records in memory after a single bulk query. Use relationship queries (subqueries in SOQL) to fetch parent/child data in one query. For complex scenarios, offload work to asynchronous Apex where the limit resets to 200.</p>
+
+          <h3 class="reveal">Q: What is the Mixed DML error and how do you fix it?</h3>
+          <p class="reveal"><strong>A:</strong> Mixed DML occurs when a transaction tries to modify both setup objects (User, Profile, PermissionSet, etc.) and non-setup objects in the same transaction. Fix by separating the setup object DML into a <code>@future</code> method, which runs in its own transaction context.</p>
+
+          <h2 id="scenario" class="reveal">Scenario Questions</h2>
+
+          <h3 class="reveal">Q: An Apex trigger is running correctly in sandbox but failing in production on bulk data loads. What do you check?</h3>
+          <p class="reveal"><strong>A:</strong> First, check for SOQL or DML inside loops — sandbox tests rarely use enough records to hit limits but production loads can send 200 records in one batch. Check debug logs for the exact error and which governor limit was hit. Review the trigger for non-bulkified patterns (queries inside loops, DML inside loops). Check if other automation (Flows, other triggers) on the same object is contributing to the limit count — all share the same transaction budget.</p>
+
+          <h3 class="reveal">Q: How do you prevent trigger recursion?</h3>
+          <p class="reveal"><strong>A:</strong> Use a static Boolean flag in a utility class. Static variables persist for the lifetime of the transaction. Set the flag to <code>false</code> at the start of the handler, check it before running, and set it to <code>true</code> after the first execution so subsequent trigger fires from DML inside the handler return immediately without re-executing the logic.</p>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#apex">Apex Fundamentals</a>
+            <a href="#soql">SOQL</a>
+            <a href="#lwc">LWC</a>
+            <a href="#flow">Flow</a>
+            <a href="#governance">Governor Limits</a>
+            <a href="#scenario">Scenario Questions</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid">
+    <div class="footer-brand"><a href="../index.html" class="nav-logo"><div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="navbar-brand-text">Salesforce<span>Decoded</span></div></a><p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div>
+    <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+  </div><div class="footer-bottom"><p>&copy; 2026 Salesforce Decoded.</p><div class="footer-social"><a href="../index.html"><span class="material-symbols-rounded">code</span></a><a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a></div></div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Chrome Extensions — Salesforce Decoded</title>
+  <meta name="description" content="Chrome extensions for Salesforce developers. Quick org access, SOQL runner, field inspector, and debug tools in your browser.">
+  <meta name="keywords" content="salesforce chrome extension, salesforce developer tools extension, salesforce browser extension">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/extensions.html">
+  <link rel="stylesheet" href="css/style.css">
+   <link rel="icon" href="favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="favicons/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+          <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+    <ul class="navbar-links"><li><a href="index.html">Home</a></li><li><a href="tools.html">Tools</a></li><li><a href="errors.html">Errors</a></li><li><a href="guides.html">Guides</a></li><li><a href="tips.html">Tips</a></li><li><a href="prompts.html">Prompts</a></li><li><a href="extensions.html" class="active">Extensions</a></li><li><a href="resources.html">Resources</a></li><li><a href="about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+  <div class="mobile-nav"><a href="index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="extensions.html" class="active"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="overline reveal"><span>Extensions</span></div>
+      <h1 class="display-medium reveal stagger-2">Chrome Extensions</h1>
+      <p class="reveal stagger-3">Browser extensions designed to supercharge your Salesforce development workflow.</p>
+    </div>
+  </header>
+
+  <!-- Featured Extension -->
+  <section class="section">
+    <div class="container">
+      <div class="card card-elevated reveal-scale" style="padding:0;overflow:hidden">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+          <div style="padding:48px">
+            <span class="tag tag-primary mb-16" style="display:inline-flex">Featured Extension</span>
+            <h2 class="display-small" style="margin-bottom:16px">Salesforce Revamp</h2>
+            <p class="body-large text-muted" style="margin-bottom:24px">The all-in-one Chrome extension for Salesforce developers. Access org information, run SOQL queries, inspect fields, manage debug logs, and navigate objects — all without leaving your current page.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px">
+              <div class="feature-item" style="padding:12px 0">
+                <div class="feature-item-icon" style="width:32px;height:32px;min-width:32px"><span class="material-symbols-rounded" style="font-size:16px">code</span></div>
+                <div><h3 style="font-size:0.875rem">Inline SOQL Runner</h3></div>
+              </div>
+              <div class="feature-item" style="padding:12px 0">
+                <div class="feature-item-icon" style="width:32px;height:32px;min-width:32px;background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded" style="font-size:16px">manage_search</span></div>
+                <div><h3 style="font-size:0.875rem">Field Inspector</h3></div>
+              </div>
+              <div class="feature-item" style="padding:12px 0">
+                <div class="feature-item-icon" style="width:32px;height:32px;min-width:32px;background:#d1fae5;color:#065f46"><span class="material-symbols-rounded" style="font-size:16px">info</span></div>
+                <div><h3 style="font-size:0.875rem">Org Information</h3></div>
+              </div>
+              <div class="feature-item" style="padding:12px 0">
+                <div class="feature-item-icon" style="width:32px;height:32px;min-width:32px;background:#fef3c7;color:#92400e"><span class="material-symbols-rounded" style="font-size:16px">bug_report</span></div>
+                <div><h3 style="font-size:0.875rem">Debug Log Viewer</h3></div>
+              </div>
+            </div>
+
+            <div class="flex gap-12">
+              <a href="https://chromewebstore.google.com/detail/salesforce-revamp/llgcejoamphenmjaoiipcipcohjpmjof" class="btn btn-filled"><span class="material-symbols-rounded" style="font-size:18px">download</span> Install from Chrome Store</a>
+              <!--a href="#" class="btn btn-outlined">View on GitHub</a-->
+            </div>
+          </div>
+          <div style="background:var(--md-surface-container);display:flex;align-items:center;justify-content:center;padding:48px;position:relative;overflow:hidden">
+            <div class="dot-pattern"></div>
+            <div style="position:relative;z-index:1;width:100%;max-width:320px">
+              <div style="background:var(--md-surface-container-lowest);border-radius:var(--md-shape-lg);box-shadow:var(--md-elevation-3);padding:20px;font-size:0.8125rem">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+                  <div style="width:28px;height:28px;background:var(--accent-gradient);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700">F4D</div>
+                  <span style="font-family:var(--font-display);font-weight:600;font-size:0.875rem">Salesforce Revamp</span>
+                </div>
+                <div style="background:var(--md-surface-container);border-radius:8px;padding:12px;margin-bottom:12px">
+                  <div style="font-family:var(--font-mono);font-size:0.75rem;color:var(--md-primary)">Org: Production</div>
+                  <div style="font-family:var(--font-mono);font-size:0.75rem;color:var(--md-outline)">API: v66.0 • Limits: OK</div>
+                </div>
+                <div style="background:var(--md-inverse-surface);color:var(--md-inverse-on-surface);border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:0.6875rem;line-height:1.6">
+                  <span style="color:#c792ea">SELECT</span> Id, Name<br>
+                  <span style="color:#c792ea">FROM</span> Account<br>
+                  <span style="color:#c792ea">LIMIT</span> <span style="color:#f78c6c">10</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+                <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+           <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4>
+          <ul>
+            <li><a href="tools.html">Tools</a></li>
+            <li><a href="errors.html">Errors</a></li>
+            <li><a href="guides.html">Guides</a></li>
+            <li><a href="prompts.html">Prompts</a></li>
+            <li><a href="extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Resources</h4>
+          <ul>
+            <li><a href="tips.html">Tips</a></li>
+            <li><a href="resources.html">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="about.html">About</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="https://sfdecoded.netlify.app/"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="js/main.js"></script>
+</body>
+</html>

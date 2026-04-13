@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fix: Callout Not Allowed From Triggers — Salesforce Error Solution | Salesforce Decoded</title>
+<meta name="description" content="Learn why Salesforce throws 'Callout not allowed from triggers' and how to fix it by moving callouts to @future or Queueable Apex."/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',system-ui,sans-serif;background:#f8fafc;color:#0f172a;line-height:1.7;font-size:16px}
+nav{background:#0f172a;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;gap:2rem;height:60px}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.nav-logo-icon{width:30px;height:30px;background:#0070d2;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff}
+.nav-logo-text{font-weight:600;font-size:15px;color:#f1f5f9;letter-spacing:-0.01em}
+.nav-links{display:flex;gap:0;list-style:none;margin-left:auto}
+.nav-links a{color:#94a3b8;text-decoration:none;font-size:13.5px;padding:0 12px;height:60px;display:flex;align-items:center;transition:color .15s;border-bottom:2px solid transparent}
+.nav-links a:hover{color:#e2e8f0}
+.nav-links a.active{color:#fff;border-bottom-color:#0070d2}
+.page-wrap{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+.breadcrumb{padding:1.25rem 0 0;font-size:13px;color:#64748b;display:flex;align-items:center;gap:6px}
+.breadcrumb a{color:#64748b;text-decoration:none}.breadcrumb a:hover{color:#0070d2}
+.breadcrumb span{color:#94a3b8}
+.content-grid{display:grid;grid-template-columns:1fr 220px;gap:3rem;padding:1.5rem 0 4rem;align-items:start}
+@media(max-width:900px){.content-grid{grid-template-columns:1fr}.sidebar{display:none}}
+article{min-width:0}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem}
+.badge{display:inline-flex;align-items:center;font-size:12px;font-weight:500;padding:3px 10px;border-radius:99px;letter-spacing:0.01em}
+.badge-runtime{background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe}
+.badge-code{background:#fef2f2;color:#9f1239;border:1px solid #fecdd3;font-family:'SF Mono','Fira Code',monospace;font-size:11px}
+h1{font-size:2rem;font-weight:700;line-height:1.2;color:#0f172a;margin-bottom:.75rem;letter-spacing:-0.02em}
+.subtitle{font-size:1rem;color:#475569;margin-bottom:1.75rem;line-height:1.6}
+.err-box{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:1rem 1.25rem;margin-bottom:2rem;display:flex;align-items:flex-start;gap:10px}
+.err-icon{color:#f87171;font-size:13px;font-weight:600;background:#3f0f0f;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.err-msg{font-family:'SF Mono','Fira Code','Courier New',monospace;font-size:13.5px;color:#fca5a5;line-height:1.5}
+.err-msg strong{color:#f87171;font-weight:600}
+h2{font-size:1.2rem;font-weight:700;color:#0f172a;margin:2.25rem 0 .9rem;padding-bottom:.6rem;border-bottom:2px solid #e2e8f0;letter-spacing:-0.01em}
+h3{font-size:1rem;font-weight:600;color:#1e293b;margin:1.5rem 0 .6rem}
+p{color:#374151;margin-bottom:1rem;font-size:.9625rem}
+ul,ol{padding-left:1.5rem;margin-bottom:1rem}
+li{color:#374151;font-size:.9625rem;margin-bottom:.35rem}
+code{font-family:'SF Mono','Fira Code','Courier New',monospace;font-size:.835rem;background:#f1f5f9;color:#1e40af;padding:1px 5px;border-radius:4px;border:1px solid #e2e8f0}
+.code-block{margin:1rem 0 1.5rem;border-radius:10px;overflow:hidden;border:1px solid #1e293b}
+.code-header{background:#1e293b;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.code-lang{font-size:12px;color:#94a3b8;font-weight:500}
+.code-label{font-size:11px;color:#64748b;font-style:italic}
+.code-copy{font-size:11px;color:#64748b;background:none;border:1px solid #334155;border-radius:4px;padding:2px 8px;cursor:pointer;font-family:inherit}
+pre{background:#0f172a;padding:1.15rem 1.25rem;overflow-x:auto;margin:0}
+pre code{background:none;border:none;color:#e2e8f0;font-size:13px;padding:0;border-radius:0;line-height:1.65}
+.kw{color:#7dd3fc}.str{color:#86efac}.cm{color:#64748b;font-style:italic}.cls{color:#fde68a}.fn{color:#c4b5fd}.num{color:#fb923c}.op{color:#94a3b8}.ann{color:#fbbf24}
+.tip-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem 1.25rem;margin:1.75rem 0;display:flex;gap:10px}
+.tip-icon{color:#1d4ed8;font-size:16px;flex-shrink:0;margin-top:2px}
+.tip-content{font-size:.9rem;color:#1e3a8a;line-height:1.6}
+.tip-content strong{color:#1e40af}
+.sidebar{position:sticky;top:80px}
+.sidebar-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1.1rem 1.25rem}
+.sidebar-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin-bottom:.85rem}
+.sidebar-nav{list-style:none;padding:0;display:flex;flex-direction:column;gap:2px}
+.sidebar-nav a{display:block;font-size:13.5px;color:#475569;text-decoration:none;padding:5px 8px;border-radius:6px;border-left:2px solid transparent;transition:all .15s}
+.sidebar-nav a:hover{color:#0070d2;background:#eff6ff;border-left-color:#93c5fd}
+footer{background:#0f172a;border-top:1px solid #1e293b;padding:2.5rem 1.5rem}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem}
+.footer-brand p{font-size:13px;color:#64748b;margin-top:.5rem;line-height:1.6;max-width:240px}
+.footer-col h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#475569;margin-bottom:.85rem}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:.4rem}
+.footer-col a{font-size:13px;color:#64748b;text-decoration:none;transition:color .15s}
+.footer-col a:hover{color:#94a3b8}
+.footer-bottom{border-top:1px solid #1e293b;padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto}
+.footer-bottom span{font-size:13px;color:#475569}
+.footer-links{display:flex;gap:1rem}
+.footer-links a{font-size:13px;color:#475569;text-decoration:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="https://sfdecoded.netlify.app/" class="nav-logo">
+      <div class="nav-logo-icon">SF</div>
+      <span class="nav-logo-text">SalesforceDecoded</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://sfdecoded.netlify.app/">Home</a></li>
+      <li><a href="https://sfdecoded.netlify.app/tools">Tools</a></li>
+      <li><a href="https://sfdecoded.netlify.app/errors" class="active">Errors</a></li>
+      <li><a href="https://sfdecoded.netlify.app/guides">Guides</a></li>
+      <li><a href="https://sfdecoded.netlify.app/tips">Tips</a></li>
+      <li><a href="https://sfdecoded.netlify.app/prompts">Prompts</a></li>
+      <li><a href="https://sfdecoded.netlify.app/extensions">Extensions</a></li>
+      <li><a href="https://sfdecoded.netlify.app/resources">Resources</a></li>
+      <li><a href="https://sfdecoded.netlify.app/about">About</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="https://sfdecoded.netlify.app/">Home</a>
+    <span>/</span>
+    <a href="https://sfdecoded.netlify.app/errors">Errors</a>
+    <span>/</span>
+    Callout Not Allowed From Triggers
+  </div>
+
+  <div class="content-grid">
+    <article>
+      <div class="badges">
+        <span class="badge badge-runtime">Runtime Error</span>
+        <span class="badge badge-code">CALLOUT_LOOP_NOT_ALLOWED</span>
+      </div>
+
+      <h1>Callout Not Allowed From Triggers</h1>
+      <p class="subtitle">You attempted to make an HTTP callout or web service call directly inside an Apex trigger, which Salesforce prohibits in synchronous trigger context.</p>
+
+      <div class="err-box">
+        <span class="err-icon">error</span>
+        <div class="err-msg"><strong>System.CalloutException:</strong> Callout from triggers are currently not supported.</div>
+      </div>
+
+      <h2 id="what">What does this error mean?</h2>
+      <p>Salesforce enforces a strict rule: <strong>synchronous Apex triggers cannot make HTTP callouts or web service invocations</strong> (REST, SOAP, or any <code>HttpRequest</code> call). This restriction exists because triggers run inside a database transaction — if the external service were slow or unreachable, the transaction would stall, consuming a database lock for an indeterminate period and risking timeout cascades across your org.</p>
+      <p>The error surfaces immediately when your trigger — or any class synchronously called by your trigger — executes an <code>Http.send()</code>, a stub generated from a WSDL, or an <code>@HttpCallout</code>-annotated mock in tests without the proper annotation setup.</p>
+      <p>Importantly, this restriction also applies to <strong>code paths called indirectly</strong>: if your trigger calls a utility class that calls a service class that issues a callout, the exception still fires even though the callout is not in the trigger file itself.</p>
+
+      <h2 id="causes">Common Causes</h2>
+
+      <h3>1. Direct Http callout inside a trigger body</h3>
+      <p>The most direct cause — an <code>HttpRequest</code> / <code>Http.send()</code> block placed inside a <code>trigger</code> file or a helper method called synchronously from one.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Apex — Bad Example</span>
+          <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
+        </div>
+        <pre><code><span class="cm">// ❌ BAD: direct callout inside trigger</span>
+<span class="kw">trigger</span> <span class="cls">OpportunityTrigger</span> <span class="kw">on</span> <span class="cls">Opportunity</span> (after insert) {
+    <span class="kw">for</span> (<span class="cls">Opportunity</span> opp : Trigger.new) {
+        <span class="cls">HttpRequest</span> req = <span class="kw">new</span> <span class="cls">HttpRequest</span>();
+        req.setEndpoint(<span class="str">'https://api.example.com/notify'</span>);
+        req.setMethod(<span class="str">'POST'</span>);
+        <span class="kw">new</span> <span class="cls">Http</span>().<span class="fn">send</span>(req); <span class="cm">// 💥 throws CalloutException</span>
+    }
+}</code></pre>
+      </div>
+
+      <h3>2. Callout buried inside a service class called from a trigger</h3>
+      <p>A trigger delegates to a handler or service class, which in turn calls an integration class. The callout restriction applies to the entire synchronous call chain, not just the trigger file.</p>
+
+      <h3>3. Test class missing <code>@isTest(SeeAllData=false)</code> or mock setup</h3>
+      <p>In unit tests, calling a method that issues an HTTP request without a registered <code>HttpCalloutMock</code> or <code>WebServiceMock</code> throws this same exception. The test framework blocks real network calls.</p>
+
+      <h2 id="solution">How to Fix It</h2>
+
+      <h3>Solution 1: Move the callout to an <code>@future</code> method</h3>
+      <p>Annotate a static method with <code>@future(callout=true)</code>. The trigger enqueues the work; the callout executes asynchronously after the transaction commits, where callouts are fully supported.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Apex — Correct</span>
+          <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
+        </div>
+        <pre><code><span class="cm">// ✅ GOOD: delegate to @future(callout=true)</span>
+<span class="kw">trigger</span> <span class="cls">OpportunityTrigger</span> <span class="kw">on</span> <span class="cls">Opportunity</span> (after insert) {
+    <span class="cls">Set</span>&lt;<span class="cls">Id</span>&gt; oppIds = <span class="kw">new</span> <span class="cls">Set</span>&lt;<span class="cls">Id</span>&gt;();
+    <span class="kw">for</span> (<span class="cls">Opportunity</span> opp : Trigger.new) {
+        oppIds.<span class="fn">add</span>(opp.Id);
+    }
+    <span class="cls">OpportunityCalloutService</span>.<span class="fn">notifyExternalSystem</span>(oppIds);
+}
+
+<span class="kw">public class</span> <span class="cls">OpportunityCalloutService</span> {
+    <span class="ann">@future</span>(callout=<span class="kw">true</span>)
+    <span class="kw">public static void</span> <span class="fn">notifyExternalSystem</span>(<span class="cls">Set</span>&lt;<span class="cls">Id</span>&gt; oppIds) {
+        <span class="kw">for</span> (<span class="cls">Id</span> oppId : oppIds) {
+            <span class="cls">HttpRequest</span> req = <span class="kw">new</span> <span class="cls">HttpRequest</span>();
+            req.<span class="fn">setEndpoint</span>(<span class="str">'callout:ExternalAPI/notify'</span>);
+            req.<span class="fn">setMethod</span>(<span class="str">'POST'</span>);
+            req.<span class="fn">setBody</span>(<span class="str">'{"id":"'</span> + oppId + <span class="str">'"}'</span>);
+            <span class="cls">HttpResponse</span> res = <span class="kw">new</span> <span class="cls">Http</span>().<span class="fn">send</span>(req);
+        }
+    }
+}</code></pre>
+      </div>
+
+      <h3>Solution 2: Use Queueable Apex with callout support</h3>
+      <p>For more complex scenarios — passing rich objects, chaining jobs, or needing better error handling — implement <code>Queueable</code> with the <code>Database.AllowsCallouts</code> marker interface. This gives you a full class context, instance variables, and the ability to chain subsequent jobs.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Apex</span>
+          <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
+        </div>
+        <pre><code><span class="kw">public class</span> <span class="cls">OpportunityNotifyJob</span>
+        <span class="kw">implements</span> <span class="cls">Queueable</span>, <span class="cls">Database</span>.<span class="cls">AllowsCallouts</span> {
+
+    <span class="kw">private</span> <span class="cls">List</span>&lt;<span class="cls">Opportunity</span>&gt; opps;
+
+    <span class="kw">public</span> <span class="fn">OpportunityNotifyJob</span>(<span class="cls">List</span>&lt;<span class="cls">Opportunity</span>&gt; opps) {
+        <span class="kw">this</span>.opps = opps;
+    }
+
+    <span class="kw">public void</span> <span class="fn">execute</span>(<span class="cls">QueueableContext</span> ctx) {
+        <span class="kw">for</span> (<span class="cls">Opportunity</span> opp : opps) {
+            <span class="cls">HttpRequest</span> req = <span class="kw">new</span> <span class="cls">HttpRequest</span>();
+            req.<span class="fn">setEndpoint</span>(<span class="str">'callout:ExternalAPI/notify'</span>);
+            req.<span class="fn">setMethod</span>(<span class="str">'POST'</span>);
+            req.<span class="fn">setBody</span>(<span class="cls">JSON</span>.<span class="fn">serialize</span>(opp));
+            <span class="cls">HttpResponse</span> res = <span class="kw">new</span> <span class="cls">Http</span>().<span class="fn">send</span>(req);
+            <span class="cm">// handle res.getStatusCode() etc.</span>
+        }
+    }
+}
+
+<span class="cm">// In trigger:</span>
+<span class="cls">System</span>.<span class="fn">enqueueJob</span>(<span class="kw">new</span> <span class="cls">OpportunityNotifyJob</span>(Trigger.new));</code></pre>
+      </div>
+
+      <h3>Solution 3: Register a mock in tests</h3>
+      <p>In unit tests, implement <code>HttpCalloutMock</code> and register it with <code>Test.setMock()</code> before calling the method under test. Without this, even a correctly structured async callout class will throw the exception when exercised synchronously in tests.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Apex — Test Class</span>
+          <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
+        </div>
+        <pre><code><span class="ann">@isTest</span>
+<span class="kw">private class</span> <span class="cls">OpportunityCalloutServiceTest</span> {
+
+    <span class="kw">private class</span> <span class="cls">MockCallout</span> <span class="kw">implements</span> <span class="cls">HttpCalloutMock</span> {
+        <span class="kw">public</span> <span class="cls">HttpResponse</span> <span class="fn">respond</span>(<span class="cls">HttpRequest</span> req) {
+            <span class="cls">HttpResponse</span> res = <span class="kw">new</span> <span class="cls">HttpResponse</span>();
+            res.<span class="fn">setStatusCode</span>(<span class="num">200</span>);
+            res.<span class="fn">setBody</span>(<span class="str">'{"status":"ok"}'</span>);
+            <span class="kw">return</span> res;
+        }
+    }
+
+    <span class="ann">@isTest</span>
+    <span class="kw">static void</span> <span class="fn">testNotify</span>() {
+        <span class="cls">Test</span>.<span class="fn">setMock</span>(<span class="cls">HttpCalloutMock</span>.<span class="kw">class</span>, <span class="kw">new</span> <span class="cls">MockCallout</span>());
+        <span class="cls">Test</span>.<span class="fn">startTest</span>();
+        <span class="cls">OpportunityCalloutService</span>.<span class="fn">notifyExternalSystem</span>(
+            <span class="kw">new</span> <span class="cls">Set</span>&lt;<span class="cls">Id</span>&gt;{<span class="cls">UserInfo</span>.<span class="fn">getUserId</span>()}
+        );
+        <span class="cls">Test</span>.<span class="fn">stopTest</span>();
+    }
+}</code></pre>
+      </div>
+
+      <div class="tip-box">
+        <span class="tip-icon">💡</span>
+        <div class="tip-content">
+          <strong>Pro Tip:</strong> Prefer Queueable over <code>@future</code> for new callout work — Queueable classes support instance variables, proper error handling via <code>AsyncException</code>, and job chaining. Reserve <code>@future(callout=true)</code> only for simple, fire-and-forget notifications where you're passing only primitive or <code>Set&lt;Id&gt;</code> parameters.
+        </div>
+      </div>
+    </article>
+
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-title">On this page</div>
+        <ul class="sidebar-nav">
+          <li><a href="#what">What does this mean?</a></li>
+          <li><a href="#causes">Common Causes</a></li>
+          <li><a href="#solution">How to Fix It</a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="https://sfdecoded.netlify.app/" class="nav-logo">
+        <div class="nav-logo-icon">SF</div>
+        <span class="nav-logo-text">SalesforceDecoded</span>
+      </a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developers, for developers.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="https://sfdecoded.netlify.app/tools">Tools</a></li>
+        <li><a href="https://sfdecoded.netlify.app/errors">Errors</a></li>
+        <li><a href="https://sfdecoded.netlify.app/guides">Guides</a></li>
+        <li><a href="https://sfdecoded.netlify.app/extensions">Extensions</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="https://sfdecoded.netlify.app/tips">Tips</a></li>
+        <li><a href="https://sfdecoded.netlify.app/resources">Resources</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Community</h4>
+      <ul>
+        <li><a href="https://sfdecoded.netlify.app/about">About</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Salesforce Decoded.</span>
+    <div class="footer-links">
+      <a href="https://sfdecoded.netlify.app/">code</a>
+      <a href="mailto:sfdecoded@gmail.com">mail</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lightning Web Components Guide — Complete Guide | Salesforce Decoded</title>
+  <meta name="description" content="Build modern Salesforce UIs with LWC. Component lifecycle, data binding, wire service, pub-sub, custom events, and advanced patterns.">
+  <meta name="keywords" content="lightning web components, lwc guide, salesforce lwc, wire service, lwc lifecycle, lwc events">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/guides/lwc-guide.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+    <ul class="navbar-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li>
+      <li><a href="../guides.html" class="active">Guides</a></li>
+      <li><a href="../tips.html">Tips</a></li>
+      <li><a href="../prompts.html">Prompts</a></li>
+      <li><a href="../extensions.html">Extensions</a></li>
+      <li><a href="../resources.html">Resources</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+    <div class="navbar-search" role="button" tabindex="0">
+      <span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd>
+    </div>
+    <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+  </div></nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html" class="active"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../guides.html">Guides</a><span class="separator">/</span>
+        <span class="current">Lightning Web Components Guide</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-primary">Frontend Guide</span>
+        <span class="body-small text-outline">20 min read</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">Lightning Web Components Guide</h1>
+      <p class="reveal stagger-4">Build modern Salesforce UIs with LWC — from component lifecycle and data binding to advanced pub-sub and custom event patterns.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+
+          <p class="body-large reveal">Lightning Web Components (LWC) is Salesforce's modern UI framework built on web standards — custom elements, shadow DOM, and ES modules. Unlike Aura, LWC uses native browser APIs, making it significantly faster and easier to maintain.</p>
+
+          <h2 id="component-anatomy" class="reveal">Component Anatomy</h2>
+          <p class="reveal">Every LWC component is a folder with at minimum three files: an HTML template, a JavaScript controller, and an XML metadata file. The folder name defines the component's tag name.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">HTML — accountCard.html</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">&lt;!-- accountCard/accountCard.html --&gt;</span>
+&lt;<span class="code-keyword">template</span>&gt;
+    &lt;<span class="code-type">lightning-card</span> title=<span class="code-string">{account.Name}</span> icon-name=<span class="code-string">"standard:account"</span>&gt;
+        &lt;<span class="code-type">div</span> class=<span class="code-string">"slds-card__body slds-card__body_inner"</span>&gt;
+
+            <span class="code-comment">&lt;!-- Conditional rendering --&gt;</span>
+            &lt;<span class="code-keyword">template</span> lwc:if=<span class="code-string">{isLoaded}</span>&gt;
+                &lt;<span class="code-type">p</span>&gt;Industry: &lt;<span class="code-type">strong</span>&gt;{account.Industry}&lt;/<span class="code-type">strong</span>&gt;&lt;/<span class="code-type">p</span>&gt;
+                &lt;<span class="code-type">p</span>&gt;Revenue: &lt;<span class="code-type">strong</span>&gt;{formattedRevenue}&lt;/<span class="code-type">strong</span>&gt;&lt;/<span class="code-type">p</span>&gt;
+            &lt;/<span class="code-keyword">template</span>&gt;
+
+            &lt;<span class="code-keyword">template</span> lwc:else&gt;
+                &lt;<span class="code-type">lightning-spinner</span> alternative-text=<span class="code-string">"Loading"</span>&gt;&lt;/<span class="code-type">lightning-spinner</span>&gt;
+            &lt;/<span class="code-keyword">template</span>&gt;
+
+            <span class="code-comment">&lt;!-- Iterating lists --&gt;</span>
+            &lt;<span class="code-keyword">template</span> for:each=<span class="code-string">{contacts}</span> for:item=<span class="code-string">"contact"</span>&gt;
+                &lt;<span class="code-type">p</span> key=<span class="code-string">{contact.Id}</span>&gt;{contact.Name}&lt;/<span class="code-type">p</span>&gt;
+            &lt;/<span class="code-keyword">template</span>&gt;
+
+        &lt;/<span class="code-type">div</span>&gt;
+        &lt;<span class="code-type">div</span> slot=<span class="code-string">"footer"</span>&gt;
+            &lt;<span class="code-type">lightning-button</span> label=<span class="code-string">"Edit"</span> onclick=<span class="code-string">{handleEdit}</span>&gt;&lt;/<span class="code-type">lightning-button</span>&gt;
+        &lt;/<span class="code-type">div</span>&gt;
+    &lt;/<span class="code-type">lightning-card</span>&gt;
+&lt;/<span class="code-keyword">template</span>&gt;</code></pre>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">JavaScript — accountCard.js</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-keyword">import</span> { LightningElement, api, track, wire } <span class="code-keyword">from</span> <span class="code-string">'lwc'</span>;
+<span class="code-keyword">import</span> { NavigationMixin } <span class="code-keyword">from</span> <span class="code-string">'lightning/navigation'</span>;
+<span class="code-keyword">import</span> getAccountDetails <span class="code-keyword">from</span> <span class="code-string">'@salesforce/apex/AccountController.getAccountDetails'</span>;
+
+<span class="code-keyword">export default class</span> <span class="code-type">AccountCard</span> <span class="code-keyword">extends</span> NavigationMixin(LightningElement) {
+    <span class="code-comment">// @api — public property, settable by parent components</span>
+    <span class="code-keyword">@api</span> recordId;
+
+    <span class="code-comment">// @track — not needed for objects/arrays in modern LWC (tracked by default)</span>
+    isLoaded = <span class="code-keyword">false</span>;
+    contacts = [];
+
+    <span class="code-comment">// Computed property — getter pattern</span>
+    <span class="code-keyword">get</span> <span class="code-function">formattedRevenue</span>() {
+        <span class="code-keyword">return</span> <span class="code-keyword">this</span>.account?.AnnualRevenue
+            ? <span class="code-string">'$'</span> + <span class="code-keyword">this</span>.account.AnnualRevenue.toLocaleString()
+            : <span class="code-string">'N/A'</span>;
+    }
+
+    <span class="code-function">handleEdit</span>() {
+        <span class="code-keyword">this</span>[NavigationMixin.Navigate]({
+            type: <span class="code-string">'standard__recordPage'</span>,
+            attributes: {
+                recordId: <span class="code-keyword">this</span>.recordId,
+                actionName: <span class="code-string">'edit'</span>
+            }
+        });
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="lifecycle-hooks" class="reveal">Lifecycle Hooks</h2>
+          <p class="reveal">LWC components go through a defined lifecycle. Understanding each hook is critical for placing initialization logic, DOM manipulation, and cleanup code correctly.</p>
+
+          <div class="card card-elevated reveal" style="padding:28px;margin:24px 0">
+            <div style="display:grid;gap:16px">
+              <div style="display:flex;gap:16px;align-items:flex-start">
+                <div style="background:var(--md-primary-container);color:var(--md-on-primary-container);border-radius:8px;padding:6px 14px;font-family:var(--font-mono);font-size:0.8125rem;white-space:nowrap;font-weight:600">constructor()</div>
+                <p style="margin:0;font-size:0.9rem;color:var(--md-on-surface-variant);padding-top:4px">Called when component is created. Don't access child elements yet — they don't exist. Use for initial property setup.</p>
+              </div>
+              <div style="display:flex;gap:16px;align-items:flex-start">
+                <div style="background:var(--md-primary-container);color:var(--md-on-primary-container);border-radius:8px;padding:6px 14px;font-family:var(--font-mono);font-size:0.8125rem;white-space:nowrap;font-weight:600">connectedCallback()</div>
+                <p style="margin:0;font-size:0.9rem;color:var(--md-on-surface-variant);padding-top:4px">Fires when component is inserted into DOM. Safe to access <code>this.template</code> but child slots may not be rendered yet.</p>
+              </div>
+              <div style="display:flex;gap:16px;align-items:flex-start">
+                <div style="background:var(--md-primary-container);color:var(--md-on-primary-container);border-radius:8px;padding:6px 14px;font-family:var(--font-mono);font-size:0.8125rem;white-space:nowrap;font-weight:600">renderedCallback()</div>
+                <p style="margin:0;font-size:0.9rem;color:var(--md-on-surface-variant);padding-top:4px">Fires after every render. <strong>Can fire multiple times</strong> — use a boolean guard to prevent repeated initialization. Safe to query child DOM.</p>
+              </div>
+              <div style="display:flex;gap:16px;align-items:flex-start">
+                <div style="background:var(--md-error-container);color:var(--md-on-error-container);border-radius:8px;padding:6px 14px;font-family:var(--font-mono);font-size:0.8125rem;white-space:nowrap;font-weight:600">disconnectedCallback()</div>
+                <p style="margin:0;font-size:0.9rem;color:var(--md-on-surface-variant);padding-top:4px">Fires when component is removed from DOM. Clean up event listeners, timers, and subscriptions here to prevent memory leaks.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">JavaScript — Lifecycle Hooks Pattern</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-keyword">import</span> { LightningElement } <span class="code-keyword">from</span> <span class="code-string">'lwc'</span>;
+<span class="code-keyword">import</span> { subscribe, unsubscribe, MessageContext } <span class="code-keyword">from</span> <span class="code-string">'lightning/messageService'</span>;
+
+<span class="code-keyword">export default class</span> <span class="code-type">MyComponent</span> <span class="code-keyword">extends</span> LightningElement {
+    _initialized = <span class="code-keyword">false</span>;
+    _subscription = <span class="code-keyword">null</span>;
+    _intervalId = <span class="code-keyword">null</span>;
+
+    <span class="code-function">connectedCallback</span>() {
+        <span class="code-comment">// Subscribe to message channel</span>
+        <span class="code-keyword">this</span>._subscription = subscribe(<span class="code-keyword">this</span>.messageContext, MY_CHANNEL, (msg) => {
+            <span class="code-keyword">this</span>.<span class="code-function">handleMessage</span>(msg);
+        });
+        <span class="code-comment">// Start polling</span>
+        <span class="code-keyword">this</span>._intervalId = setInterval(() => <span class="code-keyword">this</span>.<span class="code-function">refresh</span>(), <span class="code-number">30000</span>);
+    }
+
+    <span class="code-function">renderedCallback</span>() {
+        <span class="code-comment">// Only run once, even though this fires on every render</span>
+        <span class="code-keyword">if</span> (<span class="code-keyword">this</span>._initialized) <span class="code-keyword">return</span>;
+        <span class="code-keyword">this</span>._initialized = <span class="code-keyword">true</span>;
+        <span class="code-comment">// Safe to access child elements now</span>
+        <span class="code-keyword">const</span> canvas = <span class="code-keyword">this</span>.template.querySelector(<span class="code-string">'canvas'</span>);
+        <span class="code-keyword">this</span>.<span class="code-function">initChart</span>(canvas);
+    }
+
+    <span class="code-function">disconnectedCallback</span>() {
+        <span class="code-comment">// Always clean up to prevent memory leaks</span>
+        unsubscribe(<span class="code-keyword">this</span>._subscription);
+        clearInterval(<span class="code-keyword">this</span>._intervalId);
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="wire-service" class="reveal">Wire Service</h2>
+          <p class="reveal">The <code>@wire</code> decorator is the reactive way to fetch data and metadata in LWC. It automatically re-fetches when its reactive properties change and works with both Apex methods and Salesforce data APIs.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">JavaScript — Wire Patterns</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-keyword">import</span> { LightningElement, api, wire } <span class="code-keyword">from</span> <span class="code-string">'lwc'</span>;
+<span class="code-keyword">import</span> { getRecord, getFieldValue } <span class="code-keyword">from</span> <span class="code-string">'lightning/uiRecordApi'</span>;
+<span class="code-keyword">import</span> { getPicklistValues, getObjectInfo } <span class="code-keyword">from</span> <span class="code-string">'lightning/uiObjectInfoApi'</span>;
+<span class="code-keyword">import</span> ACCOUNT_OBJECT <span class="code-keyword">from</span> <span class="code-string">'@salesforce/schema/Account'</span>;
+<span class="code-keyword">import</span> NAME_FIELD <span class="code-keyword">from</span> <span class="code-string">'@salesforce/schema/Account.Name'</span>;
+<span class="code-keyword">import</span> INDUSTRY_FIELD <span class="code-keyword">from</span> <span class="code-string">'@salesforce/schema/Account.Industry'</span>;
+<span class="code-keyword">import</span> getRelatedContacts <span class="code-keyword">from</span> <span class="code-string">'@salesforce/apex/AccountController.getRelatedContacts'</span>;
+
+<span class="code-keyword">export default class</span> <span class="code-type">WireDemo</span> <span class="code-keyword">extends</span> LightningElement {
+    <span class="code-keyword">@api</span> recordId;
+
+    <span class="code-comment">// Wire to standard record API — auto-refreshes on recordId change</span>
+    <span class="code-keyword">@wire</span>(getRecord, { recordId: <span class="code-string">'$recordId'</span>, fields: [NAME_FIELD, INDUSTRY_FIELD] })
+    account;
+
+    <span class="code-comment">// Wire to Apex — cacheable = true required for @wire</span>
+    <span class="code-keyword">@wire</span>(getRelatedContacts, { accountId: <span class="code-string">'$recordId'</span> })
+    <span class="code-function">wiredContacts</span>({ error, data }) {
+        <span class="code-keyword">if</span> (data) {
+            <span class="code-keyword">this</span>.contacts = data.map(c => ({
+                ...c,
+                displayName: c.FirstName + <span class="code-string">' '</span> + c.LastName
+            }));
+        } <span class="code-keyword">else if</span> (error) {
+            <span class="code-keyword">this</span>.error = error.body.message;
+        }
+    }
+
+    <span class="code-comment">// Wire to picklist values</span>
+    <span class="code-keyword">@wire</span>(getObjectInfo, { objectApiName: ACCOUNT_OBJECT })
+    objectInfo;
+
+    <span class="code-keyword">@wire</span>(getPicklistValues, { 
+        recordTypeId: <span class="code-string">'$objectInfo.data.defaultRecordTypeId'</span>, 
+        fieldApiName: INDUSTRY_FIELD 
+    })
+    industryPicklist;
+
+    <span class="code-comment">// Computed getter using wire data</span>
+    <span class="code-keyword">get</span> <span class="code-function">accountName</span>() {
+        <span class="code-keyword">return</span> getFieldValue(<span class="code-keyword">this</span>.account.data, NAME_FIELD);
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="custom-events" class="reveal">Custom Events & Communication</h2>
+          <p class="reveal">LWC uses a clear communication model: <strong>properties down</strong> and <strong>events up</strong>. Child components dispatch custom events; parent components listen and react.</p>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">swap_vert</span>
+            <p><strong>Communication Pattern:</strong> Pass data down via <code>@api</code> properties. Communicate upward via custom <code>CustomEvent</code>. For unrelated components, use Lightning Message Service (LMS).</p>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">JavaScript — Child: Dispatching Events</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// childForm.js — dispatches event to parent</span>
+<span class="code-keyword">export default class</span> <span class="code-type">ChildForm</span> <span class="code-keyword">extends</span> LightningElement {
+
+    <span class="code-function">handleSave</span>() {
+        <span class="code-keyword">const</span> formData = {
+            name: <span class="code-keyword">this</span>.template.querySelector(<span class="code-string">'[data-field="name"]'</span>).value,
+            industry: <span class="code-keyword">this</span>.template.querySelector(<span class="code-string">'[data-field="industry"]'</span>).value
+        };
+
+        <span class="code-comment">// Dispatch event with payload</span>
+        <span class="code-keyword">this</span>.dispatchEvent(
+            <span class="code-keyword">new</span> CustomEvent(<span class="code-string">'save'</span>, {
+                detail: formData,
+                bubbles: <span class="code-keyword">true</span>,   <span class="code-comment">// bubbles up the DOM tree</span>
+                composed: <span class="code-keyword">false</span>  <span class="code-comment">// stays within shadow DOM by default</span>
+            })
+        );
+    }
+
+    <span class="code-function">handleCancel</span>() {
+        <span class="code-keyword">this</span>.dispatchEvent(<span class="code-keyword">new</span> CustomEvent(<span class="code-string">'cancel'</span>));
+    }
+}</code></pre>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">HTML + JavaScript — Parent: Listening to Events</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">&lt;!-- parentPage.html --&gt;</span>
+&lt;<span class="code-keyword">template</span>&gt;
+    &lt;<span class="code-type">c-child-form</span> 
+        onsave=<span class="code-string">{handleSave}</span> 
+        oncancel=<span class="code-string">{handleCancel}</span>&gt;
+    &lt;/<span class="code-type">c-child-form</span>&gt;
+&lt;/<span class="code-keyword">template</span>&gt;
+
+<span class="code-comment">// parentPage.js</span>
+<span class="code-keyword">export default class</span> <span class="code-type">ParentPage</span> <span class="code-keyword">extends</span> LightningElement {
+
+    <span class="code-function">handleSave</span>(event) {
+        <span class="code-keyword">const</span> { name, industry } = event.detail;
+        <span class="code-comment">// Call Apex or process data</span>
+        createAccount({ name, industry })
+            .then(() => { <span class="code-keyword">this</span>.showSuccess = <span class="code-keyword">true</span>; })
+            .catch(err => { <span class="code-keyword">this</span>.error = err.body.message; });
+    }
+
+    <span class="code-function">handleCancel</span>() {
+        <span class="code-keyword">this</span>[NavigationMixin.Navigate]({ type: <span class="code-string">'standard__objectPage'</span>, ... });
+    }
+}</code></pre>
+          </div>
+
+          <h2 id="lms" class="reveal">Lightning Message Service</h2>
+          <p class="reveal">For communication between components that have no parent-child relationship — across different regions of the page — use Lightning Message Service (LMS).</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">JavaScript — LMS Publish & Subscribe</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Publisher component</span>
+<span class="code-keyword">import</span> { publish, MessageContext } <span class="code-keyword">from</span> <span class="code-string">'lightning/messageService'</span>;
+<span class="code-keyword">import</span> RECORD_SELECTED <span class="code-keyword">from</span> <span class="code-string">'@salesforce/messageChannel/RecordSelected__c'</span>;
+
+<span class="code-keyword">export default class</span> <span class="code-type">Publisher</span> <span class="code-keyword">extends</span> LightningElement {
+    <span class="code-keyword">@wire</span>(MessageContext) messageContext;
+
+    <span class="code-function">handleRecordSelect</span>(event) {
+        publish(<span class="code-keyword">this</span>.messageContext, RECORD_SELECTED, {
+            recordId: event.detail.id,
+            recordName: event.detail.name
+        });
+    }
+}
+
+<span class="code-comment">// Subscriber component</span>
+<span class="code-keyword">import</span> { subscribe, unsubscribe, MessageContext } <span class="code-keyword">from</span> <span class="code-string">'lightning/messageService'</span>;
+<span class="code-keyword">import</span> RECORD_SELECTED <span class="code-keyword">from</span> <span class="code-string">'@salesforce/messageChannel/RecordSelected__c'</span>;
+
+<span class="code-keyword">export default class</span> <span class="code-type">Subscriber</span> <span class="code-keyword">extends</span> LightningElement {
+    <span class="code-keyword">@wire</span>(MessageContext) messageContext;
+    _subscription;
+
+    <span class="code-function">connectedCallback</span>() {
+        <span class="code-keyword">this</span>._subscription = subscribe(
+            <span class="code-keyword">this</span>.messageContext, 
+            RECORD_SELECTED, 
+            (message) => <span class="code-keyword">this</span>.<span class="code-function">handleMessage</span>(message)
+        );
+    }
+
+    <span class="code-function">disconnectedCallback</span>() {
+        unsubscribe(<span class="code-keyword">this</span>._subscription);
+    }
+
+    <span class="code-function">handleMessage</span>(message) {
+        <span class="code-keyword">this</span>.selectedId = message.recordId;
+    }
+}</code></pre>
+          </div>
+
+        </div>
+
+        <!-- TOC -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#component-anatomy">Component Anatomy</a>
+            <a href="#lifecycle-hooks">Lifecycle Hooks</a>
+            <a href="#wire-service">Wire Service</a>
+            <a href="#custom-events">Custom Events</a>
+            <a href="#lms">Lightning Message Service</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid">
+    <div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

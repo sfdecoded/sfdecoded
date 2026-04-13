@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Unexpected Token: &lt;EOF&gt; — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce 'unexpected token EOF' SOQL error. Learn how to debug malformed dynamic SOQL queries and fix common string-building mistakes.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/unexpected-token-eof.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <nav class="navbar"><div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+<ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html" class="active">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+<div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+<div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">Unexpected Token: &lt;EOF&gt;</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-warning">Query Syntax</span><span class="tag tag-primary">Dynamic SOQL</span></div>
+      <h1 class="display-medium reveal stagger-3">Unexpected Token: &lt;EOF&gt;</h1>
+      <p class="reveal stagger-4">System.QueryException — The SOQL query string ended unexpectedly. Salesforce reached the end of the string before the query was syntactically complete.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+          <div class="callout callout-error reveal">
+  <span class="material-symbols-rounded">error</span>
+  <div><p><strong>System.QueryException:</strong> unexpected token: '&lt;EOF&gt;'</p></div>
+</div>
+          
+<h2 id="what" class="reveal">What does this error mean?</h2>
+<p class="reveal"><code>&lt;EOF&gt;</code> stands for "End of File" — in this context it means Salesforce reached the end of the SOQL query string but was still expecting more tokens to complete the syntax. The query is incomplete. This error almost always comes from <strong>dynamic SOQL</strong> built by concatenating strings, where a missing space, typo, or incorrect conditional branch produces a truncated or malformed query.</p>
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+<h3 class="reveal">1. Missing space between tokens</h3>
+<p class="reveal">When concatenating string fragments without proper spacing: <code>'SELECT Id' + 'FROM Account'</code> produces <code>SELECT IdFROM Account</code> — invalid SOQL that reaches EOF before a valid parse.</p>
+<h3 class="reveal">2. Conditional WHERE clause built incorrectly</h3>
+<p class="reveal">Dynamic WHERE clauses that conditionally append filter fragments often produce partial strings like <code>SELECT Id FROM Account WHERE</code> — the <code>WHERE</code> keyword with no condition causes an unexpected EOF.</p>
+<h3 class="reveal">3. Empty string variable in bind expression</h3>
+<p class="reveal">A dynamic field name or object name variable that resolves to an empty string leaves a gap in the query structure.</p>
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+<h3 class="reveal">Solution 1: Debug-print the query string before execution</h3>
+<p class="reveal">Always log the complete dynamic query string before calling <code>Database.query()</code>. This shows you the exact malformed string.</p>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code>String soql = <span class="code-string">'SELECT Id FROM '</span> + objectName
+           + <span class="code-string">' WHERE '</span> + filterClause;
+
+<span class="code-comment">// ✅ Always print before executing dynamic SOQL</span>
+System.<span class="code-function">debug</span>(<span class="code-string">'Query: '</span> + soql);
+
+List&lt;SObject&gt; results = Database.<span class="code-function">query</span>(soql);</code></pre>
+</div>
+<h3 class="reveal">Solution 2: Guard against empty WHERE clauses</h3>
+<p class="reveal">When dynamically building a WHERE clause, use a <code>List&lt;String&gt;</code> of conditions and join them. This prevents orphaned <code>WHERE</code> keywords.</p>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code>List&lt;String&gt; conditions = <span class="code-keyword">new</span> List&lt;String&gt;();
+
+<span class="code-keyword">if</span> (filterByActive) {{
+    conditions.<span class="code-function">add</span>(<span class="code-string">'IsActive__c = true'</span>);
+}}
+<span class="code-keyword">if</span> (ownerId != <span class="code-keyword">null</span>) {{
+    conditions.<span class="code-function">add</span>(<span class="code-string">'OwnerId = \'</span> + ownerId + <span class="code-string">'\'</span>);
+}}
+
+String soql = <span class="code-string">'SELECT Id, Name FROM Account'</span>;
+<span class="code-keyword">if</span> (!conditions.<span class="code-function">isEmpty</span>()) {{
+    soql += <span class="code-string">' WHERE '</span> + String.<span class="code-function">join</span>(conditions, <span class="code-string">' AND '</span>);
+}}
+
+System.<span class="code-function">debug</span>(soql); <span class="code-comment">// inspect before running</span>
+List&lt;SObject&gt; results = Database.<span class="code-function">query</span>(soql);</code></pre>
+</div>
+<div class="callout callout-info reveal">
+  <span class="material-symbols-rounded">lightbulb</span>
+  <div><p><strong>Pro Tip:</strong> Use the <strong>Developer Console → Execute Anonymous</strong> window to paste and test your dynamic query string directly. If it fails, you'll see the exact parse error immediately — much faster than deploying and reading debug logs.</p></div>
+</div>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+ <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+  <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+<div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+<div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

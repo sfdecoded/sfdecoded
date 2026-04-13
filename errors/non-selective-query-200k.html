@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Non-Selective Query on Object with 200,000+ Records — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce non-selective query error on large objects. Learn selectivity thresholds, indexed fields, and how to get custom indexes.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/non-selective-query-200k.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <nav class="navbar"><div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+<ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html" class="active">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+<div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+<div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">Non-Selective Query on Object with 200,000+ Records</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-error">Performance</span><span class="tag tag-warning">Query Syntax</span></div>
+      <h1 class="display-medium reveal stagger-3">Non-Selective Query on Object with 200,000+ Records</h1>
+      <p class="reveal stagger-4">System.QueryException — A SOQL query runs against an object with over 200,000 records without a selective indexed filter, triggering Salesforce's full-table-scan protection.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+          <div class="callout callout-error reveal">
+  <span class="material-symbols-rounded">error</span>
+  <div><p><strong>System.QueryException:</strong> Non-selective query against large object type (more than 200000 rows). Consider an indexed filter or contact salesforce.com about custom indexing.</p></div>
+</div>
+          
+<h2 id="what" class="reveal">What does this error mean?</h2>
+<p class="reveal">This is the same underlying error as a non-selective query, but thrown specifically in the context of Apex triggers or classes running against large objects — particularly important in trigger contexts where the error can halt record saves entirely. Salesforce requires that queries on objects with 200,000+ records use at least one <strong>selective filter</strong> on an indexed field.</p>
+<p class="reveal">Selectivity is calculated per-filter: a filter is selective if it reduces the result set below 10% of the first million records, or below 5% of records beyond one million, with a maximum of 333,333 records. If no individual filter meets the threshold, the query is considered non-selective.</p>
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+<h3 class="reveal">1. Trigger queries not scoped to trigger records</h3>
+<p class="reveal">A trigger that queries related records using a non-indexed field instead of the trigger's record IDs — for example, querying all cases for an account using a custom field rather than the AccountId lookup.</p>
+<h3 class="reveal">2. Negation operators on any field</h3>
+<p class="reveal">Filters using <code>!=</code>, <code>NOT IN</code>, or <code>NOT LIKE</code> are inherently non-selective regardless of the field — they potentially match most records.</p>
+<h3 class="reveal">3. OR conditions between non-indexed fields</h3>
+<p class="reveal">OR conditions prevent index use even when one of the fields is indexed, because both branches must be evaluated.</p>
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+<h3 class="reveal">Solution 1: Anchor trigger queries to trigger.newMap.keySet()</h3>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-comment">// ❌ BAD — non-indexed filter on large Case object</span>
+List&lt;Case&gt; cases = [
+    <span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> Case
+    <span class="code-keyword">WHERE</span> Custom_Category__c = <span class="code-string">'Support'</span>
+];
+
+<span class="code-comment">// ✅ GOOD — indexed Id field, always selective</span>
+List&lt;Case&gt; cases = [
+    <span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> Case
+    <span class="code-keyword">WHERE</span> Id <span class="code-keyword">IN</span> :Trigger.newMap.keySet()
+];
+
+<span class="code-comment">// ✅ GOOD — indexed date range + additional filter</span>
+List&lt;Case&gt; cases = [
+    <span class="code-keyword">SELECT</span> Id, Custom_Category__c <span class="code-keyword">FROM</span> Case
+    <span class="code-keyword">WHERE</span> CreatedDate = LAST_N_DAYS:7
+      <span class="code-keyword">AND</span> Custom_Category__c = <span class="code-string">'Support'</span>
+];</code></pre>
+</div>
+<h3 class="reveal">Solution 2: Use the Developer Console Query Plan tool</h3>
+<p class="reveal">Open the Developer Console → Query Editor → paste your SOQL → click <strong>Plan</strong> (not Execute). The Query Plan shows cardinality estimates and whether any index will be used. A "TableScan" in the plan means the query will be non-selective on large objects.</p>
+<div class="callout callout-info reveal">
+  <span class="material-symbols-rounded">lightbulb</span>
+  <div><p><strong>Pro Tip:</strong> If your use case genuinely requires filtering on a non-indexed custom field at large scale, open a Salesforce Support case requesting a <strong>custom index</strong>. Salesforce evaluates selectivity and adds the index if the field typically produces selective queries. This is free and has no ongoing cost.</p></div>
+</div>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+ <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+  <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+<div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+<div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fix: CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY — Salesforce Error Solution | Salesforce Decoded</title>
+
+<meta name="description" content="Fix the Salesforce CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY error. Learn why triggers, flows, or automation fail during DML operations and how to resolve it.">
+
+<link rel="canonical" href="https://sfdecoded.netlify.app/errors/cannot-insert-update-activate-entity.html">
+
+<link rel="stylesheet" href="../css/style.css">
+
+<link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+
+<meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+
+</head>
+
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+
+<nav class="navbar">
+<div class="navbar-inner">
+
+<a href="../index.html" class="nav-logo">
+<div class="nav-logo-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+</svg>
+</div>
+<div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+</a>
+
+<ul class="navbar-links">
+<li><a href="../index.html">Home</a></li>
+<li><a href="../tools.html">Tools</a></li>
+<li><a href="../errors.html" class="active">Errors</a></li>
+<li><a href="../guides.html">Guides</a></li>
+<li><a href="../tips.html">Tips</a></li>
+<li><a href="../prompts.html">Prompts</a></li>
+<li><a href="../extensions.html">Extensions</a></li>
+<li><a href="../resources.html">Resources</a></li>
+<li><a href="../about.html">About</a></li>
+</ul>
+
+<div class="navbar-search" role="button" tabindex="0">
+<span class="material-symbols-rounded">search</span>
+<span>Search...</span>
+<kbd>⌘K</kbd>
+</div>
+
+<button class="navbar-mobile-toggle" aria-label="Toggle menu">
+<span class="material-symbols-rounded">menu</span>
+</button>
+
+</div>
+</nav>
+
+
+
+<header class="page-header">
+
+<div class="container">
+
+<div class="breadcrumbs reveal">
+<a href="../index.html">Home</a>
+<span class="separator">/</span>
+<a href="../errors.html">Errors</a>
+<span class="separator">/</span>
+<span class="current">CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY</span>
+</div>
+
+<div class="flex items-center gap-12 mb-16 reveal stagger-2">
+<span class="tag tag-error">DML Error</span>
+</div>
+
+<h1 class="display-medium reveal stagger-3">CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY</h1>
+
+<p class="reveal stagger-4">
+System.DmlException — A trigger, flow, or automation failed during a record insert, update, or delete operation.
+</p>
+
+</div>
+
+</header>
+
+
+
+<section class="section">
+
+<div class="container">
+
+<div class="article-layout">
+
+<div class="article-content">
+
+
+<div class="callout callout-error reveal">
+<span class="material-symbols-rounded">error</span>
+<div>
+<p>
+<strong>CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY:</strong> execution of trigger failed
+</p>
+</div>
+</div>
+
+
+
+<h2 id="what" class="reveal">What does this error mean?</h2>
+
+<p class="reveal">
+This error occurs when Salesforce attempts to run automation such as <strong>Apex triggers, flows, workflow rules, or process builders</strong> during a record insert, update, or delete — and one of those automations throws an exception.
+</p>
+
+<p class="reveal">
+Because the automation fails, Salesforce blocks the entire transaction and returns the <code>CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY</code> error.
+</p>
+
+
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+
+<h3 class="reveal">1. Unhandled exception in Apex trigger</h3>
+
+<p class="reveal">
+Trigger logic throws an exception due to null values, SOQL errors, or invalid data.
+</p>
+
+<h3 class="reveal">2. Validation rule triggered by automation</h3>
+
+<p class="reveal">
+A flow or trigger updates fields that violate validation rules.
+</p>
+
+<h3 class="reveal">3. Recursive trigger logic</h3>
+
+<p class="reveal">
+Triggers repeatedly update the same records, causing recursion and failure.
+</p>
+
+<h3 class="reveal">4. Flow or Process Builder failure</h3>
+
+<p class="reveal">
+Declarative automation throws an error due to missing fields or invalid conditions.
+</p>
+
+
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+
+
+
+<h3 class="reveal">Solution 1 — Check debug logs</h3>
+
+<p class="reveal">
+Open debug logs to identify which automation or trigger caused the exception.
+</p>
+
+<div class="code-block reveal">
+<pre><code>
+Setup → Debug Logs
+</code></pre>
+</div>
+
+
+
+<h3 class="reveal">Solution 2 — Identify failing trigger</h3>
+
+<div class="code-block reveal">
+
+<div class="code-block-header">
+<span class="code-block-lang">Apex</span>
+<button class="code-copy-btn">
+<span class="material-symbols-rounded">content_copy</span> Copy
+</button>
+</div>
+
+<pre><code>
+trigger AccountTrigger on Account (before insert, before update) {
+
+    for(Account acc : Trigger.new){
+
+        if(acc.Name == null){
+            acc.Name = 'Default Name';
+        }
+
+    }
+
+}
+</code></pre>
+
+</div>
+
+
+
+<h3 class="reveal">Solution 3 — Add defensive coding</h3>
+
+<div class="code-block reveal">
+
+<div class="code-block-header">
+<span class="code-block-lang">Apex</span>
+</div>
+
+<pre><code>
+if(record != null && record.Field__c != null){
+    // safe processing
+}
+</code></pre>
+
+</div>
+
+
+
+<div class="callout callout-info reveal">
+<span class="material-symbols-rounded">lightbulb</span>
+<div>
+<p>
+<strong>Pro Tip:</strong> Always include error handling and null checks in Apex triggers to prevent runtime failures during DML operations.
+</p>
+</div>
+</div>
+
+
+
+</div>
+
+
+
+<aside>
+
+<nav class="toc">
+
+<h4>On this page</h4>
+
+<a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+
+</nav>
+
+</aside>
+
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<footer class="footer">
+
+<div class="container">
+
+<div class="footer-grid">
+
+<div class="footer-brand">
+
+<a href="../index.html" class="nav-logo">
+
+<div class="nav-logo-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+</svg>
+</div>
+
+<div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+
+</a>
+
+<p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+
+</div>
+
+</div>
+
+<div class="footer-bottom">
+
+<p>&copy; 2026 Salesforce Decoded.</p>
+
+<div class="footer-social">
+<a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+<a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+</div>
+
+</div>
+
+</div>
+
+</footer>
+
+
+<button class="back-to-top" aria-label="Back to top">
+<span class="material-symbols-rounded">arrow_upward</span>
+</button>
+
+
+<script src="../js/main.js"></script>
+
+</body>
+</html>

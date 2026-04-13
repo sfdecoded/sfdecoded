@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Governor Limits Explained — Complete Guide | Salesforce Decoded</title>
+  <meta name="description" content="Understand every Salesforce governor limit — SOQL, DML, CPU, heap, callouts — why they exist and practical strategies to stay within bounds.">
+  <meta name="keywords" content="salesforce governor limits, apex limits, soql limits, dml limits, cpu time limit, heap size limit">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/guides/governor-limits.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="navbar"><div class="navbar-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+    </a>
+    <ul class="navbar-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../tools.html">Tools</a></li>
+      <li><a href="../errors.html">Errors</a></li>
+      <li><a href="../guides.html" class="active">Guides</a></li>
+      <li><a href="../tips.html">Tips</a></li>
+      <li><a href="../prompts.html">Prompts</a></li>
+      <li><a href="../extensions.html">Extensions</a></li>
+      <li><a href="../resources.html">Resources</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+    <div class="navbar-search" role="button" tabindex="0">
+      <span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd>
+    </div>
+    <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+  </div></nav>
+
+  <div class="mobile-nav">
+    <a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="../errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="../guides.html" class="active"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="../about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../guides.html">Guides</a><span class="separator">/</span>
+        <span class="current">Governor Limits Explained</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2">
+        <span class="tag tag-primary">Platform Guide</span>
+        <span class="body-small text-outline">10 min read</span>
+      </div>
+      <h1 class="display-medium reveal stagger-3">Governor Limits Explained</h1>
+      <p class="reveal stagger-4">Understand every Salesforce governor limit, why they exist, and practical strategies to always stay within bounds.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+
+          <p class="body-large reveal">Salesforce is a multi-tenant platform — thousands of customers share the same infrastructure. Governor limits are enforced guardrails that prevent any single org or transaction from monopolizing shared resources. Understanding them isn't optional; it's fundamental to Salesforce development.</p>
+
+          <h2 id="why-limits" class="reveal">Why Governor Limits Exist</h2>
+          <p class="reveal">In a traditional single-tenant application, you can consume as many resources as your server allows. In Salesforce's multi-tenant model, the platform must guarantee fair resource distribution across all orgs running on the same servers at the same time. Governor limits are the technical implementation of that guarantee.</p>
+
+          <div class="callout callout-info reveal">
+            <span class="material-symbols-rounded">info</span>
+            <p><strong>Limits are per transaction:</strong> Every Apex transaction (trigger, class method, batch job chunk, future method) starts with a fresh set of limits. Async operations like <code>@future</code> and Batch Apex get their own separate limit context.</p>
+          </div>
+
+          <h2 id="soql-limits" class="reveal">SOQL & SOSL Limits</h2>
+
+          <div class="card card-elevated reveal" style="padding:0;overflow:hidden;margin:24px 0">
+            <table style="width:100%;border-collapse:collapse;font-size:0.9rem">
+              <thead>
+                <tr style="background:var(--md-surface-container);text-align:left">
+                  <th style="padding:14px 20px;font-family:var(--font-display);font-weight:600;color:var(--md-on-surface)">Limit</th>
+                  <th style="padding:14px 20px;font-family:var(--font-display);font-weight:600;color:var(--md-on-surface)">Synchronous</th>
+                  <th style="padding:14px 20px;font-family:var(--font-display);font-weight:600;color:var(--md-on-surface)">Asynchronous</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-top:1px solid var(--md-outline-variant)">
+                  <td style="padding:14px 20px;color:var(--md-on-surface-variant)">SOQL Queries</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">100</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">200</td>
+                </tr>
+                <tr style="border-top:1px solid var(--md-outline-variant);background:var(--md-surface-container-low)">
+                  <td style="padding:14px 20px;color:var(--md-on-surface-variant)">Records Retrieved by SOQL</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">50,000</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">50,000</td>
+                </tr>
+                <tr style="border-top:1px solid var(--md-outline-variant)">
+                  <td style="padding:14px 20px;color:var(--md-on-surface-variant)">SOSL Queries</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">20</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">20</td>
+                </tr>
+                <tr style="border-top:1px solid var(--md-outline-variant);background:var(--md-surface-container-low)">
+                  <td style="padding:14px 20px;color:var(--md-on-surface-variant)">Records Retrieved by SOSL</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">2,000</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">2,000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Monitor SOQL Usage</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// Check limit consumption in real-time</span>
+System.debug(<span class="code-string">'SOQL used: '</span> + Limits.getQueries() + <span class="code-string">' / '</span> + Limits.getLimitQueries());
+System.debug(<span class="code-string">'Rows used: '</span> + Limits.getQueryRows() + <span class="code-string">' / '</span> + Limits.getLimitQueryRows());
+
+<span class="code-comment">// Proactive check before a large query</span>
+<span class="code-keyword">if</span> (Limits.getQueries() >= Limits.getLimitQueries() - <span class="code-number">5</span>) {
+    <span class="code-comment">// Too close to limit — defer to async or throw a handled exception</span>
+    <span class="code-keyword">throw new</span> LimitException(<span class="code-string">'Approaching SOQL limit, cannot proceed synchronously'</span>);
+}</code></pre>
+          </div>
+
+          <h2 id="dml-limits" class="reveal">DML Limits</h2>
+
+          <div class="card card-elevated reveal" style="padding:0;overflow:hidden;margin:24px 0">
+            <table style="width:100%;border-collapse:collapse;font-size:0.9rem">
+              <thead>
+                <tr style="background:var(--md-surface-container);text-align:left">
+                  <th style="padding:14px 20px;font-family:var(--font-display);font-weight:600;color:var(--md-on-surface)">Limit</th>
+                  <th style="padding:14px 20px;font-family:var(--font-display);font-weight:600;color:var(--md-on-surface)">Synchronous</th>
+                  <th style="padding:14px 20px;font-family:var(--font-display);font-weight:600;color:var(--md-on-surface)">Asynchronous</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-top:1px solid var(--md-outline-variant)">
+                  <td style="padding:14px 20px;color:var(--md-on-surface-variant)">DML Statements</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">150</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">150</td>
+                </tr>
+                <tr style="border-top:1px solid var(--md-outline-variant);background:var(--md-surface-container-low)">
+                  <td style="padding:14px 20px;color:var(--md-on-surface-variant)">Records via DML</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">10,000</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">10,000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warning reveal">
+            <span class="material-symbols-rounded">warning</span>
+            <p><strong>One DML, many records:</strong> <code>insert myList</code> is ONE DML statement regardless of list size. Each separate <code>insert</code>, <code>update</code>, <code>delete</code>, <code>upsert</code>, or <code>merge</code> call counts as one statement against the 150 limit.</p>
+          </div>
+
+          <h2 id="cpu-heap" class="reveal">CPU Time & Heap Size</h2>
+
+          <div class="grid grid-2 mt-24 mb-32">
+            <div class="card reveal stagger-1" style="text-align:center;padding:28px">
+              <div class="stat-number" style="font-size:2.5rem">10s</div>
+              <div class="body-small text-muted" style="margin-top:4px">CPU time (synchronous)</div>
+              <p style="font-size:0.8125rem;color:var(--md-outline);margin-top:12px">60s for async. Counts only Apex execution, not SOQL wait time.</p>
+            </div>
+            <div class="card reveal stagger-2" style="text-align:center;padding:28px">
+              <div class="stat-number" style="font-size:2.5rem">6 MB</div>
+              <div class="body-small text-muted" style="margin-top:4px">Heap size (synchronous)</div>
+              <p style="font-size:0.8125rem;color:var(--md-outline);margin-top:12px">12 MB for async. Total memory for all objects in transaction.</p>
+            </div>
+          </div>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — CPU & Heap Optimization Tips</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// ❌ Heap hog — stores entire query result in memory</span>
+List&lt;Account&gt; accounts = [<span class="code-keyword">SELECT</span> Id, Name, Description <span class="code-keyword">FROM</span> Account];
+
+<span class="code-comment">// ✅ Only fetch fields you need — reduces heap usage</span>
+List&lt;Account&gt; accounts = [<span class="code-keyword">SELECT</span> Id, Name <span class="code-keyword">FROM</span> Account <span class="code-keyword">LIMIT</span> <span class="code-number">1000</span>];
+
+<span class="code-comment">// ❌ CPU hog — string concatenation in loops</span>
+String result = <span class="code-string">''</span>;
+<span class="code-keyword">for</span> (Integer i = <span class="code-number">0</span>; i &lt; <span class="code-number">10000</span>; i++) {
+    result += i + <span class="code-string">','</span>; <span class="code-comment">// Creates new String object each iteration</span>
+}
+
+<span class="code-comment">// ✅ Use List and join — far more CPU efficient</span>
+List&lt;String&gt; parts = <span class="code-keyword">new</span> List&lt;String&gt;();
+<span class="code-keyword">for</span> (Integer i = <span class="code-number">0</span>; i &lt; <span class="code-number">10000</span>; i++) {
+    parts.add(String.valueOf(i));
+}
+String result = String.join(parts, <span class="code-string">','</span>);
+
+<span class="code-comment">// Monitor mid-execution</span>
+System.debug(<span class="code-string">'CPU used: '</span> + Limits.getCpuTime() + <span class="code-string">'ms'</span>);
+System.debug(<span class="code-string">'Heap used: '</span> + Limits.getHeapSize() + <span class="code-string">' bytes'</span>);</code></pre>
+          </div>
+
+          <h2 id="callout-limits" class="reveal">Callout Limits</h2>
+
+          <div class="card card-elevated reveal" style="padding:0;overflow:hidden;margin:24px 0">
+            <table style="width:100%;border-collapse:collapse;font-size:0.9rem">
+              <thead>
+                <tr style="background:var(--md-surface-container);text-align:left">
+                  <th style="padding:14px 20px;font-family:var(--font-display);font-weight:600;color:var(--md-on-surface)">Limit</th>
+                  <th style="padding:14px 20px;font-family:var(--font-display);font-weight:600;color:var(--md-on-surface)">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-top:1px solid var(--md-outline-variant)">
+                  <td style="padding:14px 20px;color:var(--md-on-surface-variant)">Callouts per transaction</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">100</td>
+                </tr>
+                <tr style="border-top:1px solid var(--md-outline-variant);background:var(--md-surface-container-low)">
+                  <td style="padding:14px 20px;color:var(--md-on-surface-variant)">Callout timeout (max)</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">120 seconds</td>
+                </tr>
+                <tr style="border-top:1px solid var(--md-outline-variant)">
+                  <td style="padding:14px 20px;color:var(--md-on-surface-variant)">Response body size</td>
+                  <td style="padding:14px 20px;font-family:var(--font-mono);font-weight:600;color:var(--md-primary)">6 MB</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-error reveal">
+            <span class="material-symbols-rounded">error</span>
+            <p><strong>Critical Rule:</strong> You cannot make a callout after a DML operation in the same transaction. If you do, you'll get <code>System.CalloutException: You have uncommitted work pending.</code> Use <code>@future(callout=true)</code> or Queueable to separate them.</p>
+          </div>
+
+          <h2 id="async-limits" class="reveal">Async Context Limits</h2>
+          <p class="reveal">Moving work to asynchronous contexts is the primary strategy for working around synchronous limits. Each async mechanism has its own limit context.</p>
+
+          <div class="code-block reveal">
+            <div class="code-block-header">
+              <span class="code-block-lang">Apex — Async Limit Contexts</span>
+              <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+            </div>
+<pre><code><span class="code-comment">// @future — simple async, higher limits, no chaining</span>
+<span class="code-keyword">public class</span> <span class="code-type">AsyncHelper</span> {
+    <span class="code-keyword">@future</span>(callout=<span class="code-keyword">true</span>)
+    <span class="code-keyword">public static void</span> <span class="code-function">doCallout</span>(Set&lt;Id&gt; recordIds) {
+        <span class="code-comment">// 200 SOQL, 200 DML, 12MB heap, 60s CPU</span>
+        <span class="code-comment">// No further @future calls from here</span>
+    }
+}
+
+<span class="code-comment">// Queueable — chainable, can store state, supports callouts</span>
+<span class="code-keyword">public class</span> <span class="code-type">MyQueueable</span> <span class="code-keyword">implements</span> Queueable, Database.AllowsCallouts {
+    <span class="code-keyword">private</span> List&lt;Id&gt; recordIds;
+
+    <span class="code-keyword">public</span> <span class="code-function">MyQueueable</span>(List&lt;Id&gt; ids) { <span class="code-keyword">this</span>.recordIds = ids; }
+
+    <span class="code-keyword">public void</span> <span class="code-function">execute</span>(QueueableContext ctx) {
+        <span class="code-comment">// Process first batch</span>
+        <span class="code-comment">// Chain the next batch if more remain</span>
+        <span class="code-keyword">if</span> (!recordIds.isEmpty()) {
+            System.enqueueJob(<span class="code-keyword">new</span> MyQueueable(remainingIds));
+        }
+    }
+}
+
+<span class="code-comment">// Batch Apex — best for LDV, 200 records per chunk</span>
+<span class="code-keyword">public class</span> <span class="code-type">MyBatch</span> <span class="code-keyword">implements</span> Database.Batchable&lt;SObject&gt; {
+    <span class="code-keyword">public</span> Database.QueryLocator <span class="code-function">start</span>(Database.BatchableContext bc) {
+        <span class="code-comment">// Can query up to 50 million records (not subject to SOQL row limit)</span>
+        <span class="code-keyword">return</span> Database.getQueryLocator([<span class="code-keyword">SELECT</span> Id <span class="code-keyword">FROM</span> Contact]);
+    }
+    <span class="code-keyword">public void</span> <span class="code-function">execute</span>(Database.BatchableContext bc, List&lt;Contact&gt; scope) {
+        <span class="code-comment">// Fresh limits per chunk of up to 200 records</span>
+    }
+    <span class="code-keyword">public void</span> <span class="code-function">finish</span>(Database.BatchableContext bc) {}
+}</code></pre>
+          </div>
+
+          <h2 id="monitoring" class="reveal">Full Limits Reference</h2>
+
+          <div class="grid grid-2 mt-24 mb-32">
+            <div class="card reveal stagger-1" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">100</div>
+              <div class="body-small text-muted">SOQL queries (sync)</div>
+            </div>
+            <div class="card reveal stagger-2" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">150</div>
+              <div class="body-small text-muted">DML statements</div>
+            </div>
+            <div class="card reveal stagger-3" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">6 MB</div>
+              <div class="body-small text-muted">Heap size (sync)</div>
+            </div>
+            <div class="card reveal stagger-4" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">10s</div>
+              <div class="body-small text-muted">CPU time (sync)</div>
+            </div>
+            <div class="card reveal stagger-1" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">50K</div>
+              <div class="body-small text-muted">SOQL rows returned</div>
+            </div>
+            <div class="card reveal stagger-2" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">100</div>
+              <div class="body-small text-muted">HTTP callouts</div>
+            </div>
+            <div class="card reveal stagger-3" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">10K</div>
+              <div class="body-small text-muted">DML records</div>
+            </div>
+            <div class="card reveal stagger-4" style="text-align:center;padding:24px">
+              <div class="stat-number" style="font-size:2rem">50M</div>
+              <div class="body-small text-muted">Batch query locator rows</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TOC -->
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#why-limits">Why Limits Exist</a>
+            <a href="#soql-limits">SOQL &amp; SOSL Limits</a>
+            <a href="#dml-limits">DML Limits</a>
+            <a href="#cpu-heap">CPU &amp; Heap</a>
+            <a href="#callout-limits">Callout Limits</a>
+            <a href="#async-limits">Async Contexts</a>
+            <a href="#monitoring">Full Reference</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid">
+    <div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+        <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+    <div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+    <div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

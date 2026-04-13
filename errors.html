@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Error Reference Library — Salesforce Decoded</title>
+  <meta name="description" content="Fix common Salesforce errors fast. Searchable library with explanations, causes, solutions, and code examples for every Salesforce error.">
+  <meta name="keywords" content="salesforce error fix, too many soql queries 101, apex cpu time limit exceeded, salesforce error reference">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors.html">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="favicons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="favicons/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+  <!-- End Google Tag Manager -->
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tools.html">Tools</a></li>
+        <li><a href="errors.html" class="active">Errors</a></li>
+        <li><a href="guides.html">Guides</a></li>
+        <li><a href="tips.html">Tips</a></li>
+        <li><a href="prompts.html">Prompts</a></li>
+        <li><a href="extensions.html">Extensions</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav">
+    <a href="index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="tools.html"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+  <div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="overline reveal"><span>Error Reference</span></div>
+      <h1 class="display-medium reveal stagger-2">Salesforce Error Library</h1>
+      <p class="reveal stagger-3">Find clear explanations, root causes, and tested solutions for every common Salesforce error.</p>
+    </div>
+  </header>
+
+  <!-- Error Search -->
+  <section class="section-sm" style="padding-bottom:0">
+    <div class="container">
+      <div class="reveal" style="max-width:600px">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);border-radius:var(--md-shape-full);transition:border-color 0.2s">
+          <span class="material-symbols-rounded" style="color:var(--md-on-surface-variant)">search</span>
+          <input type="text" id="error-search" placeholder="Search errors (e.g., SOQL 101, CPU time limit...)" style="flex:1;border:none;outline:none;font-family:var(--font-body);font-size:0.9375rem;background:transparent;color:var(--md-on-surface)">
+        </div>
+      </div>
+
+      <div class="chip-group mt-24 reveal" id="error-filters">
+        <button class="chip active" data-filter="all">All Errors</button>
+        <button class="chip" data-filter="governor">Governor Limits</button>
+        <button class="chip" data-filter="dml">DML Errors</button>
+        <button class="chip" data-filter="query">Query Syntax</button>
+        <button class="chip" data-filter="runtime">Runtime Errors</button>
+        <button class="chip" data-filter="syntax">Syntax Errors</button>
+        <button class="chip" data-filter="deployment">Deployment</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Errors List -->
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-2" id="errors-grid">
+
+        <!-- ── EXISTING ERRORS ────────────────────────────────────── -->
+
+        <a href="errors/aggregate-query-does-not-support-querymore.html" class="card-link reveal stagger-1" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Aggregate Query Does Not Support queryMore()</h3>
+            <p>Aggregate queries don't support pagination with queryMore(). Use LIMIT and OFFSET instead.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/aggregate-query-too-many-rows-for-loop.html" class="card-link reveal stagger-2" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Aggregate Query Too Many Rows For Loop</h3>
+            <p>Aggregate queries with for-loops exceed 2,000 row limits. Use LIMIT and OFFSET pagination.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/apex-cpu-time-limit-exceeded.html" class="card-link reveal stagger-3" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Apex CPU Time Limit Exceeded</h3>
+            <p>Synchronous limit is 10,000ms, async is 60,000ms. Optimize loops, queries, and logic.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/apex-heap-size-too-large.html" class="card-link reveal stagger-4" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Apex Heap Size Too Large</h3>
+            <p>Synchronous heap limit is 6MB, async is 12MB. Reduce collections and use transient variables.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/code-coverage-below-75.html" class="card-link reveal stagger-5" data-category="deployment">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-info">Deployment</span>
+            </div>
+            <h3>Code Coverage Below 75%</h3>
+            <p>Production deployments require 75% overall test coverage. Improve your test classes.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/field-custom-validation-exception.html" class="card-link reveal stagger-6" data-category="dml">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">DML Error</span>
+            </div>
+            <h3>FIELD_CUSTOM_VALIDATION_EXCEPTION</h3>
+            <p>A validation rule is blocking the DML operation. Debug field values against validation criteria.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/field-not-relationship-includes.html" class="card-link reveal stagger-7" data-category="syntax">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Syntax Error</span>
+            </div>
+            <h3>Field Not Relationship Includes</h3>
+            <p>Cannot use relationship traversal on a non-relationship field in your SOQL query.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/insufficient-access.html" class="card-link reveal stagger-8" data-category="dml">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">DML Error</span>
+            </div>
+            <h3>Insufficient Access / Cross Reference Entity</h3>
+            <p>Permission, sharing, or ownership issues preventing record creation or updates.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/invalid-cross-join-query.html" class="card-link reveal stagger-1" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Invalid Cross Join Query</h3>
+            <p>Cross joins are not permitted in SOQL. Use supported relationship traversal patterns.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/invalid-date-format.html" class="card-link reveal stagger-2" data-category="syntax">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Syntax Error</span>
+            </div>
+            <h3>Invalid Date Format</h3>
+            <p>Date values must be formatted as YYYY-MM-DD in SOQL queries.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/invalid-query-filter-operator.html" class="card-link reveal stagger-3" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Invalid Query Filter Operator</h3>
+            <p>The SOQL operator used is not valid for this field type. Check operator compatibility.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/invalid-replication-date.html" class="card-link reveal stagger-4" data-category="syntax">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Syntax Error</span>
+            </div>
+            <h3>Invalid Replication Date</h3>
+            <p>The replication date value is invalid. Ensure date format and value are correct.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/invalid-type-sobject.html" class="card-link reveal stagger-5" data-category="syntax">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Syntax Error</span>
+            </div>
+            <h3>Invalid Type SObject</h3>
+            <p>Referenced SObject type doesn't exist in your org. Check the spelling and API names.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/list-has-no-rows.html" class="card-link reveal stagger-6" data-category="runtime">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>List Has No Rows</h3>
+            <p>Accessed a list element without checking if it contains data. Always verify list size.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/list-index-out-of-bounds.html" class="card-link reveal stagger-7" data-category="runtime">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>List Index Out Of Bounds</h3>
+            <p>Attempted to access a list index that doesn't exist. Verify index is within range.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/malformed-query-unexpected-token.html" class="card-link reveal stagger-8" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Malformed Query Unexpected Token</h3>
+            <p>SOQL syntax error detected. Check brackets, quotes, commas, and reserved keywords.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/math-exception-divide-by-zero.html" class="card-link reveal stagger-1" data-category="runtime">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>Math Exception Divide By Zero</h3>
+            <p>Cannot divide by zero. Always check divisor values before arithmetic operations.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/max-min-not-supported-with-rollup.html" class="card-link reveal stagger-2" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>MAX/MIN Not Supported With Rollup</h3>
+            <p>Cannot combine MAX or MIN aggregate functions with rollup fields. Use separate queries.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/maximum-trigger-depth-exceeded.html" class="card-link reveal stagger-3" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Maximum Trigger Depth Exceeded</h3>
+            <p>Recursive trigger firing exceeds 16-depth limit. Implement recursion guards or batch processes.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/no-such-column.html" class="card-link reveal stagger-4" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>No Such Column</h3>
+            <p>Field doesn't exist on the SObject. Verify field API name spelling and permissions.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/non-selective-query-200k.html" class="card-link reveal stagger-5" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Non-Selective Query Over 200k Rows</h3>
+            <p>Query returns too many rows without selective filters. Add indexed field conditions.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/non-selective-query.html" class="card-link reveal stagger-6" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Non-Selective Query</h3>
+            <p>Query lacks selective filters or indexed fields. Add WHERE conditions on indexed fields.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/null-pointer-exception.html" class="card-link reveal stagger-7" data-category="runtime">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>Null Pointer Exception</h3>
+            <p>Attempted operation on a null object reference. Always validate objects exist before access.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/only-variable-references-allowed.html" class="card-link reveal stagger-8" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Only Variable References Allowed</h3>
+            <p>Bind variables must be referenced variables only. Cannot use expressions or method calls.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/query-timeout.html" class="card-link reveal stagger-1" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Query Timeout</h3>
+            <p>Query execution exceeded time limit. Optimize with filters, indexes, or pagination.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/request-limit-exceeded.html" class="card-link reveal stagger-2" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Request Limit Exceeded</h3>
+            <p>API request count exceeds org limits. Implement request throttling and batching strategies.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/semijoins-only-in-where-clause.html" class="card-link reveal stagger-3" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Semijoins Only In WHERE Clause</h3>
+            <p>Semijoins using IN with subqueries are only allowed in WHERE clauses, not SELECT.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/sobject-field-not-queried.html" class="card-link reveal stagger-4" data-category="runtime">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>SObject Field Not Queried</h3>
+            <p>Field wasn't included in the query. Add it to SELECT clause before accessing.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/soql-query-no-filter-warning.html" class="card-link reveal stagger-5" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>SOQL Query No Filter Warning</h3>
+            <p>Query lacks filters on indexed fields. Add WHERE conditions to improve performance.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/too-many-aggregate-queries-301.html" class="card-link reveal stagger-6" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Too Many Aggregate Queries 301</h3>
+            <p>Aggregate query limit exceeded. Combine aggregate queries or use Batch Apex.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/too-many-callouts-101.html" class="card-link reveal stagger-7" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Too Many Callouts 101</h3>
+            <p>Exceeded 100 callout limit per transaction. Batch requests or use asynchronous processing.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/too-many-dml-statements-150.html" class="card-link reveal stagger-8" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Too Many DML Statements 150</h3>
+            <p>Exceeded the 150 DML statement limit. Consolidate operations using lists and single calls.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/too-many-future-calls-51.html" class="card-link reveal stagger-1" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Too Many Future Calls 51</h3>
+            <p>Exceeded 50 @future method calls per transaction. Use Batch Apex or Queueable instead.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/too-many-query-rows-50001.html" class="card-link reveal stagger-2" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Too Many Query Rows 50001</h3>
+            <p>Query returned more than 50,000 rows. Add filters or use LIMIT to paginate results.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/too-many-query-rows-batch-apex.html" class="card-link reveal stagger-3" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Too Many Query Rows Batch Apex</h3>
+            <p>Batch job query returns more than 50,000,000 rows. Add filters or process in smaller batches.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/too-many-queueable-jobs-51.html" class="card-link reveal stagger-4" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Too Many Queueable Jobs 51</h3>
+            <p>Exceeded 50 Queueable job enqueues per transaction. Use chaining sparingly.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/too-many-soql-queries-101.html" class="card-link reveal stagger-5" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Too Many SOQL Queries 101</h3>
+            <p>Exceeded the 100 SOQL query limit per transaction. Learn bulkification patterns to fix this.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/unable-to-lock-row.html" class="card-link reveal stagger-6" data-category="dml">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">DML Error</span>
+            </div>
+            <h3>Unable to Lock Row</h3>
+            <p>Row-level locking contention when multiple operations target the same record simultaneously.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/unexpected-token-eof.html" class="card-link reveal stagger-7" data-category="syntax">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Syntax Error</span>
+            </div>
+            <h3>Unexpected Token EOF</h3>
+            <p>SOQL query is incomplete. Check for missing clauses, brackets, or punctuation.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <!-- ── NEW ERRORS ──────────────────────────────────────────── -->
+
+        <a href="errors/mixed-dml-operation.html" class="card-link reveal stagger-8" data-category="dml">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">DML Error</span>
+            </div>
+            <h3>Mixed DML Operation</h3>
+            <p>Setup and non-setup sObjects cannot be modified in the same transaction. Separate operations using @future or Queueable.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/duplicate-value-on-record.html" class="card-link reveal stagger-1" data-category="dml">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">DML Error</span>
+            </div>
+            <h3>DUPLICATE_VALUE: Duplicate Value On Record</h3>
+            <p>A duplicate rule or unique field constraint is blocking the insert or update. Review duplicate rules and unique field configuration.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/entity-is-deleted.html" class="card-link reveal stagger-2" data-category="runtime">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>ENTITY_IS_DELETED</h3>
+            <p>The record you are trying to access has been deleted. Check for soft-deleted records or race conditions in your logic.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/required-field-missing.html" class="card-link reveal stagger-3" data-category="dml">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">DML Error</span>
+            </div>
+            <h3>REQUIRED_FIELD_MISSING</h3>
+            <p>A required field was not populated before a DML operation. Ensure all mandatory fields are set on the sObject before insert or update.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/string-too-long.html" class="card-link reveal stagger-4" data-category="dml">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">DML Error</span>
+            </div>
+            <h3>STRING_TOO_LONG</h3>
+            <p>A field value exceeds its maximum allowed character length. Truncate the string or increase the field length in Object Manager.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/cannot-insert-update-activate-entity.html" class="card-link reveal stagger-5" data-category="dml">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">DML Error</span>
+            </div>
+            <h3>CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY</h3>
+            <p>A trigger, workflow, or process automation is throwing an unhandled exception and blocking the DML. Inspect the referenced entity's automation.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/visualforce-view-state-too-large.html" class="card-link reveal stagger-6" data-category="runtime">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>Visualforce View State Too Large</h3>
+            <p>View state exceeds the 170 KB limit. Mark variables as transient, reduce collection sizes, and move heavy logic server-side.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/too-many-email-invocations.html" class="card-link reveal stagger-7" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Too Many Email Invocations 11</h3>
+            <p>Exceeded the 10 sendEmail() call limit per transaction. Consolidate email sends into a single Messaging.sendEmail() call with a list.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/self-reference-from-trigger.html" class="card-link reveal stagger-8" data-category="runtime">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>Self Reference From Trigger</h3>
+            <p>A trigger attempts to update the same record that fired it, creating a recursive loop. Use a static Boolean flag to prevent re-entry.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/invalid-session-id.html" class="card-link reveal stagger-1" data-category="runtime">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>INVALID_SESSION_ID</h3>
+            <p>The session token has expired or is malformed. Re-authenticate your integration or refresh the OAuth access token before retrying.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/record-type-not-found.html" class="card-link reveal stagger-2" data-category="runtime">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Runtime Error</span>
+            </div>
+            <h3>Record Type Not Found</h3>
+            <p>The referenced Record Type does not exist or is inaccessible to the running user's profile. Verify Record Type assignment and profile permissions.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/too-many-batch-jobs.html" class="card-link reveal stagger-3" data-category="governor">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">Governor Limit</span>
+            </div>
+            <h3>Too Many Batch Jobs In The Apex Flex Queue</h3>
+            <p>The Apex Flex Queue holds a maximum of 100 batch jobs. Monitor and stagger job submissions using Database.getAsyncApexJobId.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/invalid-field-for-insert-update.html" class="card-link reveal stagger-4" data-category="dml">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-error">DML Error</span>
+            </div>
+            <h3>INVALID_FIELD_FOR_INSERT_UPDATE</h3>
+            <p>A read-only or non-creatable field was included in an insert or update. Remove formula fields, auto-number fields, and system fields from your DML.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/foreign-key-relationship-not-supported.html" class="card-link reveal stagger-5" data-category="query">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-warning">Query Syntax</span>
+            </div>
+            <h3>Foreign Key Relationship Not Supported</h3>
+            <p>The relationship traversal used in the SOQL query is not supported for this object pairing. Restructure using a separate query and a Map.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="errors/deployment-component-failure.html" class="card-link reveal stagger-6" data-category="deployment">
+          <div class="card">
+            <div class="flex items-center gap-12 mb-8">
+              <span class="tag tag-info">Deployment</span>
+            </div>
+            <h3>Deployment Component Failure</h3>
+            <p>One or more metadata components failed validation during deployment. Review the component errors in the deployment detail page and fix each individually.</p>
+            <div class="mt-16 flex items-center gap-8 text-primary label-large">Read Solution <span class="material-symbols-rounded" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="nav-logo">
+            <div class="nav-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+          </a>
+          <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4>
+          <ul>
+            <li><a href="tools.html">Tools</a></li>
+            <li><a href="errors.html">Errors</a></li>
+            <li><a href="guides.html">Guides</a></li>
+            <li><a href="prompts.html">Prompts</a></li>
+            <li><a href="extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Resources</h4>
+          <ul>
+            <li><a href="tips.html">Tips</a></li>
+            <li><a href="resources.html">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="about.html">About</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="https://sfdecoded.netlify.app/"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="js/main.js"></script>
+  <script>
+    initChipFilter('#error-filters', '#errors-grid .card-link');
+
+    // Error search filter
+    const errorSearch = document.getElementById('error-search');
+    if (errorSearch) {
+      errorSearch.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        document.querySelectorAll('#errors-grid .card-link').forEach(card => {
+          const text = card.textContent.toLowerCase();
+          card.style.display = text.includes(q) ? '' : 'none';
+        });
+      });
+    }
+  </script>
+</body>
+</html>

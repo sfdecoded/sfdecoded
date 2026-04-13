@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Aggregate Query Has Too Many Rows — Use FOR Loop — Salesforce Error Solution | Salesforce Decoded</title>
+  <meta name="description" content="Fix the Salesforce 'Aggregate query has too many rows for direct assignment' error. Learn how to use SOQL for-loops to handle large aggregate results.">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/errors/aggregate-query-too-many-rows-for-loop.html">
+  <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../favicons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <nav class="navbar"><div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+<ul class="navbar-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li><li><a href="../errors.html" class="active">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../tips.html">Tips</a></li><li><a href="../prompts.html">Prompts</a></li><li><a href="../extensions.html">Extensions</a></li><li><a href="../resources.html">Resources</a></li><li><a href="../about.html">About</a></li></ul><div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div><button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button></div></nav>
+<div class="mobile-nav"><a href="../index.html"><span class="material-symbols-rounded">home</span> Home</a><a href="../tools.html"><span class="material-symbols-rounded">build</span> Tools</a><a href="../errors.html" class="active"><span class="material-symbols-rounded">bug_report</span> Errors</a><a href="../guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a><a href="../tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a><a href="../prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a><a href="../extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a><a href="../resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a><a href="../about.html"><span class="material-symbols-rounded">info</span> About</a></div>
+<div class="search-overlay"><div class="search-modal"><div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search errors..."></div><div class="search-results"></div><div class="search-footer"><span>Type to search</span></div></div></div>
+
+  <header class="page-header">
+    <div class="container">
+      <div class="breadcrumbs reveal">
+        <a href="../index.html">Home</a><span class="separator">/</span>
+        <a href="../errors.html">Errors</a><span class="separator">/</span>
+        <span class="current">Aggregate Query Has Too Many Rows — Use FOR Loop</span>
+      </div>
+      <div class="flex items-center gap-12 mb-16 reveal stagger-2"><span class="tag tag-warning">Apex Runtime</span><span class="tag tag-primary">QueryException</span></div>
+      <h1 class="display-medium reveal stagger-3">Aggregate Query Has Too Many Rows — Use FOR Loop</h1>
+      <p class="reveal stagger-4">System.QueryException — An aggregate SOQL query returned more than 2,000 rows and was directly assigned to a List, which is not supported. Use a SOQL for-loop instead.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="article-layout">
+        <div class="article-content">
+          <div class="callout callout-error reveal">
+  <span class="material-symbols-rounded">error</span>
+  <div><p><strong>System.QueryException:</strong> Aggregate query has too many rows for direct assignment, use FOR loop</p></div>
+</div>
+          
+<h2 id="what" class="reveal">What does this error mean?</h2>
+<p class="reveal">When an aggregate SOQL query (one using <code>GROUP BY</code> or aggregate functions) returns more than <strong>2,000 rows</strong>, Salesforce does not allow direct assignment to a <code>List&lt;AggregateResult&gt;</code> variable. The direct assignment would require loading all 2,000+ rows into memory simultaneously, which Salesforce guards against. The solution is to use a SOQL for-loop, which processes aggregate results in chunks.</p>
+
+<h2 id="causes" class="reveal">Common Causes</h2>
+<h3 class="reveal">1. High-cardinality GROUP BY field</h3>
+<p class="reveal">Grouping by a field with many distinct values (e.g., <code>GROUP BY OwnerId</code> in a large org with thousands of users, or <code>GROUP BY External_Id__c</code> on a high-volume object) produces more than 2,000 groups.</p>
+<h3 class="reveal">2. No LIMIT clause on aggregate query</h3>
+<p class="reveal">An aggregate query without a <code>LIMIT</code> that returns an unexpectedly large number of distinct groups as data grows over time.</p>
+
+<h2 id="solution" class="reveal">How to Fix It</h2>
+<h3 class="reveal">Solution 1: Use a SOQL for-loop for large aggregate results</h3>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-comment">// ❌ BAD — fails if more than 2,000 groups</span>
+List&lt;AggregateResult&gt; results = [
+    <span class="code-keyword">SELECT</span> OwnerId, <span class="code-keyword">SUM</span>(Amount) total
+    <span class="code-keyword">FROM</span> Opportunity
+    <span class="code-keyword">GROUP BY</span> OwnerId
+];
+
+<span class="code-comment">// ✅ GOOD — for-loop handles any number of groups</span>
+Map&lt;Id, Decimal&gt; totalByOwner = <span class="code-keyword">new</span> Map&lt;Id, Decimal&gt;();
+<span class="code-keyword">for</span> (AggregateResult ar : [
+    <span class="code-keyword">SELECT</span> OwnerId, <span class="code-keyword">SUM</span>(Amount) total
+    <span class="code-keyword">FROM</span> Opportunity
+    <span class="code-keyword">GROUP BY</span> OwnerId
+]) {{
+    totalByOwner.put(
+        (Id) ar.<span class="code-function">get</span>(<span class="code-string">'OwnerId'</span>),
+        (Decimal) ar.<span class="code-function">get</span>(<span class="code-string">'total'</span>)
+    );
+}}</code></pre>
+</div>
+<h3 class="reveal">Solution 2: Add a LIMIT clause if you only need top results</h3>
+<div class="code-block reveal">
+  <div class="code-block-header">
+    <span class="code-block-lang">Apex</span>
+    <button class="code-copy-btn"><span class="material-symbols-rounded">content_copy</span> Copy</button>
+  </div>
+<pre><code><span class="code-comment">// If you only need the top N groups, add LIMIT</span>
+List&lt;AggregateResult&gt; top10 = [
+    <span class="code-keyword">SELECT</span> OwnerId, <span class="code-keyword">SUM</span>(Amount) total
+    <span class="code-keyword">FROM</span> Opportunity
+    <span class="code-keyword">GROUP BY</span> OwnerId
+    <span class="code-keyword">ORDER BY SUM</span>(Amount) <span class="code-keyword">DESC</span>
+    <span class="code-keyword">LIMIT</span> 10
+];</code></pre>
+</div>
+
+        </div>
+        <aside>
+          <nav class="toc">
+            <h4>On this page</h4>
+            <a href="#what">What does this mean?</a>
+<a href="#causes">Common Causes</a>
+<a href="#solution">How to Fix It</a>
+          </nav>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">
+      <a href="../index.html" class="nav-logo">
+          <div class="nav-logo-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+    <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+  </a>
+ <p>Tools &amp; knowledge for Salesforce developers. Built by developer, for developers.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="../tools.html">Tools</a></li>
+  <li><a href="../errors.html">Errors</a></li><li><a href="../guides.html">Guides</a></li><li><a href="../extensions.html">Extensions</a></li></ul></div>
+<div class="footer-col"><h4>Resources</h4><ul><li><a href="../tips.html">Tips</a></li><li><a href="../resources.html">Resources</a></li></ul></div>
+<div class="footer-col"><h4>Community</h4><ul><li><a href="../about.html">About</a></li></ul></div></div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Salesforce Decoded.</p>
+    <div class="footer-social">
+      <a href="../index.html"><span class="material-symbols-rounded">code</span></a>
+      <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+    </div>
+  </div></div></footer>
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="../js/main.js"></script>
+</body>
+</html>

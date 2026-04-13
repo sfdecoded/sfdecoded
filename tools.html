@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Developer Tools — Salesforce Decoded</title>
+  <meta name="description" content="Free Salesforce developer tools: SOQL Formatter, ID Converter, Apex Code Generator, JSON to Apex, and more. Boost your productivity.">
+  <meta name="keywords" content="salesforce developer tools, soql formatter, salesforce id converter, apex code generator, json to apex">
+  <link rel="canonical" href="https://sfdecoded.netlify.app/tools.html">
+  <link rel="stylesheet" href="css/style.css">
+   <link rel="icon" href="favicons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="favicons/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+ <meta name="google-site-verification" content="3gniyBELCU1msSREXL1_zbMkbXx338IEKrhlrq8x7dQ" />
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5994JVPZ');</script>
+<!-- End Google Tag Manager -->
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5994JVPZ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tools.html" class="active">Tools</a></li>
+        <li><a href="errors.html">Errors</a></li>
+        <li><a href="guides.html">Guides</a></li>
+        <li><a href="tips.html">Tips</a></li>
+        <li><a href="prompts.html">Prompts</a></li>
+        <li><a href="extensions.html">Extensions</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+      <div class="navbar-search" role="button" tabindex="0"><span class="material-symbols-rounded">search</span><span>Search...</span><kbd>⌘K</kbd></div>
+      <button class="navbar-mobile-toggle" aria-label="Toggle menu"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </nav>
+  <div class="mobile-nav">
+    <a href="index.html"><span class="material-symbols-rounded">home</span> Home</a>
+    <a href="tools.html" class="active"><span class="material-symbols-rounded">build</span> Tools</a>
+    <a href="errors.html"><span class="material-symbols-rounded">bug_report</span> Errors</a>
+    <a href="guides.html"><span class="material-symbols-rounded">menu_book</span> Guides</a>
+    <a href="tips.html"><span class="material-symbols-rounded">lightbulb</span> Tips</a>
+    <a href="prompts.html"><span class="material-symbols-rounded">smart_toy</span> Prompts</a>
+    <a href="extensions.html"><span class="material-symbols-rounded">extension</span> Extensions</a>
+    <a href="resources.html"><span class="material-symbols-rounded">folder_open</span> Resources</a>
+    <a href="about.html"><span class="material-symbols-rounded">info</span> About</a>
+  </div>
+  <div class="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap"><span class="material-symbols-rounded">search</span><input type="text" placeholder="Search tools, errors, guides..."></div>
+      <div class="search-results"></div>
+      <div class="search-footer"><span>Type to search</span></div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="overline reveal">
+        <span>Developer Tools</span>
+      </div>
+      <h1 class="display-medium reveal stagger-2">Salesforce Developer Tools</h1>
+      <p class="reveal stagger-3">Free browser-based utilities to format, convert, generate, and explore — designed to save you hours every week.</p>
+    </div>
+  </header>
+
+  <!-- Filter Chips -->
+  <section class="section-sm" style="padding-bottom:0">
+    <div class="container">
+      <div class="chip-group reveal" id="tool-filters">
+        <button class="chip active" data-filter="all">All Tools</button>
+        <button class="chip" data-filter="formatter">Formatters</button>
+        <button class="chip" data-filter="converter">Converters</button>
+        <button class="chip" data-filter="generator">Generators</button>
+        <button class="chip" data-filter="explorer">Explorers</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools Grid -->
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-3" id="tools-grid">
+
+        <a href="tools/soql-formatter.html" class="card-link reveal stagger-1" data-category="formatter">
+          <div class="card">
+            <div class="card-icon"><span class="material-symbols-rounded">code</span></div>
+            <h3>SOQL Formatter</h3>
+            <p>Instantly format and beautify messy SOQL queries with proper indentation and keyword highlighting.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="tag tag-primary">Popular</span>
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="tools/salesforce-id-converter.html" class="card-link reveal stagger-2" data-category="converter">
+          <div class="card">
+            <div class="card-icon" style="background:#fef3c7;color:#92400e"><span class="material-symbols-rounded">swap_horiz</span></div>
+            <h3>Salesforce ID Converter</h3>
+            <p>Convert 15-character IDs to 18-character case-insensitive format. Supports bulk conversion.</p>
+            <div class="mt-16"><span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="tools/apex-code-generator.html" class="card-link reveal stagger-3" data-category="generator">
+          <div class="card">
+            <div class="card-icon" style="background:#dbeafe;color:#1e40af"><span class="material-symbols-rounded">auto_fix_high</span></div>
+            <h3>Apex Code Generator</h3>
+            <p>Generate boilerplate Apex classes, triggers, test classes, batch jobs, and schedulable classes.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="tag tag-primary">New</span>
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="tools/json-to-apex.html" class="card-link reveal stagger-4" data-category="converter">
+          <div class="card">
+            <div class="card-icon" style="background:#d1fae5;color:#065f46"><span class="material-symbols-rounded">transform</span></div>
+            <h3>JSON to Apex Converter</h3>
+            <p>Paste any JSON payload and generate a fully typed Apex wrapper class with deserialization.</p>
+            <div class="mt-16"><span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="tools/salesforce-icon-explorer.html" class="card-link reveal stagger-5" data-category="explorer">
+          <div class="card">
+            <div class="card-icon" style="background:#ede9fe;color:#5b21b6"><span class="material-symbols-rounded">palette</span></div>
+            <h3>Salesforce Icon Explorer</h3>
+            <p>Browse, search, and preview all Salesforce Lightning Design System icons with copy-to-clipboard.</p>
+            <div class="mt-16"><span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="tools/field-dependency-viewer.html" class="card-link reveal stagger-6" data-category="explorer">
+          <div class="card">
+            <div class="card-icon" style="background:#fce7f3;color:#9d174d"><span class="material-symbols-rounded">data_object</span></div>
+            <h3>Field Dependency Viewer</h3>
+            <p>Visualize field-level dependencies, picklist values, and record type mappings across objects.</p>
+            <div class="mt-16"><span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="tools/json-formatter.html" class="card-link reveal" data-category="formatter">
+          <div class="card">
+            <div class="card-icon" style="background:#fff7ed;color:#c2410c"><span class="material-symbols-rounded">data_array</span></div>
+            <h3>JSON Formatter</h3>
+            <p>Pretty-print, minify, and validate JSON responses from Salesforce REST API calls.</p>
+            <div class="mt-16"><span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="tools/test-data-generator.html" class="card-link reveal" data-category="generator">
+          <div class="card">
+            <div class="card-icon" style="background:#f0fdf4;color:#166534"><span class="material-symbols-rounded">description</span></div>
+            <h3>Test Data Generator</h3>
+            <p>Generate realistic test data for Salesforce objects including standard and custom fields.</p>
+            <div class="mt-16"><span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="tools/xml-to-json-converter.html" class="card-link reveal" data-category="converter">
+          <div class="card">
+            <div class="card-icon" style="background:#eef2ff;color:#3730a3"><span class="material-symbols-rounded">compare_arrows</span></div>
+            <h3>XML to JSON Converter</h3>
+            <p>Convert Salesforce metadata XML to readable JSON and vice versa for API integrations.</p>
+            <div class="mt-16"><span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span></div>
+          </div>
+        </a>
+
+        <a href="tools/soql-query-analyzer.html" class="card-link reveal" data-category="analyzer">
+          <div class="card">
+            <div class="card-icon" style="background:#fef2f2;color:#dc2626"><span class="material-symbols-rounded">analytics</span></div>
+            <h3>SOQL Query Analyzer</h3>
+            <p>Analyze SOQL queries for performance issues, non-selectivity, missing indexes, and optimization suggestions.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="tag tag-primary">New</span>
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="tools/cron-expression-builder.html" class="card-link reveal" data-category="generator">
+          <div class="card">
+            <div class="card-icon" style="background:#f3e8ff;color:#7c3aed"><span class="material-symbols-rounded">schedule</span></div>
+            <h3>Cron Expression Builder</h3>
+            <p>Visually create and validate Salesforce scheduled job cron expressions with real-time preview and templates.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="tag tag-primary">New</span>
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="tools/security-audit-checker.html" class="card-link reveal" data-category="analyzer">
+          <div class="card">
+            <div class="card-icon" style="background:#fecaca;color:#991b1b"><span class="material-symbols-rounded">security</span></div>
+            <h3>Security Audit Checker</h3>
+            <p>Scan Apex code for security vulnerabilities, injection risks, hardcoded credentials, and missing CRUD checks.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="tag tag-primary">New</span>
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="tools/lwc-component-builder.html" class="card-link reveal" data-category="generator">
+          <div class="card">
+            <div class="card-icon" style="background:#e0e7ff;color:#3f51b5"><span class="material-symbols-rounded">widgets</span></div>
+            <h3>LWC Component Builder</h3>
+            <p>Visually build Lightning Web Components with drag-drop interface. Generate production-ready HTML, JavaScript, and CSS.</p>
+            <div class="mt-16 flex items-center gap-8">
+              <span class="tag tag-primary">New</span>
+              <span class="material-symbols-rounded text-primary" style="font-size:18px">arrow_forward</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+                <a href="index.html" class="nav-logo">
+              <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+        <div class="navbar-brand-text">Salesforce<span>Decoded</span></div>
+      </a>
+           <p>Tools & knowledge for Salesforce developers. Built by developer, for developers.</p>
+        </div>
+        <div class="footer-col"><h4>Product</h4>
+          <ul>
+            <li><a href="tools.html">Tools</a></li>
+            <li><a href="errors.html">Errors</a></li>
+            <li><a href="guides.html">Guides</a></li>
+            <li><a href="prompts.html">Prompts</a></li>
+            <li><a href="extensions.html">Extensions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Resources</h4>
+          <ul>
+            <li><a href="tips.html">Tips</a></li>
+            <li><a href="resources.html">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col"><h4>Community</h4><ul><li><a href="about.html">About</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Salesforce Decoded.</p>
+        <div class="footer-social">
+          <a href="https://sfdecoded.netlify.app/"><span class="material-symbols-rounded">code</span></a>
+          <a href="mailto:sfdecoded@gmail.com"><span class="material-symbols-rounded">mail</span></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><span class="material-symbols-rounded">arrow_upward</span></button>
+  <script src="js/main.js"></script>
+  <script>initChipFilter('#tool-filters', '#tools-grid .card-link');</script>
+</body>
+</html>
